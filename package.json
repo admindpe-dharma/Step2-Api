@@ -1,0 +1,18 @@
+{
+  "name": "new-sealable",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "type": "module",
+  "scripts": {
+    "start": "nodemon index.js",
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "author": "",
+  "license": "ISC",
+  "dependencies": {
+    "ethernet-ip": "^1.2.5",
+    "express": "^4.19.2",
+    "modbus-serial": "^8.0.16"
+  }
+}
