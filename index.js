@@ -1,7 +1,7 @@
 import ModbusRTU from 'modbus-serial';
 import {SerialPort} from 'serialport'
 
-/* const client = new ModbusRTU();
+const client = new ModbusRTU();
 client.connectRTU("/dev/ttyUSB0", { baudRate: 9600 })
   .then(() => {
     console.log("Connected to PLC via Modbus RTU over USB.");
@@ -10,24 +10,45 @@ client.connectRTU("/dev/ttyUSB0", { baudRate: 9600 })
   .catch((err) => {
     console.error("Error connecting to PLC:", err);
   });
- */
  
-  const port = new SerialPort({
-    path: '/dev/tty-usbserial0',
+const Timbangan = new SerialPort({
+    path: '/dev/ttyUSB1',
     baudRate: 9600,
     dataBits: 8,
     stopBits: 1,
     parity: 'none',
     });
 
-port.on('open', () => {
+Timbangan.on('open', () => {
   console.log('Serial port terhubung');
 });
 
-port.on('data', (data) => {
+Timbangan.on('data', (data) => {
   console.log('Data Timbangan:', data.toString());
+
 });
 
-port.on('error', (err) => {
+Timbangan.on('error', (err) => {
   console.error('Error:', err.message);
+});
+
+const Timbangan_1 = new SerialPort({
+  path: '/dev/ttyUSB2',
+  baudRate: 9600,
+  dataBits: 8,
+  stopBits: 1,
+  parity: 'none',
+  });
+
+Timbangan_1.on('open', () => {
+console.log('Serial port terhubung');
+});
+
+Timbangan_1.on('data', (data) => {
+console.log('Data Timbangan 2 :', data.toString());
+
+});
+
+Timbangan_1.on('error', (err) => {
+console.error('Error:', err.message);
 });
