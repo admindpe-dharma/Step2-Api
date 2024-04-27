@@ -18,19 +18,15 @@ const Timbangan = new SerialPort({
     stopBits: 1,
     parity: 'none',
     });
-function readtimbangan() {
+
   Timbangan.on('open', () => {
     console.log('Timbangan Terhubung terhubung');
-    readtimbangan();
   });
-}
 
-function readSerialData() {
+
   Timbangan.on('data', (data) => {
     console.log('Data Timbangan:', data.toString());
-    readSerialData(); // Panggil fungsi kembali untuk membaca data selanjutnya
   });
-}
 
 Timbangan.on('error', (err) => {
   console.error('Error:', err.message);
@@ -49,10 +45,11 @@ console.log('Timbangan 1 terhubung');
 });
 
 Timbangan_1.on('data', (data) => {
-console.log('Data Timbangan 2 :', data.toString());
+console.log('Data Timbangan 1 :', data.toString());
 
 });
 
 Timbangan_1.on('error', (err) => {
 console.error('Error:', err.message);
 });
+
