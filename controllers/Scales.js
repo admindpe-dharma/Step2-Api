@@ -17,7 +17,7 @@ export const getScales4Kg = async (res) => {
             const match = data.toString().match(/WT:(\d+\.\d+)g/);
             if (match) {
                 const weight = match[1];
-                console.log('Berat Timbangan:', weight, 'gram');
+                /* console.log('Berat Timbangan:', weight, 'gram'); */
                 // Kirim data yang diterima sebagai respons ke client
                 response = { weight: parseFloat(weight) }; // Mengubah string berat menjadi angka float
                 // Pastikan Anda masih memiliki akses ke objek res di sini
