@@ -3,7 +3,7 @@ import ModbusRTU from 'modbus-serial';
 import {SerialPort} from 'serialport'
 import ScalesRoute from "./routes/ScalesRoute.js";
 
-
+const port = 5000;
 const app = express();
 
 app.use(ScalesRoute);
@@ -49,4 +49,13 @@ console.log('Timbangan 1 terhubung');
 Timbangan_1.on('error', (err) => {
 console.error('Error:', err.message);
 });
+
+app.listen(port, () => {
+  console.log(`Server up and running on port ${port}`);
+});
+
+app.use(cors({
+  credentials: true,
+  origin: 'http://localhost:3000'
+}));
 
