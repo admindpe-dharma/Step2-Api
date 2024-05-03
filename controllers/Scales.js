@@ -1,5 +1,6 @@
 import {SerialPort} from 'serialport';
 
+
 export const getScales4Kg = async (res) => {
     try {
         let response;
@@ -13,12 +14,16 @@ export const getScales4Kg = async (res) => {
             });
 
         Timbangan.on('data', (data) => {
-            console.log('Data Timbangan:', data.toString());
-            // Kirim data yang diterima sebagai respons ke client
-            response = { data: data.toString() };
-            // Pastikan Anda masih memiliki akses ke objek res di sini
-            if (res && typeof res.status === 'function') {
-                res.status(200).json(response);
+            const match = data.toString().match(/WT:(\d+\.\d+)g/);
+            if (match) {
+                const weight = match[1];
+                console.log('Berat Timbangan:', weight, 'gram');
+                // Kirim data yang diterima sebagai respons ke client
+                response = { weight: parseFloat(weight) }; // Mengubah string berat menjadi angka float
+                // Pastikan Anda masih memiliki akses ke objek res di sini
+                if (res && typeof res.status === 'function') {
+                    res.status(200).json(response);
+                }
             }
         });
 
@@ -26,7 +31,8 @@ export const getScales4Kg = async (res) => {
         await new Promise((resolve) => setTimeout(resolve, 1000));
 
         // Kirim pesan respons awal ke client
-        if (res && typeof res.status === 'function') {
+        // Hanya kirim jika ada respons yang sudah diatur sebelumnya
+        if (response && res && typeof res.status === 'function') {
             res.status(200).json(response);
         }
     } catch (error) {
