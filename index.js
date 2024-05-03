@@ -31,6 +31,14 @@ const Timbangan = new SerialPort({
     console.log('Timbangan Terhubung');
   });
 
+  Timbangan.on('data', (data) => {
+    const match = data.toString().match(/WT:(\d+\.\d+)g/);
+    if (match) {
+      const weight = match[1];
+      console.log('Berat Timbangan:', weight, 'gram');
+    }
+  });
+
 Timbangan.on('error', (err) => {
   console.error('Error:', err.message);
 });
