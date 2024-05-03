@@ -10,29 +10,23 @@ export const getScales4Kg = async (res) => {
             dataBits: 8,
             stopBits: 1,
             parity: 'none',
-            });        
+            });
+        
 
         Timbangan.on('data', (data) => {
             console.log('Data Timbangan:', data.toString());
             // Kirim data yang diterima sebagai respons ke client
             response = { data: data.toString() };
-            // Pastikan Anda masih memiliki akses ke objek res di sini
-            if (res && typeof res.status === 'function') {
-                res.status(200).json(response);
-            }
+            res.status(200).json(response);
         });
 
         // Menggunakan promise untuk memberikan waktu
         await new Promise((resolve) => setTimeout(resolve, 1000));
 
         // Kirim pesan respons awal ke client
-        if (res && typeof res.status === 'function') {
-            res.status(200).json(response);
-        }
+        res.status(200).json(response);
     } catch (error) {
-        if (res && typeof res.status === 'function') {
-            res.status(500).json({ msg: error.message });
-        }
+        res.status(500).json({ msg: error.message });
     }
 };
 
