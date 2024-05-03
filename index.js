@@ -2,6 +2,7 @@ import express from "express";
 import ModbusRTU from 'modbus-serial';
 import {SerialPort} from 'serialport'
 import ScalesRoute from "./routes/ScalesRoute.js";
+import cors from  "cors";
 
 const port = 5000;
 const app = express();
