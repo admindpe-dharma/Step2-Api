@@ -4,12 +4,13 @@ export const getScales4Kg = async (res) => {
     try {
         let response;
 
-        const Timbangan = new SerialPort('/dev/ttyUSB0', {
+        const Timbangan = new SerialPort({
+            path: '/dev/ttyUSB0',
             baudRate: 9600,
             dataBits: 8,
             stopBits: 1,
             parity: 'none',
-        });
+            });        
 
         Timbangan.on('data', (data) => {
             console.log('Data Timbangan:', data.toString());
