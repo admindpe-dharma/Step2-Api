@@ -19,7 +19,7 @@ client.connectRTU("/dev/ttyUSB0", { baudRate: 9600 })
     console.error("Error connecting to PLC:", err);
   });
   */
-const Timbangan = new SerialPort({
+/* const Timbangan = new SerialPort({
     path: '/dev/ttyUSB0',
     baudRate: 9600,
     dataBits: 8,
@@ -41,7 +41,7 @@ const Timbangan = new SerialPort({
 
 Timbangan.on('error', (err) => {
   console.error('Error:', err.message);
-});
+}); */
 
 const Timbangan_1 = new SerialPort({
   path: '/dev/ttyUSB1',
