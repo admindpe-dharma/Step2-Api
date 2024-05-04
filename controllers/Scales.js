@@ -1,48 +1,54 @@
-import {SerialPort} from 'serialport';
+import { SerialPort } from 'serialport';
+import { Server } from 'socket.io';
+import http from 'http';
 
 
-export const getScales4Kg = async (res) => {
+const Timbangan = new SerialPort({
+    path: 'COM8',
+    baudRate: 9600,
+    dataBits: 8,
+    stopBits: 1,
+    parity: 'none',
+    });
+
+Timbangan.on('error', (error) => {
+    console.log(error);
+});
+
+export const getScales4Kg = /*async*/ (io/*req, res, next*/) => {
     try {
         let response;
 
-        const Timbangan = new SerialPort({
-            path: '/dev/ttyUSB0',
-            baudRate: 9600,
-            dataBits: 8,
-            stopBits: 1,
-            parity: 'none',
-            });
+    /*     setInterval(function(){
+            let rnd = Math.floor(Math.random() * 100);
+            console.log(rnd);
+            io.emit('data',{weight: parseFloat(rnd.toString())});
+        },1000); */
 
         Timbangan.on('data', (data) => {
             const match = data.toString().match(/WT:(\d+\.\d+)g/);
+           /*  console.log(data.toString()); */
             if (match) {
                 const weight = match[1];
                 /* console.log('Berat Timbangan:', weight, 'gram'); */
                 // Kirim data yang diterima sebagai respons ke client
                 response = { weight: parseFloat(weight) }; // Mengubah string berat menjadi angka float
-                // Pastikan Anda masih memiliki akses ke objek res di sini
-                if (res && typeof res.status === 'function') {
-                    res.status(200).json(response);
-                }
+                io.emit('data', parseFloat(weight));
             }
         });
-
-        // Menggunakan promise untuk memberikan waktu
-        await new Promise((resolve) => setTimeout(resolve, 1000));
+      
 
         // Kirim pesan respons awal ke client
         // Hanya kirim jika ada respons yang sudah diatur sebelumnya
-        if (response && res && typeof res.status === 'function') {
+        if (response != undefined && response != null) {
             res.status(200).json(response);
         }
     } catch (error) {
-        if (res && typeof res.status === 'function') {
-            res.status(500).json({ msg: error.message });
-        }
+        res.status(500).json({ msg: error.message });
     }
 };
 
-export const getScales50Kg = async (res) => {
+export const getScales50Kg = async (req, res) => {
     try {
         let response;
 
@@ -58,6 +64,10 @@ export const getScales50Kg = async (res) => {
             // Kirim data yang diterima sebagai respons ke client
             response = { data: data.toString() };
             res.status(200).json(response);
+        });
+
+        Timbangan_1.on('error', (error) => {
+            console.log(error);
         });
 
         // Menggunakan promise untuk memberikan waktu
