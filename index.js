@@ -3,7 +3,7 @@ import ScalesRoute from "./routes/ScalesRoute.js";
 import cors from  "cors";
 import http from 'http';
 import { Server } from "socket.io";
-import { getScales4Kg } from "./controllers/Scales.js";
+import { getScales4Kg ,getScales50Kg} from "./controllers/Scales.js";
 
 const app = express();
 const server = http.createServer(app);
@@ -37,3 +37,4 @@ server.listen(port, () => {
   console.log(`Server up and running on port ${port}`);
 });
 getScales4Kg(io);
+getScales50Kg(io);
