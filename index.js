@@ -1,5 +1,7 @@
 import express from "express";
 import ScalesRoute from "./routes/ScalesRoute.js";
+import ScannerRoute from "./routes/ScannerRoute.js";
+import db from "./config/db.js";
 import cors from  "cors";
 import http from 'http';
 import { Server } from "socket.io";
@@ -21,9 +23,19 @@ const io = new Server(server, {
   }
 });
 
+try {
+  await db.authenticate();
+  console.log('Database terhubung..');
+  
+} catch (error) {
+  console.error(error);
+  
+}
+
 export { Server, io };
 
 app.use(ScalesRoute);
+app.use(ScannerRoute);
 
 /* io.on('connection', (socket) => {
   console.log('Client connected');

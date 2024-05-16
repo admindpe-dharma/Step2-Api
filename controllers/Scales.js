@@ -1,7 +1,7 @@
 import { SerialPort } from 'serialport';
 
 const Timbangan = new SerialPort({
-    path: 'COM7',
+    path: '/dev/ttyUSB0',
     baudRate: 9600,
     dataBits: 8,
     stopBits: 1,
@@ -9,7 +9,7 @@ const Timbangan = new SerialPort({
     }); 
 
 const Timbangan_1 = new SerialPort({
-        path: 'COM6',
+        path: '/dev/ttyUSB1',
         baudRate: 9600,
         dataBits: 8,
         stopBits: 1,
@@ -61,6 +61,6 @@ export const getScales50Kg =(io) => {
             res.status(200).json(response);
         }
     } catch (error) {
-        res.status(500).json({ msg: error.message });
+    /  res.status(500).json({ msg: error.message });
     }
 };
