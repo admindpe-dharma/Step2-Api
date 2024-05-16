@@ -61,6 +61,6 @@ export const getScales50Kg =(io) => {
             res.status(200).json(response);
         }
     } catch (error) {
-    /  res.status(500).json({ msg: error.message });
+      res.status(500).json({ msg: error.message });
     }
 };
