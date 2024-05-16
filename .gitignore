@@ -1,5 +1,4 @@
 node_modules
 request.rest
 login.rest
-config
 .env
