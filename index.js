@@ -6,6 +6,7 @@ import cors from  "cors";
 import http from 'http';
 import { Server } from "socket.io";
 import { getScales4Kg ,getScales50Kg} from "./controllers/Scales.js";
+import bodyParser from "body-parser";
 
 const app = express();
 const server = http.createServer(app);
@@ -22,6 +23,8 @@ const io = new Server(server, {
     origin: "http://localhost:3000"
   }
 });
+
+app.use(bodyParser.json());
 
 try {
   await db.authenticate();
