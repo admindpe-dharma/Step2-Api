@@ -6,26 +6,33 @@ const Timbangan = new SerialPort({
     dataBits: 8,
     stopBits: 1,
     parity: 'none',
-    }); 
+});
 
 const Timbangan_1 = new SerialPort({
-        path: '/dev/ttyUSB1',
-        baudRate: 9600,
-        dataBits: 8,
-        stopBits: 1,
-        parity: 'none',
-        }); 
+    path: '/dev/ttyUSB1',
+    baudRate: 9600,
+    dataBits: 8,
+    stopBits: 1,
+    parity: 'none',
+});
 
 Timbangan.on('error', (error) => {
     console.log(error);
 });
 
-export const getScales4Kg =(io) => {
+export const getScales4Kg = (io) => {
     try {
         let response;
+        console.log("start reading scale4kg");
+        io.on('connectScale', () => {
+            console.log("reconnect scale");
+            Timbangan.open(() => {
+                console.log("opening port");
+            });
+        });
         Timbangan.on('data', (data) => {
             const match = data.toString().match(/WT:(\d+\.\d+)g/);
-           /*  console.log(data.toString()); */
+            /*  console.log(data.toString()); */
             if (match) {
                 const weight = match[1];
                 console.log('Berat Timbangan 4kg :', weight, 'gram');
@@ -33,59 +40,55 @@ export const getScales4Kg =(io) => {
                 io.emit('data', response);
             }
         });
-      
-        if (response != undefined && response != null) {
-            res.status(200).json(response);
-        }
     } catch (error) {
-        res.status(500).json({ msg: error.message });
+            console.log(error);
+//        res.status(500).json({ msg: error.message });
     }
 };
-let currentWeight=0;
+let currentWeight = 0;
 let holdDelay = false;
-export const getScales50Kg =(io) => {
+export const getScales50Kg = (io) => {
     try {
-         let response;
-       /* console.log("TEt");
-        setInterval(function(){
-            response = { weight50Kg: 20 };
-            io.emit('data', response);
-        },5000); */
-        io.on('connectScale',()=>{
+        let response;
+        console.log("start reading scale50kg");
+        /* console.log("TEt");
+         setInterval(function(){
+             response = { weight50Kg: 20 };
+             io.emit('data', response);
+         },5000); */
+        io.on('connectScale', () => {
             console.log("reconnect scale");
-            Timbangan.open(()=>{
+            Timbangan_1.open(() => {
                 console.log("opening port");
             });
         });
         Timbangan_1.on('data', (rawData) => {
-           // console.log('Data Timbangan:', weight50Kg.toString());
+            // console.log('Data Timbangan:', weight50Kg.toString());
             // Kirim data yang diterima sebagai respons ke clien
-	  console.log('timbangan 50kg',rawData.toString());
-	    const data = parseFloat(rawData.toString().replace("=","")).toString();
-	 // console.log(data);
-	    let res='';
-	    const point = data.indexOf(".");
-            for (let i=data.length-1;i>=0;i--)
-    	    {
-        	if (((data.length-1) - i) == point)
-            		res += ".";
-        	if (parseInt(data[i]))
-            		res += data[i];
-	    }
-	    const parsed = parseFloat(res.toString());
-//            if ( Math.abs(currentWeight - parsed) < 0.5)
-//		return;
-	    /*if (holdDelay && (currentWeight > parsed))
-		return;
-	    if (!holdDelay)
-	    {
-		holdDelay=  true;
-		setTimeout(()=>{
-			holdDelay=false;
-	        },500);
-	    }*/
-	    currentWeight = parsed;
-            response = { weight50Kg: res.toString() };
+            console.log('timbangan 50kg', rawData.toString());
+            const data = parseFloat(rawData.toString().replace("=", "")).toString();
+            // console.log(data);
+            let res = '';
+            const point = data.indexOf(".");
+            for (let i = data.length - 1; i >= 0; i--) {
+                if (((data.length - 1) - i) == point)
+                    res += ".";
+                if (parseInt(data[i]))
+                    res += data[i];
+            }
+            const parsed = parseFloat(res.toString());
+            //            if ( Math.abs(currentWeight - parsed) < 0.5)
+            //		return;
+            /*if (holdDelay && (currentWeight > parsed))
+            return;
+            if (!holdDelay)
+            {
+            holdDelay=  true;
+            setTimeout(()=>{
+                holdDelay=false;
+                },500);
+            }*/
+            response = { weight50Kg: parsed };
             io.emit('data1', response);
         });
 
@@ -96,7 +99,7 @@ export const getScales50Kg =(io) => {
             res.status(200).json(response);
         }
     } catch (error) {
-	console.log(error);
-//      res.status(500).json({ msg: error.message });
+        console.log(error);
+        //      res.status(500).json({ msg: error.message });
     }
 };
