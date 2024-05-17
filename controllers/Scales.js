@@ -57,7 +57,7 @@ export const getScales50Kg =(io) => {
                 console.log("opening port");
             });
         });
-        Timbangan_1.on('data1', (rawData) => {
+        Timbangan_1.on('data', (rawData) => {
            // console.log('Data Timbangan:', weight50Kg.toString());
             // Kirim data yang diterima sebagai respons ke clien
 	  console.log(rawData.toString());
@@ -75,7 +75,7 @@ export const getScales50Kg =(io) => {
 	    const parsed = parseFloat(res.toString());
 //            if ( Math.abs(currentWeight - parsed) < 0.5)
 //		return;
-	    if (holdDelay && (currentWeight > parsed))
+	    /*if (holdDelay && (currentWeight > parsed))
 		return;
 	    if (!holdDelay)
 	    {
@@ -83,10 +83,10 @@ export const getScales50Kg =(io) => {
 		setTimeout(()=>{
 			holdDelay=false;
 	        },500);
-	    }
+	    }*/
 	    currentWeight = parsed;
             response = { weight50Kg: res.toString() };
-            io.emit('data', response);
+            io.emit('data1', response);
         });
 
         Timbangan.on('error', (error) => {
