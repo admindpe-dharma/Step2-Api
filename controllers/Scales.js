@@ -32,7 +32,7 @@ export const getScales4Kg = (io) => {
         });
         Timbangan.on('data', (data) => {
             const match = data.toString().match(/WT:(\d+\.\d+)g/);
-            /*  console.log(data.toString()); */
+              console.log({"4kg":data.toString()}); 
             if (match) {
                 const weight = match[1];
                 console.log(['Berat Timbangan 4kg :', weight, 'gram']);
