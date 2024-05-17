@@ -1,7 +1,7 @@
 
 import { Sequelize } from "sequelize";
 
-const db = new Sequelize('Sealable','pcs','123456',{
+const db = new Sequelize('new-sealable','root','',{
     host: "localhost",
     dialect: "mysql"
 });

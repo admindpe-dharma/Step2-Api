@@ -5,7 +5,7 @@ import db from "./config/db.js";
 import cors from  "cors";
 import http from 'http';
 import { Server } from "socket.io";
-import { getScales4Kg ,getScales50Kg} from "./controllers/Scales.js";
+//import { getScales4Kg ,getScales50Kg} from "./controllers/Scales.js";
 import bodyParser from "body-parser";
 
 const app = express();
@@ -51,5 +51,5 @@ app.use(ScannerRoute);
 server.listen(port, () => {
   console.log(`Server up and running on port ${port}`);
 });
-getScales4Kg(io);
-getScales50Kg(io);
+//getScales4Kg(io);
+//getScales50Kg(io);
