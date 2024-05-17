@@ -51,7 +51,13 @@ export const getScales50Kg =(io) => {
             response = { weight50Kg: 20 };
             io.emit('data', response);
         },5000); */
-        Timbangan.on('data', (rawData) => {
+        io.on('connectScale',()=>{
+            console.log("reconnect scale");
+            Timbangan.open(()=>{
+                console.log("opening port");
+            });
+        });
+        Timbangan_1.on('data1', (rawData) => {
            // console.log('Data Timbangan:', weight50Kg.toString());
             // Kirim data yang diterima sebagai respons ke clien
 	  // console.log(rawData.toString());
