@@ -35,7 +35,7 @@ export const getScales4Kg = (io) => {
             /*  console.log(data.toString()); */
             if (match) {
                 const weight = match[1];
-                console.log('Berat Timbangan 4kg :', weight, 'gram');
+                console.log(['Berat Timbangan 4kg :', weight, 'gram']);
                 response = { weight: parseFloat(weight) };
                 io.emit('data', response);
             }
