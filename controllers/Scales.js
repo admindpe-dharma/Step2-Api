@@ -60,7 +60,7 @@ export const getScales50Kg =(io) => {
         Timbangan_1.on('data1', (rawData) => {
            // console.log('Data Timbangan:', weight50Kg.toString());
             // Kirim data yang diterima sebagai respons ke clien
-	  // console.log(rawData.toString());
+	  console.log(rawData.toString());
 	    const data = parseFloat(rawData.toString().replace("=","")).toString();
 	 // console.log(data);
 	    let res='';
