@@ -4,7 +4,7 @@ import db from "../config/db.js";
 const { DataTypes } = Sequelize;
 
 const waste = db.define('waste', {
-    wasteId: {
+    Id: {
         type: DataTypes.INTEGER,
         allowNull: false,
         primaryKey:true

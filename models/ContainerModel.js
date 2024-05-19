@@ -19,7 +19,7 @@ const container = db.define('container', {
 });
 
 
-Waste.hasMany(container, { foreignKey: 'Idwaste', as: 'container' });
-container.belongsTo(Waste, { foreignKey: 'Idwaste', as: 'waste' });
+Waste.hasMany(container, { foreignKey: 'IdWaste', as: 'container' });
+container.belongsTo(Waste, { foreignKey: 'IdWaste', as: 'waste' });
 
 export default container;

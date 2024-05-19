@@ -14,20 +14,25 @@ const bin = db.define('bin', {
         type: DataTypes.STRING,
     },
     weight: {
-        type: DataTypes.DECIMAL,
+        type: DataTypes.INTEGER,
     },
     IdWaste: {
-        type: DataTypes.INTEGER
+        type: DataTypes.INTEGER,
+        allowNull: true
     },
     max_weight: {
         type:DataTypes.DECIMAL,
+    },
+    name_hostname: {
+        type:DataTypes.STRING,
     }
+
 }, {
     freezeTableName: true,
     timestamps:false
 });
 
-waste.hasMany(bin, { foreignKey: 'Idwaste', as: 'bin' });
-bin.belongsTo(waste, { foreignKey: 'Idwaste', as: 'waste' });
+waste.hasMany(bin, { foreignKey: 'IdWaste', as: 'bin' });
+bin.belongsTo(waste, { foreignKey: 'IdWaste', as: 'waste' });
 
 export default bin;

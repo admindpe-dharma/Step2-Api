@@ -2,6 +2,8 @@ import Users from "../models/EmployeeModel.js"
 import Container from "../models/ContainerModel.js";
 import Waste from "../models/WasteModel.js";
 import Bin from "../models/BinModel.js";
+import transaction from "../models/TransactionModel.js"
+import moment from 'moment';
 
 export const ScanBadgeid = async (req, res) => {
     console.log(req.body);
@@ -57,13 +59,13 @@ export const ScanContainer = async (req, res) => {
 };
 
 export const CheckBinCapacity = async (req, res) => {
-    const { Idwaste, neto } = req.body;
-
+    const { IdWaste, neto } = req.body;
+console.log(IdWaste);
     try {
         // Mengambil semua tempat sampah yang sesuai dengan type_waste dari database
         const bins = await Bin.findAll({
             where: {
-                Idwaste: Idwaste
+                IdWaste: IdWaste
             }
         });
 
@@ -92,4 +94,21 @@ export const CheckBinCapacity = async (req, res) => {
         res.status(500).json({ success: false, message: 'Internal Server Error' });
     }
 };
+
+export const SaveTransaksi = async (req,res) => {
+    const {payload} = req.body;
+    payload.recordDate = moment().format("YYYY-MM-DD HH:mm:ss");
+    console.log(payload);
+    (await transaction.create(payload)).save();
+    res.status(200).json({msg:'ok'});
+};
+
+export const UpdateBinWeight = async (req,res) =>{
+    const {binId,neto} = req.body;
+    const data = await Bin.findOne({where: {id:binId}});
+    data.weight = parseFloat(neto) + parseFloat(data.weight);
+    data.save();
+   // await switchLamp(data.id,"RED",data.weight >= parseFloat(data.max_weight))
+    res.status(200).json({msg:'ok'});
+}
 
