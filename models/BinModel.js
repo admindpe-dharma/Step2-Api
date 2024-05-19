@@ -16,7 +16,7 @@ const bin = db.define('bin', {
     weight: {
         type: DataTypes.DECIMAL,
     },
-    Idwaste: {
+    IdWaste: {
         type: DataTypes.INTEGER
     },
     max_weight: {
