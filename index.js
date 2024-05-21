@@ -13,7 +13,7 @@ const server = http.createServer(app);
 
 const port = 5000;
 
-app.use(cors({
+/* app.use(cors({
   origin: '*', // Allow any origin
   methods: ['GET', 'POST', 'PUT', 'DELETE'], // Allow specific HTTP methods
   allowedHeaders: ['Content-Type', 'Authorization'], // Allow specific headers
@@ -22,6 +22,17 @@ app.use(cors({
 const io = new Server(server, {
   cors: {
     origin: "*"
+  }
+}); */
+
+app.use(cors({
+  credentials: true,
+  origin: 'http://localhost:3000'
+}));
+
+const io = new Server(server, {
+  cors: {
+    origin: "http://localhost:3000"
   }
 });
 
