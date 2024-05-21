@@ -13,19 +13,19 @@ const server = http.createServer(app);
 
 const port = 5000;
 
-/* app.use(cors({
+ app.use(cors({
   origin: '*', // Allow any origin
   methods: ['GET', 'POST', 'PUT', 'DELETE'], // Allow specific HTTP methods
-  allowedHeaders: ['Content-Type', 'Authorization'], // Allow specific headers
+/*  allowedHeaders: ['Content-Type', 'Authorization'], // Allow specific headers*/
   credentials:false 
 }));
 const io = new Server(server, {
   cors: {
     origin: "*"
   }
-}); */
+}); 
 
-app.use(cors({
+/*app.use(cors({
   credentials:false,
   origin: '*'
 }));
@@ -34,7 +34,7 @@ const io = new Server(server, {
   cors: {
     origin: "*"
   }
-});
+});*/
 
 app.use(bodyParser.json());
 
