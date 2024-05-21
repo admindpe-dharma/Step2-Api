@@ -5,8 +5,9 @@ import Bin from "../models/BinModel.js";
 import transaction from "../models/TransactionModel.js"
 import moment from 'moment';
 
+
 export const ScanBadgeid = async (req, res) => {
-    console.log(req.body);
+    console.log(req);
     const { badgeId } = req.body;
     try {
         const user = await Users.findOne({ attributes: ['badgeId',"username"], where: { badgeId } });
@@ -25,7 +26,7 @@ export const ScanContainer = async (req, res) => {
     const { containerId } = req.body;
     try {
         const container = await Container.findOne({
-            attributes: ['containerId', 'name', 'station', 'weightbin', 'IdWaste'],
+            attributes: ['containerId', 'name', 'station', 'weightbin', 'IdWaste','type'],
             include: [
                 {
                     model: Waste,
@@ -39,7 +40,7 @@ export const ScanContainer = async (req, res) => {
                     as: 'bin',
                     required: true,
                     duplicating: false,
-                    attributes: ['name', 'id', 'IdWaste']
+                    attributes: ['name', 'id', 'IdWaste','name_hostname']
                 }
                     ]
                 }
@@ -111,4 +112,22 @@ export const UpdateBinWeight = async (req,res) =>{
    // await switchLamp(data.id,"RED",data.weight >= parseFloat(data.max_weight))
     res.status(200).json({msg:'ok'});
 }
+
+export const UpdateBinWeightCollection = async (req, res) => {
+    const { binId } = req.body; // neto is not needed as weight will be set to 0
+    const data = await Bin.findOne({ where: { id: binId } });
+    
+    if (data) {
+        data.weight = 0; // Set weight to 0
+        await data.save();
+        res.status(200).json({ msg: 'ok' });
+    } else {
+        res.status(404).json({ msg: 'Bin not found' });
+    }
+};
+
+/* export const Hostname = async (res) => {
+    const hostname = os.hostname();
+    res.status(200).json({ hostname });
+} */
 
