@@ -26,7 +26,7 @@ const io = new Server(server, {
 }); */
 
 app.use(cors({
-  credentials:false
+  credentials:false,
   origin: 'http://localhost:3000'
 }));
 
