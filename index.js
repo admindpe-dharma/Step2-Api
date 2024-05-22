@@ -7,7 +7,7 @@ import http from 'http';
 import { Server } from "socket.io";
 //import { getScales4Kg ,getScales50Kg} from "./controllers/Scales.js";
 import bodyParser from "body-parser";
-
+import getWeightBin from "./controllers/Bin.js"
 const app = express();
 const server = http.createServer(app);
 
@@ -19,22 +19,17 @@ const port = 5000;
 /*  allowedHeaders: ['Content-Type', 'Authorization'], // Allow specific headers*/
   credentials:false 
 }));
-const io = new Server(server, {
-  cors: {
-    origin: "*"
-  }
-}); 
 
-/*app.use(cors({
+/* app.use(cors({
   credentials:false,
   origin: '*'
-}));
+})); */
 
 const io = new Server(server, {
   cors: {
     origin: "*"
   }
-});*/
+});
 
 app.use(bodyParser.json());
 
@@ -52,16 +47,11 @@ export { Server, io };
 app.use(ScalesRoute);
 app.use(ScannerRoute);
 
-/* io.on('connection', (socket) => {
-  console.log('Client connected');
 
-  socket.on('disconnect', () => {
-    console.log('Client disconnected');
-  });
-}); */
-
+getWeightBin(io);
 server.listen(port, () => {
   console.log(`Server up and running on port ${port}`);
 });
 //getScales4Kg(io);
 //getScales50Kg(io);
+getWeightBin(io);

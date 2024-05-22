@@ -65,7 +65,7 @@ Timbangan.on('error', (error) => {
             // console.log('Data Timbangan:', weight50Kg.toString());
             // Kirim data yang diterima sebagai respons ke clien
             console.log('timbangan 50kg', rawData.toString());
-            const data = parseFloat(rawData.toString().replace("=", "")).toString();
+            const data = parseFloat(rawData.toString().replace("+", "")).toString();
             // console.log(data);
             let res = '';
             const point = data.indexOf(".");
