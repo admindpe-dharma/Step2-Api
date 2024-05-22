@@ -5,6 +5,7 @@ export const getWeightBin = async (io) => {
     try {
         io.on('getWeightBin',async (hostname)=>{
             const bin = await Bin.findOne({ where: { name_hostname: hostname } });
+            console.log({bin:bin,hostname:hostname});
             let payload = {};
             if (bin) {
                 payload = { weight: bin.weight };
