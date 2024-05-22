@@ -22,8 +22,8 @@ const transaction = db.define('transaction', {
     IdWaste  : {
         type: DataTypes.INTEGER,
     },
-    neto   : {
-        type: DataTypes.INTEGER,
+    type   : {
+        type: DataTypes.STRING,
         allowNull: true  
     },
    recordDate: {
