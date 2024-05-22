@@ -10,7 +10,7 @@ import bodyParser from "body-parser";
 import {getWeightBin} from "./controllers/Bin.js"
 const app = express();
 const server = http.createServer(app);
-
+const clientList= [];
 const port = 5000;
 
  app.use(cors({
@@ -50,10 +50,16 @@ app.use(ScannerRoute);
 io.on('connection',(socket)=>{
 //  console.log("listening socket.io");
 getWeightBin(socket);
+socket.on('disconnect',()=>{
+    clientList.splice(clientList.findIndex(v=>v.id==socket.id),1);
+    console.log(clientList);
+});
+
 });
 server.listen(port, () => {
   console.log(`Server up and running on port ${port}`);
 });
+export {clientList,io};
 //getScales4Kg(io);
 //getScales50Kg(io);
 //getWeightBin(io);
