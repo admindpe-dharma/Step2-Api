@@ -47,8 +47,10 @@ export { Server, io };
 app.use(ScalesRoute);
 app.use(ScannerRoute);
 
-
+io.on('connection',()=>{
+  console.log("listening socket.io");
 getWeightBin(io);
+});
 server.listen(port, () => {
   console.log(`Server up and running on port ${port}`);
 });
