@@ -17,6 +17,8 @@ export const getWeightBin =  (socket) => {
 
 export const updateBinWeightData = async (hostname)=>{
     const _id = clientList.find(x=>x.hostname==hostname);
+    console.log("Update " +hostname);
+    console.log(clientList);
     console.log(_id);
     const bin = await Bin.findOne({ where: { name_hostname: hostname } });
     console.log({bin:bin,hostname:hostname});
