@@ -8,7 +8,6 @@ import { updateBinWeightData } from "./Bin.js";
 
 
 export const ScanBadgeid = async (req, res) => {
-    console.log(req);
     const { badgeId } = req.body;
     try {
         const user = await Users.findOne({ attributes: ['badgeId',"username"], where: { badgeId } });

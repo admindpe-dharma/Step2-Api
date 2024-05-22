@@ -2,7 +2,6 @@ import { clientList, io } from "../index.js";
 import Bin from "../models/BinModel.js";
 
 export const getWeightBin =  (socket) => {
-    //console.log(req);
     try {
         socket.on('getWeightBin',async (hostname)=>{
             clientList.push({id:socket.id,hostname:hostname});
@@ -21,7 +20,7 @@ export const updateBinWeightData = async (hostname)=>{
     console.log(clientList);
     console.log(_id);
     const bin = await Bin.findOne({ where: { name_hostname: hostname } });
-    console.log({bin:bin,hostname:hostname});
+    console.log({hostname:hostname});
     let payload = {};
     if (bin) {
         payload = { weight: bin.weight };
