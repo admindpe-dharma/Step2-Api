@@ -4,8 +4,8 @@ import Bin from "../models/BinModel.js";
 export const getWeightBin =  (socket) => {
     //console.log(req);
     try {
-        socket.on('getWeightBin',async (hostname,id)=>{
-            clientList.push({id:id,hostname:hostname});
+        socket.on('getWeightBin',async (hostname)=>{
+            clientList.push({id:socket.id,hostname:hostname});
             console.log(clientList);
             await updateBinWeightData(hostname);
         });
