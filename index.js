@@ -7,7 +7,7 @@ import http from 'http';
 import { Server } from "socket.io";
 //import { getScales4Kg ,getScales50Kg} from "./controllers/Scales.js";
 import bodyParser from "body-parser";
-import getWeightBin from "./controllers/Bin.js"
+import {getWeightBin} from "./controllers/Bin.js"
 const app = express();
 const server = http.createServer(app);
 
@@ -54,4 +54,4 @@ server.listen(port, () => {
 });
 //getScales4Kg(io);
 //getScales50Kg(io);
-getWeightBin(io);
+//getWeightBin(io);
