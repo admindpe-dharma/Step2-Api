@@ -26,6 +26,6 @@ export const updateBinWeightData = async (hostname)=>{
     } else {
         payload = { error: 'Bin not found' };
     }
-    io.to(_id).emit('getweight', payload);
+    io.to(_id.id).emit('getweight', payload);
 }
 
