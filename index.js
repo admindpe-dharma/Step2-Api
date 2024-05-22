@@ -42,7 +42,6 @@ try {
   
 }
 
-export { Server, io };
 
 app.use(ScalesRoute);
 app.use(ScannerRoute);
@@ -59,7 +58,7 @@ socket.on('disconnect',()=>{
 server.listen(port, () => {
   console.log(`Server up and running on port ${port}`);
 });
-export {clientList,io};
+export {clientList,io,Server};
 //getScales4Kg(io);
 //getScales50Kg(io);
 //getWeightBin(io);
