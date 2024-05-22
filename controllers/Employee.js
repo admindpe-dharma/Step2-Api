@@ -110,7 +110,6 @@ export const UpdateBinWeight = async (req,res) =>{
     const data = await Bin.findOne({where: {id:binId}});
     data.weight = parseFloat(neto) + parseFloat(data.weight);
     data.save();
-    await updateBinWeightData(data.name_hostname);
    // await switchLamp(data.id,"RED",data.weight >= parseFloat(data.max_weight))
     res.status(200).json({msg:'ok'});
 }
@@ -119,6 +118,7 @@ export const UpdateBinWeightCollection = async (req, res) => {
     const { binId } = req.body; // neto is not needed as weight will be set to 0
     const data = await Bin.findOne({ where: { id: binId } });
     
+    await updateBinWeightData(data.name_hostname);
     if (data) {
         data.weight = 0; // Set weight to 0
         await data.save();
