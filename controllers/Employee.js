@@ -117,10 +117,10 @@ export const UpdateBinWeightCollection = async (req, res) => {
     const { binId } = req.body; // neto is not needed as weight will be set to 0
     const data = await Bin.findOne({ where: { id: binId } });
     
-    await updateBinWeightData(data.name_hostname);
     if (data) {
         data.weight = 0; // Set weight to 0
         await data.save();
+        await updateBinWeightData(data.name_hostname);
         res.status(200).json({ msg: 'ok' });
     } else {
         res.status(404).json({ msg: 'Bin not found' });
