@@ -61,7 +61,7 @@ export const getScales50Kg = (io) => {
                 console.log("opening port");
             });
         });
-        Timbangan_1.on('data', (rawData) => {
+        Timbangan_1.on('data', (data) => {
 
             const match = data.toString().match(/[\d]+\.\d{2}(?=Kg)/);
             console.log({ "4kg": data.toString() });
