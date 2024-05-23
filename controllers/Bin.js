@@ -1,6 +1,7 @@
 import { clientList, io } from "../index.js";
 import Bin from "../models/BinModel.js";
 
+
 export const getWeightBin =  (socket) => {
     try {
         socket.on('getWeightBin',async (hostname)=>{
@@ -30,21 +31,45 @@ export const updateBinWeightData = async (hostname)=>{
     io.to(_id.id).emit('getweight', payload);
 }
 
-export const checkMaxWeight = async () => {
-    while (true) {
-        const dataBin = await Bin.findAll();
-        for (let i = 0; i < dataBin.length; i++) {
-            console.log({ id: dataBin[i].id });
-            const latest = await Bin.findOne({
-                where: { name_hostname: dataBin[i].name_hostname }
-            });
-            
-            if (latest) {
-                //console.log(`Weight for ${latest.name_hostname}: ${latest.weight}`);
-                io.to(latest.id).emit('checkMaxweight', latest.weight);
+export const checkMaxWeight = (socket) => {
+    const checkWeightLoop = async () => {
+        while (true) {
+            const dataBin = await Bin.findAll();
+            for (let i = 0; i < dataBin.length; i++) {
+                console.log({ id: dataBin[i].id });
+                const latest = await Bin.findOne({
+                    where: { name_hostname: dataBin[i].name_hostname }
+                });
+
+                if (latest) {
+                    socket.emit('checkMaxweight', {
+                        id: latest.id,
+                        weight: latest.weight
+                    });
+                    sendredlampon();
+                }
             }
+            await new Promise(resolve => setTimeout(resolve, 1000));
         }
-        await new Promise(resolve => setTimeout(resolve, 1000));
-    }
+    };
+
+    checkWeightLoop().catch(err => console.error(err));
 };
 
+export const getbinData = async (req, res) => {
+    const { hostname } = req.query;
+    try {
+        const bin = await Bin.findOne({
+            where: { name_hostname: hostname }
+        });
+
+        if (bin) {
+            res.json({ bin });
+        } else {
+            res.json({ error: 'bin ID not found' });
+        }
+    } catch (error) {
+        console.error(error);
+        res.status(500).json({ msg: 'Terjadi kesalahan server' });
+    }
+};
