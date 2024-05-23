@@ -18,7 +18,7 @@ const Timbangan_1 = new SerialPort({
 
 Timbangan.on('error', (error) => {
     console.log(error);
-}); 
+});
 
 export const getScales4Kg = (io) => {
     try {
@@ -32,7 +32,7 @@ export const getScales4Kg = (io) => {
         });
         Timbangan.on('data', (data) => {
             const match = data.toString().match(/WT:(\d+\.\d+)g/);
-              console.log({"4kg":data.toString()}); 
+            console.log({ "4kg": data.toString() });
             if (match) {
                 const weight = match[1];
                 console.log(['Berat Timbangan 4kg :', weight, 'gram']);
@@ -41,8 +41,8 @@ export const getScales4Kg = (io) => {
             }
         });
     } catch (error) {
-            console.log(error);
-//        res.status(500).json({ msg: error.message });
+        console.log(error);
+        //        res.status(500).json({ msg: error.message });
     }
 };
 
@@ -62,10 +62,21 @@ export const getScales50Kg = (io) => {
             });
         });
         Timbangan_1.on('data', (rawData) => {
-            // console.log('Data Timbangan:', weight50Kg.toString());
-            // Kirim data yang diterima sebagai respons ke clien
-            console.log('timbangan 50kg', rawData.toString());
-            const data = parseFloat(rawData.toString().replace("+", "")).toString();
+
+            const match = data.toString().match(/[\d]+\.\d{2}(?=Kg)/);
+            console.log({ "4kg": data.toString() });
+
+            if (match) {
+                const weight = match[0];
+                console.log(['Berat Timbangan 50kg :', weight, 'kg']);
+                response = { weight: parseFloat(weight) };
+
+                // io.emit('data', response);
+            }
+
+
+            //console.log('timbangan 50kg', rawData.toString());
+            //const data = parseFloat(rawData.toString().replace("+", "")).toString();
             // console.log(data);
             /*let res = '';
             const point = data.indexOf(".");
@@ -75,7 +86,7 @@ export const getScales50Kg = (io) => {
                 if (parseInt(data[i]))
                     res += data[i];
             }*/
-//            const parsed = parseFloat(data);
+            //            const parsed = parseFloat(data);
             //            if ( Math.abs(currentWeight - parsed) < 0.5)
             //		return;
             /*if (holdDelay && (currentWeight > parsed))
@@ -87,7 +98,7 @@ export const getScales50Kg = (io) => {
                 holdDelay=false;
                 },500);
             }*/
-            response = { weight50Kg: data };
+            response = { weight50Kg: weight };
             io.emit('data1', response);
         });
 
@@ -99,6 +110,6 @@ export const getScales50Kg = (io) => {
         }
     } catch (error) {
         console.log(error);
-        //      res.status(500).json({ msg: error.message });
+        //    res.status(500).json({ msg: error.message });
     }
 };
