@@ -20,8 +20,11 @@ Timbangan.on('error', (error) => {
     console.log(error);
 });
 
+let _4kgOutput = '';
+let _50kgOutput = '';
 export const getScales4Kg = (io) => {
     try {
+        
         let response;
         console.log("start reading scale4kg");
         io.on('connectScale', () => {
@@ -31,14 +34,22 @@ export const getScales4Kg = (io) => {
             });
         });
         Timbangan.on('data', (data) => {
-            const match = data.toString().match(/WT:(\d+\.\d+)g/);
-            console.log({ "4kg": data.toString() });
+            if (data.toString() != '\n')
+            {
+                _4kgOutput = _4kgOutput + data.toString();
+                return;
+            }
+            _4kgOutput = _4kgOutput.replace("\n","").replace("\r","");
+            const match = _4kgOutput.toString().match(/WT:(\d+\.\d+)g/);
+            console.log({ "4kg": _4kgOutput.toString(),match:match });
             if (match) {
                 const weight = match[1];
                 console.log(['Berat Timbangan 4kg :', weight, 'gram']);
                 response = { weight: parseFloat(weight) };
                 io.emit('data', response);
+                
             }
+            _4kgOutput = '';
         });
     } catch (error) {
         console.log(error);
@@ -62,9 +73,14 @@ export const getScales50Kg = (io) => {
             });
         });
         Timbangan_1.on('data', (data) => {
-
-            const match = data.toString().match(/[\d]+\.\d{2}(?=Kg)/);
-            console.log({ "4kg": data.toString() });
+            if (data.toString()!='\n')
+            {
+                _50kgOutput = _50kgOutput+ data.toString();
+                return;
+            }
+            _50kgOutput = _50kgOutput.replace("\r","").replace("\n","");
+            const match = _50kgOutput.toString().match(/[\d]+\.\d{2}(?=Kg)/);
+            console.log({ "50kg": _50kgOutput.toString(),match:match });
 
             if (match) {
                 const weight = match[0];
@@ -73,7 +89,7 @@ export const getScales50Kg = (io) => {
                 response = { weight50Kg: weight };
                 io.emit('data1', response);
             }
-
+            _50kgOutput = '';
 
             //console.log('timbangan 50kg', rawData.toString());
             //const data = parseFloat(rawData.toString().replace("+", "")).toString();
