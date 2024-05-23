@@ -7,7 +7,7 @@ import http from 'http';
 import { Server } from "socket.io";
 import { getScales4Kg ,getScales50Kg} from "./controllers/Scales.js";
 import bodyParser from "body-parser";
-import {getWeightBin,checkMaxWeight} from "./controllers/Bin.js"
+import {getWeightBin} from "./controllers/Bin.js"
 const app = express();
 const server = http.createServer(app);
 const clientList= [];
@@ -50,7 +50,7 @@ io.on('connection',(socket)=>{
 //  console.log("listening socket.io");
 getWeightBin(socket);
 
-checkMaxWeight(socket);
+//checkMaxWeight(socket);
 socket.on('disconnect',()=>{
     clientList.splice(clientList.findIndex(v=>v.id==socket.id),1);
     console.log(clientList);
