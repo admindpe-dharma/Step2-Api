@@ -34,6 +34,7 @@ export const getScales4Kg = (io) => {
             });
         });
         Timbangan.on('data', (data) => {
+            console.log({ "4kg": data.toString() });
             if (data.toString() != '\n')
             {
                 _4kgOutput = _4kgOutput + data.toString();
@@ -41,7 +42,6 @@ export const getScales4Kg = (io) => {
             }
             _4kgOutput = _4kgOutput.replace("\n","").replace("\r","");
             const match = _4kgOutput.toString().match(/WT:(\d+\.\d+)g/);
-            console.log({ "4kg": _4kgOutput.toString(),match:match });
             if (match) {
                 const weight = match[1];
                 console.log(['Berat Timbangan 4kg :', weight, 'gram']);
@@ -80,11 +80,11 @@ export const getScales50Kg = (io) => {
             }
             _50kgOutput = _50kgOutput.replace("\r","").replace("\n","");
             const match = _50kgOutput.toString().match(/[\d]+\.\d{2}(?=Kg)/);
-            console.log({ "50kg": _50kgOutput.toString(),match:match });
+//            console.log({ "50kg": _50kgOutput.toString(),match:match });
 
             if (match) {
                 const weight = match[0];
-                console.log(['Berat Timbangan 50kg :', weight, 'kg']);
+        //        console.log(['Berat Timbangan 50kg :', weight, 'kg']);
                 response = { weight: parseFloat(weight) };
                 response = { weight50Kg: weight };
                 io.emit('data1', response);
