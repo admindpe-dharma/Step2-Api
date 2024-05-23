@@ -40,7 +40,7 @@ export const ScanContainer = async (req, res) => {
                     as: 'bin',
                     required: true,
                     duplicating: false,
-                    attributes: ['name', 'id', 'IdWaste','name_hostname']
+                    attributes: ['name', 'id', 'IdWaste','name_hostname','weight']
                 }
                     ]
                 }
@@ -104,6 +104,14 @@ export const SaveTransaksi = async (req,res) => {
     res.status(200).json({msg:'ok'});
 };
 
+export const SaveTransaksiCollection = async (req,res) => {
+    const {payload} = req.body;
+    payload.recordDate = moment().format("YYYY-MM-DD HH:mm:ss");
+    console.log(payload);
+    (await transaction.create(payload)).save();
+    res.status(200).json({msg:'ok'});
+};
+
 export const UpdateBinWeight = async (req,res) =>{
     const {binId,neto} = req.body;
     const data = await Bin.findOne({where: {id:binId}});
@@ -111,7 +119,7 @@ export const UpdateBinWeight = async (req,res) =>{
     data.save();
    // await switchLamp(data.id,"RED",data.weight >= parseFloat(data.max_weight))
     res.status(200).json({msg:'ok'});
-}
+};
 
 export const UpdateBinWeightCollection = async (req, res) => {
     const { binId } = req.body; // neto is not needed as weight will be set to 0

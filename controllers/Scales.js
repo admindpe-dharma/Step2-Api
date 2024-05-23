@@ -1,6 +1,6 @@
 import { SerialPort } from 'serialport';
 
-/* const Timbangan = new SerialPort({
+const Timbangan = new SerialPort({
     path: 'COM1',
     baudRate: 9600,
     dataBits: 8,
@@ -18,7 +18,7 @@ const Timbangan_1 = new SerialPort({
 
 Timbangan.on('error', (error) => {
     console.log(error);
-}); */
+}); 
 
 //export const getScales4Kg = (io) => {
     try {
@@ -67,15 +67,15 @@ Timbangan.on('error', (error) => {
             console.log('timbangan 50kg', rawData.toString());
             const data = parseFloat(rawData.toString().replace("+", "")).toString();
             // console.log(data);
-            let res = '';
+            /*let res = '';
             const point = data.indexOf(".");
             for (let i = data.length - 1; i >= 0; i--) {
                 if (((data.length - 1) - i) == point)
                     res += ".";
                 if (parseInt(data[i]))
                     res += data[i];
-            }
-            const parsed = parseFloat(res.toString());
+            }*/
+//            const parsed = parseFloat(data);
             //            if ( Math.abs(currentWeight - parsed) < 0.5)
             //		return;
             /*if (holdDelay && (currentWeight > parsed))
@@ -87,7 +87,7 @@ Timbangan.on('error', (error) => {
                 holdDelay=false;
                 },500);
             }*/
-            response = { weight50Kg: parsed };
+            response = { weight50Kg: data };
             io.emit('data1', response);
         });
 

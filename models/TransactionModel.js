@@ -26,6 +26,10 @@ const transaction = db.define('transaction', {
         type: DataTypes.STRING,
         allowNull: true  
     },
+    weight   : {
+        type: DataTypes.INTEGER,
+        allowNull: true  
+    },
    recordDate: {
 	type: DataTypes.STRING
    }
