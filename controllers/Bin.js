@@ -31,31 +31,6 @@ export const updateBinWeightData = async (hostname)=>{
     io.to(_id.id).emit('getweight', payload);
 }
 
-export const checkMaxWeight = (socket) => {
-    const checkWeightLoop = async () => {
-        while (true) {
-            const dataBin = await Bin.findAll();
-            for (let i = 0; i < dataBin.length; i++) {
-                console.log({ id: dataBin[i].id });
-                const latest = await Bin.findOne({
-                    where: { name_hostname: dataBin[i].name_hostname }
-                });
-
-                if (latest) {
-                    socket.emit('checkMaxweight', {
-                        id: latest.id,
-                        weight: latest.weight
-                    });
-                    sendredlampon();
-                }
-            }
-            await new Promise(resolve => setTimeout(resolve, 1000));
-        }
-    };
-
-    checkWeightLoop().catch(err => console.error(err));
-};
-
 export const getbinData = async (req, res) => {
     const { hostname } = req.query;
     try {
