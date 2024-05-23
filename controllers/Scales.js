@@ -1,7 +1,7 @@
 import { SerialPort } from 'serialport';
 
 const Timbangan = new SerialPort({
-    path: 'COM1',
+    path: '/dev/ttyUSB0',
     baudRate: 9600,
     dataBits: 8,
     stopBits: 1,
@@ -9,7 +9,7 @@ const Timbangan = new SerialPort({
 });
 
 const Timbangan_1 = new SerialPort({
-    path: 'COM1',
+    path: '/dev/ttyUSB1',
     baudRate: 9600,
     dataBits: 8,
     stopBits: 1,
@@ -20,7 +20,7 @@ Timbangan.on('error', (error) => {
     console.log(error);
 }); 
 
-//export const getScales4Kg = (io) => {
+export const getScales4Kg = (io) => {
     try {
         let response;
         console.log("start reading scale4kg");
@@ -44,9 +44,9 @@ Timbangan.on('error', (error) => {
             console.log(error);
 //        res.status(500).json({ msg: error.message });
     }
-//};
+};
 
-//export const getScales50Kg = (io) => {
+export const getScales50Kg = (io) => {
     try {
         let response;
         console.log("start reading scale50kg");
@@ -101,4 +101,4 @@ Timbangan.on('error', (error) => {
         console.log(error);
         //      res.status(500).json({ msg: error.message });
     }
-//};
+};
