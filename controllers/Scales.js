@@ -34,11 +34,7 @@ export const getScales4Kg = (io) => {
             });
         });
         Timbangan.on('data', (data) => {
-            if (data.toString() != '\n')
-            {
-                _4kgOutput = _4kgOutput + data.toString();
-                return;
-            }
+            _4kgOutput = data.toString();
             console.log({ "4kg": _4kgOutput });
             _4kgOutput = _4kgOutput.replace("\n","").replace("\r","");
             const match = _4kgOutput.toString().match(/WT:(\d+\.\d+)g/);
