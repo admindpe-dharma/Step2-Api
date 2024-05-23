@@ -70,8 +70,8 @@ export const getScales50Kg = (io) => {
                 const weight = match[0];
                 console.log(['Berat Timbangan 50kg :', weight, 'kg']);
                 response = { weight: parseFloat(weight) };
-
-                // io.emit('data', response);
+                response = { weight50Kg: weight };
+                io.emit('data1', response);
             }
 
 
@@ -98,8 +98,7 @@ export const getScales50Kg = (io) => {
                 holdDelay=false;
                 },500);
             }*/
-            response = { weight50Kg: weight };
-            io.emit('data1', response);
+
         });
 
         Timbangan.on('error', (error) => {
