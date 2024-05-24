@@ -14,7 +14,7 @@ const bin = db.define('bin', {
         type: DataTypes.STRING,
     },
     weight: {
-        type: DataTypes.INTEGER,
+        type: DataTypes.DECIMAL,
     },
     IdWaste: {
         type: DataTypes.INTEGER,
