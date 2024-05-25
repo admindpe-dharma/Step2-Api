@@ -1,12 +1,13 @@
 
 import express from "express";
-import {ScanBadgeid,ScanContainer,CheckBinCapacity,SaveTransaksi,UpdateBinWeight,UpdateBinWeightCollection, SaveTransaksiCollection} from "../controllers/Employee.js"
+import {ScanBadgeid,ScanContainer,CheckBinCapacity,SaveTransaksi,UpdateBinWeight,UpdateBinWeightCollection, SaveTransaksiCollection,VerificationScan} from "../controllers/Employee.js"
 import {getbinData} from "../controllers/Bin.js"
 
 const router = express.Router();
 
 router.post('/ScanBadgeid', ScanBadgeid);
 router.post('/ScanContainer', ScanContainer);
+router.post('/VerificationScan', VerificationScan);
 router.post("/SaveTransaksi",SaveTransaksi);
 router.post('/SaveTransaksiCollection', SaveTransaksiCollection)
 router.post('/UpdateBinWeight',UpdateBinWeight)

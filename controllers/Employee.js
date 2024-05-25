@@ -59,6 +59,24 @@ export const ScanContainer = async (req, res) => {
     }
 };
 
+export const VerificationScan = async (req, res) => {
+    const { binName } = req.body;
+    try {
+        const bin = await Bin.findOne({
+            attributes: ['name'],where: { name: binName }
+        });
+
+        if (bin) {
+            res.json({ bin:bin });
+        } else {
+            res.json({ error: 'Container ID not found' });
+        }
+    } catch (error) {
+        console.error(error);
+        res.status(500).json({ msg: 'Terjadi kesalahan server' });
+    }
+};
+
 export const CheckBinCapacity = async (req, res) => {
     const { IdWaste, neto } = req.body;
 console.log(IdWaste);
