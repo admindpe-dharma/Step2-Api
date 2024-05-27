@@ -32,14 +32,14 @@ export const ScanContainer = async (req, res) => {
                     model: Waste,
                     as: 'waste',
                     required: true,
-                    duplicating: false,
+                    duplicating: true,
                     attributes: ['name'],
                     include: [
                 {
                     model: Bin,
                     as: 'bin',
                     required: true,
-                    duplicating:false,
+                    duplicating:true,
                     attributes: ['name', 'id', 'IdWaste','name_hostname','weight']
                 }
                     ]
