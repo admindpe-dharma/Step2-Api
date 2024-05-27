@@ -1,6 +1,6 @@
 import { SerialPort } from 'serialport';
 
-const Timbangan = new SerialPort({
+/* const Timbangan = new SerialPort({
     path: '/dev/ttyUSB0',
     baudRate: 9600,
     dataBits: 8,
@@ -14,11 +14,11 @@ const Timbangan_1 = new SerialPort({
     dataBits: 8,
     stopBits: 1,
     parity: 'none',
-});
+}); */
 
-Timbangan.on('error', (error) => {
+/* Timbangan.on('error', (error) => {
     console.log(error);
-});
+}); */
 
 let _4kgOutput = '';
 let _50kgOutput = '';
@@ -33,7 +33,7 @@ export const getScales4Kg = (io) => {
                 console.log("opening port");
             });
         });
-        Timbangan.on('data', (data) => {
+       /*  Timbangan.on('data', (data) => {
             _4kgOutput = data.toString();
             console.log({ "4kg": _4kgOutput });
             _4kgOutput = _4kgOutput.replace("\n","").replace("\r","");
@@ -46,7 +46,7 @@ export const getScales4Kg = (io) => {
                 
             }
             _4kgOutput = '';
-        });
+        }); */
     } catch (error) {
         console.log(error);
         //        res.status(500).json({ msg: error.message });
@@ -68,7 +68,7 @@ export const getScales50Kg = (io) => {
                 console.log("opening port");
             });
         });
-        Timbangan_1.on('data', (data) => {
+        /* Timbangan_1.on('data', (data) => {
             if (data.toString()!='\n')
             {
                 _50kgOutput = _50kgOutput+ data.toString();
@@ -86,36 +86,11 @@ export const getScales50Kg = (io) => {
                 io.emit('data1', response);
             }
             _50kgOutput = '';
+        }); */
 
-            //console.log('timbangan 50kg', rawData.toString());
-            //const data = parseFloat(rawData.toString().replace("+", "")).toString();
-            // console.log(data);
-            /*let res = '';
-            const point = data.indexOf(".");
-            for (let i = data.length - 1; i >= 0; i--) {
-                if (((data.length - 1) - i) == point)
-                    res += ".";
-                if (parseInt(data[i]))
-                    res += data[i];
-            }*/
-            //            const parsed = parseFloat(data);
-            //            if ( Math.abs(currentWeight - parsed) < 0.5)
-            //		return;
-            /*if (holdDelay && (currentWeight > parsed))
-            return;
-            if (!holdDelay)
-            {
-            holdDelay=  true;
-            setTimeout(()=>{
-                holdDelay=false;
-                },500);
-            }*/
-
-        });
-
-        Timbangan.on('error', (error) => {
+       /*  Timbangan.on('error', (error) => {
             console.log(error);
-        });
+        }); */
         if (response != undefined && response != null) {
             res.status(200).json(response);
         }
