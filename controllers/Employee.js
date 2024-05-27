@@ -33,6 +33,7 @@ export const ScanContainer = async (req, res) => {
                     as: 'waste',
                     required: true,
                     duplicating: true,
+                    foreignKey: 'IdWaste',
                     attributes: ['name'],
                     include: [
                 {
@@ -40,6 +41,7 @@ export const ScanContainer = async (req, res) => {
                     as: 'bin',
                     required: true,
                     duplicating:true,
+                    foreignKey: 'IdWaste',
                     attributes: ['name', 'id', 'IdWaste','name_hostname','weight']
                 }
                     ]
