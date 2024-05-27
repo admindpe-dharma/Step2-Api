@@ -5,7 +5,7 @@ import Waste from "./WasteModel.js";
 const { DataTypes } = Sequelize;
 
 const container = db.define('container', {
-    containerid: {
+    containerId: {
         type: DataTypes.INTEGER,
         allowNull: false,
         primaryKey:true
