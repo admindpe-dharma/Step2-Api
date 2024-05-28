@@ -69,13 +69,13 @@ export const getScales50Kg = (io) => {
             });
         });
         Timbangan_1.on('data', (data) => {
-            console.log(data.toString());
-            if (data.toString()!='\n')
+            /*if (data.toString()!='\n')
             {
                 _50kgOutput = _50kgOutput+ data.toString();
                 return;
-            }
-            _50kgOutput = _50kgOutput.replace("\r","").replace("\n","");
+            }*/
+            _50kgOutput = data.toString().replace("\r","").replace("\n","");
+            console.log(_50kgOutput);
             const match = _50kgOutput.toString().match(/[\d]+\.\d{2}(?=Kg)/);
 //            console.log({ "50kg": _50kgOutput.toString(),match:match });
 
