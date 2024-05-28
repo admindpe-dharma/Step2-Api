@@ -16,7 +16,7 @@ export const getWeightBin =  (socket) => {
 };
 
 export const updateBinWeightData = async (hostname)=>{
-    
+    console.log(clientList);
     const _id = clientList.find(x=>x.hostname==hostname);
     if (!_id)
         return;
