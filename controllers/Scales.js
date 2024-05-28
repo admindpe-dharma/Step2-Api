@@ -69,6 +69,7 @@ export const getScales50Kg = (io) => {
             });
         });
         Timbangan_1.on('data', (data) => {
+            console.log(data.toString());
             if (data.toString()!='\n')
             {
                 _50kgOutput = _50kgOutput+ data.toString();
