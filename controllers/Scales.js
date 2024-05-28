@@ -88,7 +88,7 @@ export const getScales50Kg = (io) => {
             _50kgOutput = '';
         });
 
-       Timbangan.on('error', (error) => {
+       Timbangan_1.on('error', (error) => {
             console.log(error);
         }); 
         if (response != undefined && response != null) {
