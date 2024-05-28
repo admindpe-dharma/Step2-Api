@@ -5,6 +5,7 @@ import Bin from "../models/BinModel.js";
 export const getWeightBin =  (socket) => {
     try {
         socket.on('getWeightBin',async (hostname)=>{
+            console.log('Register ' + hostname);
             clientList.push({id:socket.id,hostname:hostname});
             console.log(clientList);
             await updateBinWeightData(hostname);
@@ -16,6 +17,7 @@ export const getWeightBin =  (socket) => {
 };
 
 export const updateBinWeightData = async (hostname)=>{
+    console.log('Update Client '+ hostname );
     console.log(clientList);
     const _id = clientList.find(x=>x.hostname==hostname);
     if (!_id)
