@@ -75,7 +75,7 @@ export const getScales50Kg = (io) => {
                 return;
             }*/
             _50kgOutput = data.toString().replace("\r","").replace("\n","");
-            console.log(_50kgOutput);
+            //console.log(_50kgOutput);
             const match = _50kgOutput.toString().match(/[\d]+\.\d{2}(?=Kg)/);
 //            console.log({ "50kg": _50kgOutput.toString(),match:match });
 
