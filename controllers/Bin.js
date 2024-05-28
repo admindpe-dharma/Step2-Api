@@ -51,3 +51,14 @@ export const getbinData = async (req, res) => {
         res.status(500).json({ msg: 'Terjadi kesalahan server' });
     }
 };
+
+export const getTimbanganData = async (req, res) => {
+   // const { instruksimsg } = req.body;
+    try {
+    const instruksimsg = req.body.pesan;
+    res.status(200).json({ instruksimsg });
+    } catch (error) {
+        console.error(error);
+        res.status(500).json({ msg: 'Terjadi kesalahan server' });
+    }
+};

@@ -61,6 +61,6 @@ server.listen(port, () => {
   console.log(`Server up and running on port ${port}`);
 });
 export {clientList,io,Server};
-getScales4Kg(io);
+//getScales4Kg(io);
 getScales50Kg(io);
 //getWeightBin(io);
