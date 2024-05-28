@@ -6,7 +6,8 @@ export const getWeightBin =  (socket) => {
     try {
         socket.on('getWeightBin',async (hostname)=>{
             console.log('Register ' + hostname);
-            clientList.push({id:socket.id,hostname:hostname});
+            if (!clientList.find(x=>x.hostname==hostname))
+                clientList.push({id:socket.id,hostname:hostname});
             console.log(clientList);
             await updateBinWeightData(hostname);
         });
@@ -26,7 +27,7 @@ export const updateBinWeightData = async (hostname)=>{
     console.log(clientList);
     console.log(_id);
     const bin = await Bin.findOne({ where: { name_hostname: hostname } });
-    console.log({hostname:hostname});
+    console.log({hostname:hostname,bin:bin});
     let payload = {};
     if (bin) {
         payload = { weight: bin.weight };
