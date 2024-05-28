@@ -8,7 +8,7 @@ import { SerialPort } from 'serialport';
     parity: 'none',
 }); */
 
-const Timbangan_1 = new SerialPort({
+const Timbangan = new SerialPort({
     path: '/dev/ttyUSB0',
     baudRate: 9600,
     dataBits: 8,
