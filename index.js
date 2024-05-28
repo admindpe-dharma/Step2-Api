@@ -52,8 +52,8 @@ getWeightBin(socket);
 
 //checkMaxWeight(socket);
 socket.on('disconnect',()=>{
-    console.log({index:clientList.findIndex(v=>v.id==socket.id)});
-    clientList.splice(clientList.findIndex(v=>v.id==socket.id),1);
+    const index = clientList.findIndex(v=>v.id==socket.id);
+    clientList.splice(index,1);
     console.log(clientList);
 });
 
