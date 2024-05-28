@@ -23,7 +23,7 @@ const Timbangan_1 = new SerialPort({
 let _4kgOutput = '';
 let _50kgOutput = '';
 export const getScales4Kg = (io) => {
-    try {
+    /* try {
         
         let response;
         console.log("start reading scale4kg");
@@ -33,7 +33,7 @@ export const getScales4Kg = (io) => {
                 console.log("opening port");
             });
         });
-       /* Timbangan.on('data', (data) => {
+       Timbangan.on('data', (data) => {
             _4kgOutput = data.toString();
             console.log({ "4kg": _4kgOutput });
             _4kgOutput = _4kgOutput.replace("\n","").replace("\r","");
@@ -46,11 +46,11 @@ export const getScales4Kg = (io) => {
                 
             }
             _4kgOutput = '';
-        });  */
+        });  
     } catch (error) {
         console.log(error);
         //        res.status(500).json({ msg: error.message });
-    }
+    } */
 };
 
 export const getScales50Kg = (io) => {
