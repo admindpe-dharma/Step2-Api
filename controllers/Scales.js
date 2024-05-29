@@ -1,24 +1,24 @@
 import { SerialPort } from 'serialport';
 
-/* const Timbangan = new SerialPort({
+const Timbangan = new SerialPort({
     path: '/dev/ttyUSB0',
     baudRate: 9600,
     dataBits: 8,
     stopBits: 1,
     parity: 'none',
-}); */
+});
 
 const Timbangan_1 = new SerialPort({
-    path: '/dev/ttyUSB0',
+    path: '/dev/ttyUSB1',
     baudRate: 9600,
     dataBits: 8,
     stopBits: 1,
     parity: 'none',
 }); 
 
-/*  Timbangan.on('error', (error) => {
+Timbangan.on('error', (error) => {
     console.log(error);
-});  */
+});
 
 let _4kgOutput = '';
 let _50kgOutput = '';
