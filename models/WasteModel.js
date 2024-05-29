@@ -11,6 +11,9 @@ const waste = db.define('waste', {
     },
     name: {
         type: DataTypes.STRING,
+    },
+    scales: {
+        type: DataTypes.STRING,
     }
 }, {
     freezeTableName: true,
