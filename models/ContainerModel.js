@@ -12,7 +12,11 @@ const container = db.define('container', {
     },
     name: {
         type: DataTypes.STRING,
+    },
+    weightbin: {
+        type: DataTypes.DECIMAL,
     }
+
 }, {
     freezeTableName: true,
     timestamps:false
