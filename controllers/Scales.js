@@ -35,7 +35,7 @@ export const getScales4Kg = (io) => {
         });
        Timbangan.on('data', (data) => {
             _4kgOutput = data.toString();
-          //  console.log({ "4kg": _4kgOutput });
+            console.log({ "4kg": _4kgOutput });
             _4kgOutput = _4kgOutput.replace("\n","").replace("\r","");
             const match = _4kgOutput.toString().match(/WT:(\d+\.\d+)g/);
             if (match) {
@@ -75,7 +75,7 @@ export const getScales50Kg = (io) => {
                 return;
             }*/
             _50kgOutput = data.toString().replace("\r","").replace("\n","");
-            //console.log(_50kgOutput);
+            console.log({_50kg: _50kgOutput});
             const match = _50kgOutput.toString().match(/[\d]+\.\d{2}(?=Kg)/);
           //  console.log({ "50kg": _50kgOutput.toString(),match:match });
 

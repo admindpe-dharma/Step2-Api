@@ -157,6 +157,17 @@ export const UpdateBinWeightCollection = async (req, res) => {
     }
 };
 
+export const UpdateContainerStatus = async (req,res) =>{
+    const {containerName,status} = req.body;
+    const data = await Bin.findOne({where: {name:containerName}});
+    data.status = {status}
+    await data.save();
+    
+    await updateBinWeightData(data.name_hostname);
+   // await switchLamp(data.id,"RED",data.weight >= parseFloat(data.max_weight))
+    res.status(200).json({msg:'ok'});
+};
+
 /* export const Hostname = async (res) => {
     const hostname = os.hostname();
     res.status(200).json({ hostname });
