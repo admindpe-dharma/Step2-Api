@@ -26,7 +26,7 @@ export const ScanContainer = async (req, res) => {
     const { containerId } = req.body;
     try {
         const container = await Container.findOne({
-            attributes: [ 'containerId','name', 'station', 'weightbin', 'IdWaste','type','handletype'],
+            attributes: [ 'containerId','name', 'station', 'weightbin', 'IdWaste','type'],
             include: [
                 {
                     model: Waste,
@@ -34,7 +34,7 @@ export const ScanContainer = async (req, res) => {
                     required: true,
                     duplicating: true,
                     foreignKey: 'IdWaste',
-                    attributes: ['name','scales'],
+                    attributes: ['name','scales','handletype'],
                     include: [
                 {
                     model: Bin,
