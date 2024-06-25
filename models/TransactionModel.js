@@ -7,10 +7,9 @@ import Weste from "./WasteModel.js";
 const { DataTypes } = Sequelize;
 
 const transaction = db.define('transaction', {
-    Id: {
-        type: DataTypes.INTEGER,
+    idscraplog: {
+        type: DataTypes.STRING,
         primaryKey:true,
-        autoIncrement: true,
         allowNull: false
     },
     badgeId : {
@@ -32,6 +31,15 @@ const transaction = db.define('transaction', {
     },
    recordDate: {
 	type: DataTypes.STRING
+   },
+   status:{
+    type: DataTypes.STRING
+   },
+   fromContainer:{
+    type: DataTypes.STRING
+   },
+   toBin : {
+    type: DataTypes.STRING
    }
 }, {
     freezeTableName: true,

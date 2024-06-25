@@ -5,7 +5,8 @@ import Bin from "../models/BinModel.js";
 import transaction from "../models/TransactionModel.js"
 import moment from 'moment';
 import { updateBinWeightData } from "./Bin.js";
-
+import employee from "../models/EmployeeModel.js";
+import axios from 'axios';
 
 export const ScanBadgeid = async (req, res) => {
     const { badgeId } = req.body;
@@ -21,7 +22,48 @@ export const ScanBadgeid = async (req, res) => {
         res.status(500).json({ msg: 'Terjadi kesalahan server'  });
     }
 };
-
+export const TransactionStep1 = async (req,res) =>{
+    const { idscraplog,waste,container,badgeId,toBin } = req.body;
+    const _waste = await Waste.findOne({
+        where:{
+            name: waste
+        }
+    });
+    const _container = await Container.findOne({
+        where:{
+            name: container
+        }
+    });
+    const _badge = await employee.findOne({
+        attributes: ["badgeId"],
+        where:{
+        badgeId : badgeId 
+        }
+    });
+    console.log("start");
+    if (!_waste)
+        return res.json({msg: "Waste Not Found"},404);
+    if (!_container)
+        return res.json({msg:" Container Not Found"},404);
+    if (!_badge)
+        return res.json({msg: "Badge not found"},404);
+    console.log(_waste);
+    const transactionData = {
+        idscraplog: idscraplog,
+        IdWaste: _waste.getDataValue("Id"),
+        idContainer : _container.getDataValue("containerId"),
+        badgeId: badgeId,
+        status: "Step-1",
+        weight: 0,
+        type: '',
+        toBin: toBin,
+        fromContainer: container,
+    };
+    const state = await transaction.create(transactionData);
+    state.save();
+    return res.status(200).json({msg:"OK"});
+    
+}
 export const ScanContainer = async (req, res) => {
     const { containerId } = req.body;
     try {
@@ -123,6 +165,40 @@ export const SaveTransaksi = async (req,res) => {
     (await transaction.create(payload)).save();
     res.status(200).json({msg:'ok'});
 };
+export const getTransaction = async (req,res)=>{
+    const { containerName } = req.params;
+    const tr = await transaction.findOne({
+        where:{
+            fromContainer: containerName
+        }
+    });
+    return res.status(!tr ? 404 : 200).json(!tr? {msg:"not found"} : tr);
+}
+export const UpdateTransaksi = async (req,res) =>{
+    const {idscraplog} = req.params;
+    const {status,type,weight} = req.body;
+    const _transaction = await transaction.findOne({
+        where:{
+            idscraplog: idscraplog
+        }
+    });
+    if (!_transaction)
+        return res.json({msg:"Transaction Not Found"},404);
+    try
+    {
+        const res =await  axios.put(`http://${process.env.STEP1}/step1/`+idscraplog,{status:"Done"});
+        _transaction.setDataValue("status",status);
+        _transaction.setDataValue("type",type);
+        _transaction.setDataValue("weight",weight);
+        await _transaction.save();
+        
+        return res.json({msg:"Ok"},200);
+    }
+    catch(err)
+    {
+        return res.json({msg:err.response.data},500);
+    }
+}
 
 export const SaveTransaksiCollection = async (req,res) => {
     const {payload} = req.body;

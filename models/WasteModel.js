@@ -17,7 +17,10 @@ const waste = db.define('waste', {
     },
     handletype:{
         type: DataTypes.STRING
-    }
+    },
+    step1: {
+     type: DataTypes.BOOLEAN
+    },
 }, {
     freezeTableName: true,
     timestamps:false

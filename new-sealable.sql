@@ -1,55 +1,57 @@
--- phpMyAdmin SQL Dump
--- version 5.2.0
--- https://www.phpmyadmin.net/
+-- MariaDB dump 10.19  Distrib 10.4.32-MariaDB, for Win64 (AMD64)
 --
--- Host: 127.0.0.1
--- Generation Time: May 20, 2024 at 05:13 AM
--- Server version: 10.4.27-MariaDB
--- PHP Version: 8.0.25
-
-SET SQL_MODE = "NO_AUTO_VALUE_ON_ZERO";
-START TRANSACTION;
-SET time_zone = "+00:00";
-
+-- Host: localhost    Database: new-sealable
+-- ------------------------------------------------------
+-- Server version	10.4.32-MariaDB
 
 /*!40101 SET @OLD_CHARACTER_SET_CLIENT=@@CHARACTER_SET_CLIENT */;
 /*!40101 SET @OLD_CHARACTER_SET_RESULTS=@@CHARACTER_SET_RESULTS */;
 /*!40101 SET @OLD_COLLATION_CONNECTION=@@COLLATION_CONNECTION */;
 /*!40101 SET NAMES utf8mb4 */;
-
---
--- Database: `new-sealable`
---
-
--- --------------------------------------------------------
+/*!40103 SET @OLD_TIME_ZONE=@@TIME_ZONE */;
+/*!40103 SET TIME_ZONE='+00:00' */;
+/*!40014 SET @OLD_UNIQUE_CHECKS=@@UNIQUE_CHECKS, UNIQUE_CHECKS=0 */;
+/*!40014 SET @OLD_FOREIGN_KEY_CHECKS=@@FOREIGN_KEY_CHECKS, FOREIGN_KEY_CHECKS=0 */;
+/*!40101 SET @OLD_SQL_MODE=@@SQL_MODE, SQL_MODE='NO_AUTO_VALUE_ON_ZERO' */;
+/*!40111 SET @OLD_SQL_NOTES=@@SQL_NOTES, SQL_NOTES=0 */;
 
 --
 -- Table structure for table `bin`
 --
 
+DROP TABLE IF EXISTS `bin`;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
+/*!40101 SET character_set_client = utf8 */;
 CREATE TABLE `bin` (
-  `id` int(11) NOT NULL,
+  `id` int(11) NOT NULL AUTO_INCREMENT,
   `name` varchar(100) NOT NULL,
-  `weight` int(11) NOT NULL,
-  `max_weight` decimal(10,0) NOT NULL,
+  `weight` decimal(11,2) NOT NULL,
+  `max_weight` decimal(10,2) NOT NULL,
   `IdWaste` int(11) NOT NULL,
-  `name_hostname` varchar(100) NOT NULL
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+  `name_hostname` varchar(100) NOT NULL,
+  PRIMARY KEY (`id`),
+  KEY `bin_ibfk_1` (`IdWaste`),
+  CONSTRAINT `bin_ibfk_1` FOREIGN KEY (`IdWaste`) REFERENCES `waste` (`id`)
+) ENGINE=InnoDB AUTO_INCREMENT=4 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+/*!40101 SET character_set_client = @saved_cs_client */;
 
 --
 -- Dumping data for table `bin`
 --
 
-INSERT INTO `bin` (`id`, `name`, `weight`, `max_weight`, `IdWaste`, `name_hostname`) VALUES
-(1, '2B-000-01', 80, '100', 1, 'PCS-01'),
-(2, '2B-000-02', 81, '100', 1, 'PCS-02');
-
--- --------------------------------------------------------
+LOCK TABLES `bin` WRITE;
+/*!40000 ALTER TABLE `bin` DISABLE KEYS */;
+INSERT INTO `bin` VALUES (1,'2-PCL-2-WR',0.00,100.00,1,'PCS-01'),(2,'2-PCL-1-TM',0.00,100.00,2,'PCS-02'),(3,'2-PCL-SP-05',0.00,100.00,4,'PCS-02');
+/*!40000 ALTER TABLE `bin` ENABLE KEYS */;
+UNLOCK TABLES;
 
 --
 -- Table structure for table `collection`
 --
 
+DROP TABLE IF EXISTS `collection`;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
+/*!40101 SET character_set_client = utf8 */;
 CREATE TABLE `collection` (
   `id` int(11) NOT NULL,
   `Idbadge` int(11) NOT NULL,
@@ -57,237 +59,176 @@ CREATE TABLE `collection` (
   `Idwaste` int(11) NOT NULL,
   `CreatedAt` datetime NOT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+/*!40101 SET character_set_client = @saved_cs_client */;
 
--- --------------------------------------------------------
+--
+-- Dumping data for table `collection`
+--
+
+LOCK TABLES `collection` WRITE;
+/*!40000 ALTER TABLE `collection` DISABLE KEYS */;
+/*!40000 ALTER TABLE `collection` ENABLE KEYS */;
+UNLOCK TABLES;
 
 --
 -- Table structure for table `container`
 --
 
+DROP TABLE IF EXISTS `container`;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
+/*!40101 SET character_set_client = utf8 */;
 CREATE TABLE `container` (
-  `containerId` int(11) NOT NULL,
+  `containerId` int(11) NOT NULL AUTO_INCREMENT,
   `name` varchar(100) NOT NULL,
   `station` varchar(100) NOT NULL,
   `IdWaste` int(11) NOT NULL,
-  `weightbin` int(11) NOT NULL,
-  `status` int(11) NOT NULL
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+  `weightbin` decimal(18,2) NOT NULL,
+  `status` int(11) NOT NULL,
+  `type` varchar(100) NOT NULL,
+  PRIMARY KEY (`containerId`),
+  KEY `container_ibfk_1` (`IdWaste`),
+  CONSTRAINT `container_ibfk_1` FOREIGN KEY (`IdWaste`) REFERENCES `waste` (`id`)
+) ENGINE=InnoDB AUTO_INCREMENT=12 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+/*!40101 SET character_set_client = @saved_cs_client */;
 
 --
 -- Dumping data for table `container`
 --
 
-INSERT INTO `container` (`containerId`, `name`, `station`, `IdWaste`, `weightbin`, `status`) VALUES
-(1, 'PCS-17', 'Coil', 1, 0, 0);
-
--- --------------------------------------------------------
+LOCK TABLES `container` WRITE;
+/*!40000 ALTER TABLE `container` DISABLE KEYS */;
+INSERT INTO `container` VALUES (1,'1-PCL-3-1-7-WR','Wire',1,0.06,0,'Dispose'),(2,'1-PCL-3-2-7-TM','Terminal',2,0.98,0,'Dispose'),(3,'PCS-03','Coil',1,0.00,0,'Dispose'),(4,'2-PCL-2-WR','Wirel',1,0.00,0,'Collection'),(5,'2-PCL-1-TM','Terminal',2,0.00,0,'Collection'),(6,'2B-000-003','Coil',1,0.00,0,'Collection'),(7,'1-PCS-SD-SR-B1','Solder Dust',3,0.00,0,'Dispose'),(8,'1-PCL-SP-SR-05-1','2-PCL-SP',4,0.00,0,'Dispose'),(9,'2-PCL-SP-05','2-PCL-SP',4,0.00,0,'Collection'),(11,'1-PCS-SP-SR-B1','1-PCS-SP',1,0.00,0,'Dispose');
+/*!40000 ALTER TABLE `container` ENABLE KEYS */;
+UNLOCK TABLES;
 
 --
 -- Table structure for table `disposewaste`
 --
 
+DROP TABLE IF EXISTS `disposewaste`;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
+/*!40101 SET character_set_client = utf8 */;
 CREATE TABLE `disposewaste` (
-  `id` int(11) NOT NULL,
+  `id` int(11) NOT NULL AUTO_INCREMENT,
   `Idbadge` int(11) NOT NULL,
   `Idcontainer` int(11) NOT NULL,
   `Idwaste` int(11) NOT NULL,
   `CreatedAt` int(11) NOT NULL,
-  `neto` decimal(10,0) NOT NULL
+  `neto` decimal(10,0) NOT NULL,
+  PRIMARY KEY (`id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+/*!40101 SET character_set_client = @saved_cs_client */;
 
--- --------------------------------------------------------
+--
+-- Dumping data for table `disposewaste`
+--
+
+LOCK TABLES `disposewaste` WRITE;
+/*!40000 ALTER TABLE `disposewaste` DISABLE KEYS */;
+/*!40000 ALTER TABLE `disposewaste` ENABLE KEYS */;
+UNLOCK TABLES;
 
 --
 -- Table structure for table `employee`
 --
 
+DROP TABLE IF EXISTS `employee`;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
+/*!40101 SET character_set_client = utf8 */;
 CREATE TABLE `employee` (
-  `id` int(11) NOT NULL,
+  `id` int(11) NOT NULL AUTO_INCREMENT,
   `username` varchar(100) NOT NULL,
   `isactive` int(11) NOT NULL,
-  `badgeId` int(11) NOT NULL
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+  `badgeId` int(11) NOT NULL,
+  PRIMARY KEY (`id`),
+  KEY `badgeId` (`badgeId`)
+) ENGINE=InnoDB AUTO_INCREMENT=4 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+/*!40101 SET character_set_client = @saved_cs_client */;
 
 --
 -- Dumping data for table `employee`
 --
 
-INSERT INTO `employee` (`id`, `username`, `isactive`, `badgeId`) VALUES
-(1, 'Admin', 1, 123);
-
--- --------------------------------------------------------
+LOCK TABLES `employee` WRITE;
+/*!40000 ALTER TABLE `employee` DISABLE KEYS */;
+INSERT INTO `employee` VALUES (1,'Admin',1,123),(2,'Rennu',1,940265),(3,'Ricky',1,939256);
+/*!40000 ALTER TABLE `employee` ENABLE KEYS */;
+UNLOCK TABLES;
 
 --
 -- Table structure for table `transaction`
 --
 
+DROP TABLE IF EXISTS `transaction`;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
+/*!40101 SET character_set_client = utf8 */;
 CREATE TABLE `transaction` (
-  `id` int(11) NOT NULL,
   `badgeId` int(11) NOT NULL,
-  `idContainer` int(11) NOT NULL,
-  `idWaste` int(11) NOT NULL,
+  `idContainer` int(11) DEFAULT NULL,
+  `idWaste` int(11) DEFAULT NULL,
   `recordDate` datetime NOT NULL DEFAULT current_timestamp(),
-  `neto` decimal(10,0) NOT NULL
+  `type` varchar(100) NOT NULL,
+  `weight` decimal(10,2) DEFAULT NULL,
+  `idscraplog` varchar(128) CHARACTER SET utf8 COLLATE utf8_general_ci NOT NULL,
+  `status` varchar(48) CHARACTER SET utf8 COLLATE utf8_general_ci DEFAULT NULL,
+  `fromContainer` varchar(100) CHARACTER SET utf8 COLLATE utf8_general_ci DEFAULT NULL,
+  `toBin` varchar(100) CHARACTER SET utf8 COLLATE utf8_general_ci DEFAULT NULL,
+  PRIMARY KEY (`idscraplog`),
+  KEY `badgeId` (`badgeId`),
+  KEY `idContainer` (`idContainer`),
+  KEY `idWaste` (`idWaste`),
+  CONSTRAINT `transaction_ibfk_1` FOREIGN KEY (`badgeId`) REFERENCES `employee` (`badgeId`),
+  CONSTRAINT `transaction_ibfk_2` FOREIGN KEY (`idContainer`) REFERENCES `container` (`containerId`) ON DELETE SET NULL ON UPDATE CASCADE,
+  CONSTRAINT `transaction_ibfk_3` FOREIGN KEY (`idWaste`) REFERENCES `waste` (`id`) ON DELETE SET NULL ON UPDATE CASCADE
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+/*!40101 SET character_set_client = @saved_cs_client */;
 
 --
 -- Dumping data for table `transaction`
 --
 
-INSERT INTO `transaction` (`id`, `badgeId`, `idContainer`, `idWaste`, `recordDate`, `neto`) VALUES
-(5, 123, 1, 1, '2024-05-19 19:53:22', '0'),
-(16, 123, 1, 1, '2024-05-19 20:36:08', '0'),
-(17, 123, 1, 1, '2024-05-19 20:37:03', '0'),
-(18, 123, 1, 1, '2024-05-19 20:37:09', '0'),
-(19, 123, 1, 1, '2024-05-19 21:17:04', '0'),
-(20, 123, 1, 1, '2024-05-19 21:20:12', '0'),
-(21, 123, 1, 1, '2024-05-19 21:20:54', '0'),
-(22, 123, 1, 1, '2024-05-19 21:24:34', '0'),
-(23, 123, 1, 1, '2024-05-19 21:26:29', '0'),
-(24, 123, 1, 1, '2024-05-19 21:28:45', '0'),
-(25, 123, 1, 1, '2024-05-19 21:31:31', '0'),
-(26, 123, 1, 1, '2024-05-19 21:35:38', '0'),
-(27, 123, 1, 1, '2024-05-19 21:35:52', '0'),
-(28, 123, 1, 1, '2024-05-19 21:37:35', '0'),
-(29, 123, 1, 1, '2024-05-19 21:39:28', '0'),
-(30, 123, 1, 1, '2024-05-19 21:43:43', '0'),
-(31, 123, 1, 1, '2024-05-19 21:47:23', '0'),
-(32, 123, 1, 1, '2024-05-19 21:47:54', '0'),
-(33, 123, 1, 1, '2024-05-19 21:49:40', '0'),
-(34, 123, 1, 1, '2024-05-20 09:53:04', '0'),
-(35, 123, 1, 1, '2024-05-20 10:02:55', '0');
-
--- --------------------------------------------------------
+LOCK TABLES `transaction` WRITE;
+/*!40000 ALTER TABLE `transaction` DISABLE KEYS */;
+INSERT INTO `transaction` VALUES (940265,11,4,'2024-06-25 03:42:24','',0.00,'00057E22DC7C4C95BD2D69EA603B7A8E','Step-1','1-PCS-SP-SR-B1','1-PCS-SP-SR-5-1');
+/*!40000 ALTER TABLE `transaction` ENABLE KEYS */;
+UNLOCK TABLES;
 
 --
 -- Table structure for table `waste`
 --
 
+DROP TABLE IF EXISTS `waste`;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
+/*!40101 SET character_set_client = utf8 */;
 CREATE TABLE `waste` (
-  `id` int(11) NOT NULL,
+  `id` int(11) NOT NULL AUTO_INCREMENT,
   `name` varchar(100) NOT NULL,
+  `scales` varchar(255) NOT NULL,
   `createdAt` datetime NOT NULL,
-  `updatedAt` datetime NOT NULL
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+  `updatedAt` datetime NOT NULL,
+  `handletype` varchar(48) CHARACTER SET utf8 COLLATE utf8_general_ci DEFAULT NULL,
+  `step1` bit(1) DEFAULT b'0',
+  PRIMARY KEY (`id`)
+) ENGINE=InnoDB AUTO_INCREMENT=7 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+/*!40101 SET character_set_client = @saved_cs_client */;
 
 --
 -- Dumping data for table `waste`
 --
 
-INSERT INTO `waste` (`id`, `name`, `createdAt`, `updatedAt`) VALUES
-(1, 'Iron', '2024-05-17 15:28:08', '2024-05-17 15:28:08');
+LOCK TABLES `waste` WRITE;
+/*!40000 ALTER TABLE `waste` DISABLE KEYS */;
+INSERT INTO `waste` VALUES (1,'Copper Wire','4Kg','2024-05-17 15:28:08','2024-05-17 15:28:08',NULL,'\0'),(2,'Copper Terminal','50Kg','0000-00-00 00:00:00','0000-00-00 00:00:00',NULL,'\0'),(3,'Solder Waste','4Kg','0000-00-00 00:00:00','0000-00-00 00:00:00',NULL,'\0'),(4,'Solder Paste','50Kg','0000-00-00 00:00:00','0000-00-00 00:00:00','Rack','\0'),(5,'Cutting Copper Terminal','50Kg','0000-00-00 00:00:00','0000-00-00 00:00:00',NULL,'\0'),(6,'Coil Reject (PCC)','50Kg','0000-00-00 00:00:00','0000-00-00 00:00:00',NULL,'\0');
+/*!40000 ALTER TABLE `waste` ENABLE KEYS */;
+UNLOCK TABLES;
+/*!40103 SET TIME_ZONE=@OLD_TIME_ZONE */;
 
---
--- Indexes for dumped tables
---
-
---
--- Indexes for table `bin`
---
-ALTER TABLE `bin`
-  ADD PRIMARY KEY (`id`),
-  ADD KEY `bin_ibfk_1` (`IdWaste`);
-
---
--- Indexes for table `container`
---
-ALTER TABLE `container`
-  ADD PRIMARY KEY (`containerId`),
-  ADD KEY `container_ibfk_1` (`IdWaste`);
-
---
--- Indexes for table `disposewaste`
---
-ALTER TABLE `disposewaste`
-  ADD PRIMARY KEY (`id`);
-
---
--- Indexes for table `employee`
---
-ALTER TABLE `employee`
-  ADD PRIMARY KEY (`id`),
-  ADD KEY `badgeId` (`badgeId`);
-
---
--- Indexes for table `transaction`
---
-ALTER TABLE `transaction`
-  ADD PRIMARY KEY (`id`),
-  ADD KEY `badgeId` (`badgeId`),
-  ADD KEY `idContainer` (`idContainer`),
-  ADD KEY `idWaste` (`idWaste`);
-
---
--- Indexes for table `waste`
---
-ALTER TABLE `waste`
-  ADD PRIMARY KEY (`id`);
-
---
--- AUTO_INCREMENT for dumped tables
---
-
---
--- AUTO_INCREMENT for table `bin`
---
-ALTER TABLE `bin`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=3;
-
---
--- AUTO_INCREMENT for table `container`
---
-ALTER TABLE `container`
-  MODIFY `containerId` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=2;
-
---
--- AUTO_INCREMENT for table `disposewaste`
---
-ALTER TABLE `disposewaste`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT;
-
---
--- AUTO_INCREMENT for table `employee`
---
-ALTER TABLE `employee`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=2;
-
---
--- AUTO_INCREMENT for table `transaction`
---
-ALTER TABLE `transaction`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=36;
-
---
--- AUTO_INCREMENT for table `waste`
---
-ALTER TABLE `waste`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=2;
-
---
--- Constraints for dumped tables
---
-
---
--- Constraints for table `bin`
---
-ALTER TABLE `bin`
-  ADD CONSTRAINT `bin_ibfk_1` FOREIGN KEY (`IdWaste`) REFERENCES `waste` (`id`);
-
---
--- Constraints for table `container`
---
-ALTER TABLE `container`
-  ADD CONSTRAINT `container_ibfk_1` FOREIGN KEY (`IdWaste`) REFERENCES `waste` (`id`);
-
---
--- Constraints for table `transaction`
---
-ALTER TABLE `transaction`
-  ADD CONSTRAINT `transaction_ibfk_1` FOREIGN KEY (`badgeId`) REFERENCES `employee` (`badgeId`),
-  ADD CONSTRAINT `transaction_ibfk_2` FOREIGN KEY (`idContainer`) REFERENCES `container` (`containerId`),
-  ADD CONSTRAINT `transaction_ibfk_3` FOREIGN KEY (`idWaste`) REFERENCES `waste` (`id`);
-COMMIT;
-
+/*!40101 SET SQL_MODE=@OLD_SQL_MODE */;
+/*!40014 SET FOREIGN_KEY_CHECKS=@OLD_FOREIGN_KEY_CHECKS */;
+/*!40014 SET UNIQUE_CHECKS=@OLD_UNIQUE_CHECKS */;
 /*!40101 SET CHARACTER_SET_CLIENT=@OLD_CHARACTER_SET_CLIENT */;
 /*!40101 SET CHARACTER_SET_RESULTS=@OLD_CHARACTER_SET_RESULTS */;
 /*!40101 SET COLLATION_CONNECTION=@OLD_COLLATION_CONNECTION */;
+/*!40111 SET SQL_NOTES=@OLD_SQL_NOTES */;
+
+-- Dump completed on 2024-06-25 14:24:34

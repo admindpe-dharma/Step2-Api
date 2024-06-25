@@ -1,13 +1,16 @@
 import express from "express";
-import ScalesRoute from "./routes/ScalesRoute.js";
+//import ScalesRoute from "./routes/ScalesRoute.js";
 import ScannerRoute from "./routes/ScannerRoute.js";
+import APIRoute from './routes/APIRoute.js';
 import db from "./config/db.js";
 import cors from  "cors";
 import http from 'http';
 import { Server } from "socket.io";
-import { getScales4Kg ,getScales50Kg} from "./controllers/Scales.js";
+//import { getScales4Kg ,getScales50Kg} from "./controllers/Scales.js";
 import bodyParser from "body-parser";
 import {getWeightBin} from "./controllers/Bin.js"
+import { config } from "dotenv";
+config();
 const app = express();
 const server = http.createServer(app);
 const clientList= [];
@@ -43,9 +46,9 @@ try {
 }
 
 
-app.use(ScalesRoute);
+//app.use(ScalesRoute);
 app.use(ScannerRoute);
-
+app.use(APIRoute);
 io.on('connection',(socket)=>{
 //  console.log("listening socket.io");
 getWeightBin(socket);
@@ -64,6 +67,6 @@ server.listen(port, () => {
   console.log(`Server up and running on port ${port}`);
 });
 export {clientList,io,Server};
-getScales4Kg(io);
-getScales50Kg(io);
+//getScales4Kg(io);
+//getScales50Kg(io);
 //getWeightBin(io);
