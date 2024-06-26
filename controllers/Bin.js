@@ -54,6 +54,23 @@ export const getbinData = async (req, res) => {
         res.status(500).json({ msg: 'Terjadi kesalahan server' });
     }
 };
+export const getBin = async (req,res) =>{
+    const {binName} = req.params;
+    try {
+        const bin = await Bin.findOne({
+            where: { name:binName }
+        });
+
+        if (bin) {
+            res.json({ bin },200);
+        } else {
+            res.json({ error: 'bin ID not found' },500);
+        }
+    } catch (error) {
+        console.error(error);
+        res.status(500).json({ msg: 'Terjadi kesalahan server' });
+    }
+;}
 
 export const getTimbanganData = async (req, res) => {
    // const { instruksimsg } = req.body;
