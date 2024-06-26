@@ -68,7 +68,7 @@ export const ScanContainer = async (req, res) => {
     const { containerId } = req.body;
     try {
         const container = await Container.findOne({
-            attributes: [ 'containerId','name', 'station', 'weightbin', 'IdWaste','type'],
+            attributes: [ 'containerId','name', 'station', 'weightbin', 'IdWaste','type','step1'],
             include: [
                 {
                     model: Waste,
