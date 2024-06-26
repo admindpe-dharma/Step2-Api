@@ -186,7 +186,7 @@ export const UpdateTransaksi = async (req,res) =>{
         return res.json({msg:"Transaction Not Found"},404);
     try
     {
-        const res =await  axios.put(`http://${process.env.STEP1}/step1/`+idscraplog,{status:"Done"});
+        const res =await  axios.put(`http://${process.env.STEP1}/api/pid/step1/`+idscraplog,{status:"Done"});
         _transaction.setDataValue("status",status);
         _transaction.setDataValue("type",type);
         _transaction.setDataValue("weight",weight);
