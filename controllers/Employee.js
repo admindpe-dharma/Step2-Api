@@ -188,6 +188,7 @@ export const UpdateTransaksi = async (req,res) =>{
     try
     {
         const res =await  axios.put(`http://${process.env.STEP1}/step1/`+idscraplog,{status:"Done"});
+        console.log(res);
         _transaction.setDataValue("status",status);
         _transaction.setDataValue("type",type);
         _transaction.setDataValue("weight",weight);
@@ -197,6 +198,7 @@ export const UpdateTransaksi = async (req,res) =>{
     }
     catch(err)
     {
+        console.log(err.response  ? err.response.data : err);
         return res.json({msg: err.response ? err.response.data : err},500);
     }
 }
