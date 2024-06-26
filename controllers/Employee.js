@@ -169,7 +169,8 @@ export const getTransaction = async (req,res)=>{
     const { containerName } = req.params;
     const tr = await transaction.findOne({
         where:{
-            fromContainer: containerName
+            fromContainer: containerName,
+            status: "Step-1"
         }
     });
     return res.status(!tr ? 404 : 200).json(!tr? {msg:"not found"} : tr);
