@@ -7,10 +7,15 @@ import Weste from "./WasteModel.js";
 const { DataTypes } = Sequelize;
 
 const transaction = db.define('transaction', {
+    id:{
+        type: DataTypes.INTEGER,
+        
+        primaryKey:true,
+        autoIncrement: true,
+    },
     idscraplog: {
         type: DataTypes.STRING,
-        primaryKey:true,
-        allowNull: false
+        allowNull: true
     },
     badgeId : {
         type: DataTypes.INTEGER,
