@@ -22,7 +22,10 @@ export const updateBinWeightData = async (hostname)=>{
     console.log(clientList);
     const _id = clientList.find(x=>x.hostname==hostname);
     if (!_id)
+    {
+        console.log(_id + "("+ hostname + ") Id not found");
         return;
+    }
     console.log("Update " +hostname);
     console.log(clientList);
     console.log(_id);
