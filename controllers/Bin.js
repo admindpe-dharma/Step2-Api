@@ -33,7 +33,7 @@ export const updateBinWeightData = async (hostname)=>{
     console.log({hostname:hostname,bin:bin});
     let payload = {};
     if (bin) {
-        payload = { weight: bin.weight };
+        payload = { weight: bin.weight,max_weight: bin.max_weight };
     } else {
         payload = { error: 'Bin not found' };
     }
