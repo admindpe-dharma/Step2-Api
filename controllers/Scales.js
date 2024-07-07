@@ -38,6 +38,7 @@ export const getScales4Kg = (io) => {
             if (temp != '\n')
             {
                 _4kgOutput += temp;
+                console.log({ "4kg": _4kgOutput });
                 return;
             }
             _4kgOutput = _4kgOutput.replace("\n","").replace("\r","");
