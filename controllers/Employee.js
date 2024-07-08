@@ -7,6 +7,7 @@ import moment from 'moment';
 import { updateBinWeightData } from "./Bin.js";
 import employee from "../models/EmployeeModel.js";
 import axios from 'axios';
+import { Op } from "sequelize";
 
 export const ScanBadgeid = async (req, res) => {
     const { badgeId } = req.body;
@@ -170,7 +171,10 @@ export const getTransaction = async (req,res)=>{
     const tr = await transaction.findOne({
         where:{
             fromContainer: containerName,
-            status: "Step-1"
+            status: "Step-1",
+            idscraplog: {
+                [Op.ne]: 'Fail'
+            }
         }
     });
     return res.status(!tr ? 404 : 200).json(!tr? {msg:"not found"} : tr);
