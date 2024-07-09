@@ -8,7 +8,7 @@ import http from 'http';
 import { Server } from "socket.io";
 import { getScales4Kg ,getScales50Kg} from "./controllers/Scales.js";
 import bodyParser from "body-parser";
-import {getWeightBin} from "./controllers/Bin.js"
+import {BroadcastBinWeight, getWeightBin} from "./controllers/Bin.js"
 import { config } from "dotenv";
 config();
 const app = express();
@@ -69,4 +69,7 @@ server.listen(port, () => {
 export {clientList,io,Server};
 getScales4Kg(io);
 getScales50Kg(io);
+setInterval(()=>{
+  BroadcastBinWeight();
+},10*1000);
 //getWeightBin(io);

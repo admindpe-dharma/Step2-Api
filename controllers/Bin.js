@@ -8,7 +8,6 @@ export const getWeightBin =  (socket) => {
             console.log('Register ' + hostname);
             if (!clientList.find(x=>x.hostname==hostname))
                 clientList.push({id:socket.id,hostname:hostname});
-            console.log(clientList);
             await updateBinWeightData(hostname);
         });
     } catch (error) {
@@ -29,6 +28,10 @@ export const updateBinWeightData = async (hostname)=>{
     console.log("Update " +hostname);
     console.log(clientList);
     console.log(_id);
+    const payload = await getBinByHostname(hostname);
+    io.to(_id.id).emit('getweight', payload);
+}
+const getBinByHostname = async (hostname)=>{
     const bin = await Bin.findOne({ where: { name_hostname: hostname } });
     console.log({hostname:hostname,bin:bin});
     let payload = {};
@@ -37,9 +40,27 @@ export const updateBinWeightData = async (hostname)=>{
     } else {
         payload = { error: 'Bin not found' };
     }
-    io.to(_id.id).emit('getweight', payload);
+    return payload;
 }
-
+export const BroadcastBinWeight = async ()=>{
+    if (!clientList || clientList == null )
+        return;
+    if (clientList.length < 0)
+        return;
+    for (let i=0;i<clientList.length;i++)
+    {
+        try
+        {
+            console.log(clientList[i]);
+            const payload = await getBinByHostname(clientList[i].hostname);
+            io.to(clientList[i].id).emit('getweight', payload);
+        }
+        catch (err)
+        {
+            console.log({BroadcastError:err});
+        }
+    }
+}
 export const getbinData = async (req, res) => {
     const { hostname } = req.query;
     try {
