@@ -1,30 +1,24 @@
 import { SerialPort } from 'serialport';
 
-const Timbangan = new SerialPort({
-    path: '/dev/ttyUSB1',
-    baudRate: 9600,
-    dataBits: 8,
-    stopBits: 1,
-    parity: 'none',
-});
 
-const Timbangan_1 = new SerialPort({
-    path: '/dev/ttyUSB0',
-    baudRate: 9600,
-    dataBits: 8,
-    stopBits: 1,
-    parity: 'none',
-}); 
 
-Timbangan.on('error', (error) => {
-    console.log(error);
-});
+
 
 let _4kgOutput = '';
 let _50kgOutput = '';
 export const getScales4Kg = (io) => {
     try {
         
+        const Timbangan = new SerialPort({
+            path: '/dev/ttyUSB1',
+            baudRate: 9600,
+            dataBits: 8,
+            stopBits: 1,
+            parity: 'none',
+        });
+        Timbangan.on('error', (error) => {
+            console.log(error);
+        });
         let response;
         console.log("start reading scale4kg");
         io.on('connectScale', () => {
@@ -62,6 +56,14 @@ export const getScales4Kg = (io) => {
 
 export const getScales50Kg = (io) => {
     try {
+        const Timbangan_1 = new SerialPort({
+            path: '/dev/ttyUSB0',
+            baudRate: 9600,
+            dataBits: 8,
+            stopBits: 1,
+            parity: 'none',
+        }); 
+        
         let response;
         console.log("start reading scale50kg");
         /* console.log("TEt");
