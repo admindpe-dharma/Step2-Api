@@ -185,7 +185,10 @@ export const UpdateTransaksi = async (req,res) =>{
     const _transaction = await transaction.findOne({
         where:{
             idscraplog: idscraplog
-        }
+        },
+        order:[
+            ['recordDate','DESC']
+        ]
     });
     if (!_transaction)
         return res.json({msg:"Transaction Not Found"},404);
