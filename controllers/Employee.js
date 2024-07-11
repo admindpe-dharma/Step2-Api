@@ -192,7 +192,7 @@ export const UpdateTransaksi = async (req,res) =>{
     try
     {
         console.log({url:`http://${process.env.STEP1}/api/pid/step1/`+idscraplog});
-        const _res =await  axios.put(`http://${process.env.STEP1}/step1/`+idscraplog,{status:"Done"});
+        const _res =await  axios.put(`http://${process.env.STEP1}/api/pid/step1/`+idscraplog,{status:"Done"});
         _transaction.setDataValue("status",status);
         _transaction.setDataValue("type",type);
         _transaction.setDataValue("weight",weight);
