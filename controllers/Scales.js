@@ -13,6 +13,8 @@ export const getScales4Kg = (io) => {
             path: '/dev/ttyUSB1',
             baudRate: 9600,
             dataBits: 8,
+            lock:false,
+            rtscts:true,
             stopBits: 1,
             parity: 'none',
         });
@@ -58,6 +60,8 @@ export const getScales50Kg = (io) => {
     try {
         const Timbangan_1 = new SerialPort({
             path: '/dev/ttyUSB0',
+            lock:false,
+            rtscts:true,
             baudRate: 9600,
             dataBits: 8,
             stopBits: 1,
