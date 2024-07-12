@@ -225,8 +225,8 @@ export const UpdateBinWeight = async (req,res) =>{
     const binData = await Bin.findAll({where: {name: data.dataValues.name}});
     for (let i=0;i<binData.length;i++)
     {
-        binData.weight = parseFloat(neto) + parseFloat(data.weight);
-        await data.save();
+        binData[i].weight = parseFloat(neto) + parseFloat(data.weight);
+        await binData[i].save();
     }
     await updateBinWeightData(data.name_hostname);
    // await switchLamp(data.id,"RED",data.weight >= parseFloat(data.max_weight))
@@ -236,10 +236,14 @@ export const UpdateBinWeight = async (req,res) =>{
 export const UpdateBinWeightCollection = async (req, res) => {
     const { binId } = req.body; // neto is not needed as weight will be set to 0
     const data = await Bin.findOne({ where: { id: binId } });
-    
+
     if (data) {
-        data.weight = 0; // Set weight to 0
-        await data.save();
+        const binData = await Bin.findAll({where: {name: data.dataValues.name}});
+        for (let i=0;i<binData.length;i++)
+        {
+            binData[i].weight =0;
+            await binData[i].save();
+        }
         await updateBinWeightData(data.name_hostname);
         res.status(200).json({ msg: 'ok' });
     } else {
