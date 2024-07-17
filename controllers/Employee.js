@@ -184,11 +184,11 @@ export const syncTransaction = async (req,res)=>{
     let _data=null;
     try
     {
-        const res = await axios.get(`http://${process.env.STEP1}/sync/`+os.hostname());
-        const trData = res.data;
+        const _res = await axios.get(`http://${process.env.STEP1}/sync/`+os.hostname());
+        const trData = _res.data;
         if (!trData.length)
-            return res.status(200).json({msg:"Empty Transaction",tr:tr});
-        _data = res.data;
+            return _res.status(200).json({msg:"Empty Transaction",tr:tr});
+        _data = _res.data;
         for (let i=0;i<trData.length;i++)
         {
             const tr = trData[i];
