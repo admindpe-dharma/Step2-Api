@@ -7,6 +7,7 @@ import moment from 'moment';
 import { updateBinWeightData } from "./Bin.js";
 import employee from "../models/EmployeeModel.js";
 import axios from 'axios';
+import os from  'os';
 import { Op } from "sequelize";
 
 export const ScanBadgeid = async (req, res) => {
@@ -178,6 +179,57 @@ export const getTransaction = async (req,res)=>{
         }
     });
     return res.status(!tr ? 404 : 200).json(!tr? {msg:"not found"} : tr);
+}
+export const syncTransaction = async (req,res)=>{
+    try
+    {
+        const res = await axios.get(`http://${process.env.STEP1}/sync/`+os.hostname());
+        const trData = res.data;
+        if (!trData.length)
+            return res.status(200).json({msg:"Empty Transaction",tr:tr});
+        for (let i=0;i<trData.length;i++)
+        {
+            const tr = trData[i];
+            const _waste = await Waste.findOne({
+                where:{
+                    name: tr.waste.name
+                }
+            });
+            const _container = await Container.findOne({
+                where:{
+                    name: tr.container.name
+                }
+            });
+            const data = await transaction.findOne({
+                where:{
+                    fromContainer: _container.name,
+                    toBin: tr.bin,
+                    idscraplog : tr.idscraplog,
+                    status: 'Step-1'
+                }
+            }) ;
+            if (!data || data == undefined)
+            {
+                const state = await transaction.create({
+                    idscraplog: tr.idscraplog,
+                    IdWaste: _waste.getDataValue("Id"),
+                    idContainer : _container.getDataValue("containerId"),
+                    badgeId: badgeId,
+                    status: "Step-1",
+                    weight: 0,
+                    type: '',
+                    toBin: tr.bin,
+                    fromContainer: _container.name,
+                });
+                state.save();
+            }
+        }
+        return res.status(200).json({msg:"Sync Success"});
+    }
+    catch(err)
+    {
+        return res.status(500).json(err);
+    }
 }
 export const UpdateTransaksi = async (req,res) =>{
     const {idscraplog} = req.params;
