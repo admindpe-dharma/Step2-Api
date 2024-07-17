@@ -213,13 +213,14 @@ export const syncTransaction = async (req,res)=>{
                     status: 'Step-1'
                 }
             }) ;
+            _data = data;
             if (!data || data == undefined)
             {
                 const state = await transaction.create({
                     idscraplog: tr.idscraplog,
                     IdWaste: _waste.getDataValue("Id"),
                     idContainer : _container.getDataValue("containerId"),
-                    badgeId: badgeId,
+                    badgeId: tr.badgeId,
                     status: "Step-1",
                     weight: 0,
                     type: '',
