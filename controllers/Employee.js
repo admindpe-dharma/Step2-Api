@@ -214,21 +214,20 @@ export const syncTransaction = async (req,res)=>{
                 }
             }) ;
             _data = data;
-            if (!data || data == undefined)
-            {
-                const state = await transaction.create({
-                    idscraplog: tr.idscraplog,
-                    IdWaste: _waste.getDataValue("Id"),
-                    idContainer : _container.getDataValue("containerId"),
-                    badgeId: tr.badgeId,
-                    status: "Step-1",
-                    weight: 0,
-                    type: '',
-                    toBin: tr.bin,
-                    fromContainer: _container.name,
-                });
-                state.save();
-            }
+            if (data)
+                continue;
+            const state = await transaction.create({
+                idscraplog: tr.idscraplog,
+                IdWaste: _waste.getDataValue("Id"),
+                idContainer : _container.getDataValue("containerId"),
+                badgeId: tr.badgeId,
+                status: "Step-1",
+                weight: 0,
+                type: '',
+                toBin: tr.bin,
+                fromContainer: _container.name,
+            });
+            state.save();
         }
         return res.status(200).json({msg:"Sync Success"});
     }
