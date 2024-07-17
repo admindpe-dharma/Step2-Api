@@ -191,6 +191,7 @@ export const syncTransaction = async (req,res)=>{
         _data = res.data;
         for (let i=0;i<trData.length;i++)
         {
+            _data = {i:i,data:trData[i]};
             const tr = trData[i];
             const _waste = await Waste.findOne({
                 where:{
