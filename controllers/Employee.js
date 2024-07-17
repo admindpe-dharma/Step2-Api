@@ -188,7 +188,7 @@ export const syncTransaction = async (req,res)=>{
         const trData = res.data;
         if (!trData.length)
             return res.status(200).json({msg:"Empty Transaction",tr:tr});
-        _data = res;
+        _data = res.data;
         for (let i=0;i<trData.length;i++)
         {
             const tr = trData[i];
