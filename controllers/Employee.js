@@ -181,12 +181,14 @@ export const getTransaction = async (req,res)=>{
     return res.status(!tr ? 404 : 200).json(!tr? {msg:"not found"} : tr);
 }
 export const syncTransaction = async (req,res)=>{
+    let _data=null;
     try
     {
         const res = await axios.get(`http://${process.env.STEP1}/sync/`+os.hostname());
         const trData = res.data;
         if (!trData.length)
             return res.status(200).json({msg:"Empty Transaction",tr:tr});
+        _data = trData;
         for (let i=0;i<trData.length;i++)
         {
             const tr = trData[i];
@@ -228,7 +230,7 @@ export const syncTransaction = async (req,res)=>{
     }
     catch(err)
     {
-        return res.status(500).json(err);
+        return res.status(500).json({err:err,data:_data});
     }
 }
 export const UpdateTransaksi = async (req,res) =>{
