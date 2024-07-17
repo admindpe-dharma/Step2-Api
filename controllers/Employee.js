@@ -233,7 +233,7 @@ export const syncTransaction = async (req,res)=>{
     }
     catch(err)
     {
-        return res.status(500).json({err:err,data:_data});
+        return res.status(500).json({err:err.message,data:_data});
     }
 }
 export const UpdateTransaksi = async (req,res) =>{
