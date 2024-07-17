@@ -191,6 +191,7 @@ export const syncTransaction = async (req,res)=>{
         _data = res.data;
         for (let i=0;i<trData.length;i++)
         {
+            const tr = trData[i];
             const _container = await Container.findOne({
                 where:{
                     name: tr.container.name
@@ -199,7 +200,6 @@ export const syncTransaction = async (req,res)=>{
             if (!_container)
                 continue;
             _data = {i:i,data:trData[i]};
-            const tr = trData[i];
             const _waste = await Waste.findOne({
                 where:{
                     name: tr.waste.name
