@@ -5,7 +5,6 @@ import Bin from "../models/BinModel.js";
 export const getWeightBin =  (socket) => {
     try {
         socket.on('getWeightBin',async (hostname)=>{
-            console.log('Register ' + hostname);
             if (!clientList.find(x=>x.hostname==hostname))
                 clientList.push({id:socket.id,hostname:hostname});
             await updateBinWeightData(hostname);
@@ -17,23 +16,16 @@ export const getWeightBin =  (socket) => {
 };
 
 export const updateBinWeightData = async (hostname)=>{
-    console.log('Update Client '+ hostname );
-    console.log(clientList);
     const _id = clientList.find(x=>x.hostname==hostname);
     if (!_id)
     {
-        console.log(_id + "("+ hostname + ") Id not found");
         return;
     }
-    console.log("Update " +hostname);
-    console.log(clientList);
-    console.log(_id);
     const payload = await getBinByHostname(hostname);
     io.to(_id.id).emit('getweight', payload);
 }
 const getBinByHostname = async (hostname)=>{
     const bin = await Bin.findOne({ where: { name_hostname: hostname } });
-    console.log({hostname:hostname,bin:bin});
     let payload = {};
     if (bin) {
         payload = { weight: bin.weight,max_weight: bin.max_weight };
@@ -51,13 +43,11 @@ export const BroadcastBinWeight = async ()=>{
     {
         try
         {
-            console.log(clientList[i]);
             const payload = await getBinByHostname(clientList[i].hostname);
             io.to(clientList[i].id).emit('getweight', payload);
         }
         catch (err)
         {
-            console.log({BroadcastError:err});
         }
     }
 }

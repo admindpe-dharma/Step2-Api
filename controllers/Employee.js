@@ -42,14 +42,12 @@ export const TransactionStep1 = async (req,res) =>{
         badgeId : badgeId 
         }
     });
-    console.log("start");
     if (!_waste)
         return res.json({msg: "Waste Not Found"},404);
     if (!_container)
         return res.json({msg:" Container Not Found"},404);
     if (!_badge)
         return res.json({msg: "Badge not found"},404);
-    console.log(_waste);
     const transactionData = {
         idscraplog: idscraplog,
         IdWaste: _waste.getDataValue("Id"),
@@ -125,7 +123,6 @@ export const VerificationScan = async (req, res) => {
 
 export const CheckBinCapacity = async (req, res) => {
     const { IdWaste, neto } = req.body;
-console.log(IdWaste);
     try {
         // Mengambil semua tempat sampah yang sesuai dengan type_waste dari database
         const bins = await Bin.findAll({
@@ -163,7 +160,6 @@ console.log(IdWaste);
 export const SaveTransaksi = async (req,res) => {
     const {payload} = req.body;
     payload.recordDate = moment().format("YYYY-MM-DD HH:mm:ss");
-    console.log(payload);
     (await transaction.create(payload)).save();
     res.status(200).json({msg:'ok'});
 };
@@ -251,7 +247,6 @@ export const UpdateTransaksi = async (req,res) =>{
         return res.json({msg:"Transaction Not Found"},404);
     try
     {
-        console.log({url:`http://${process.env.STEP1}/step1/`+idscraplog});
         const _res =await  axios.put(`http://${process.env.STEP1}/step1/`+idscraplog,{status:"Done"});
         _transaction.setDataValue("status",status);
         _transaction.setDataValue("type",type);
@@ -262,7 +257,6 @@ export const UpdateTransaksi = async (req,res) =>{
     }
     catch(err)
     {
-        console.log(err.response  ? err.response.data : err);
         return res.json({msg: err.response ? err.response.data : err},500);
     }
 }
@@ -270,7 +264,6 @@ export const UpdateTransaksi = async (req,res) =>{
 export const SaveTransaksiCollection = async (req,res) => {
     const {payload} = req.body;
     payload.recordDate = moment().format("YYYY-MM-DD HH:mm:ss");
-    console.log(payload);
     (await transaction.create(payload)).save();
     res.status(200).json({msg:'ok'});
 };
