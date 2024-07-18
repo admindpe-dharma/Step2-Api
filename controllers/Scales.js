@@ -64,7 +64,7 @@ export const getScales50Kg = (io) => {
          setInterval(function(){
              response = { weight50Kg: 20 };
              io.emit('data', response);
-         },5000); */
+         },5000); 
         io.on('connectScale', () => {
             Timbangan_1.open(() => {
             });
