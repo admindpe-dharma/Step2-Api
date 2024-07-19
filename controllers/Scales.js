@@ -40,6 +40,8 @@ export const getScales4Kg = (io) => {
                 io.emit('data', response);
                 
             }
+            else
+                console.error({kg40:_4kgOutput});
             _4kgOutput = '';
         });  
     } catch (error) {
@@ -84,6 +86,8 @@ export const getScales50Kg = (io) => {
                 response = { weight50Kg: weight };
                 io.emit('data1', response);
             }
+            else
+                console.log({kg50:_50kgOutput});
             _50kgOutput = '';
         });
 
