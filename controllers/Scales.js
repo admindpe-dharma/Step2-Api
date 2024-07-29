@@ -19,6 +19,7 @@ export const getScales4Kg = (io) => {
             parity: 'none',
         });
         Timbangan.on('error', (error) => {
+            console.log({kg4Error: error});
         });
         let response;
         io.on('connectScale', () => {
@@ -39,6 +40,12 @@ export const getScales4Kg = (io) => {
                 response = { weight: parseFloat(weight) };
                 io.emit('data', response);
                 
+            }
+            else
+            {
+                Timbangan.close();
+                getScales4Kg(io);
+                return;
             }
             _4kgOutput = '';
         });  
@@ -61,14 +68,6 @@ export const getScales50Kg = (io) => {
         }); 
         
         let response;
-         setInterval(function(){
-             response = { weight50Kg: 20 };
-             io.emit('data', response);
-             io.on('connectScale', () => {
-        },5000); 
-            Timbangan_1.open(() => {
-            });
-        });
         Timbangan_1.on('data', (data) => {
             /*if (data.toString()!='\n')
             {
@@ -84,10 +83,17 @@ export const getScales50Kg = (io) => {
                 response = { weight50Kg: weight };
                 io.emit('data1', response);
             }
+            else
+            {
+                Timbangan_1.close();
+                getScales50Kg(io);
+                return;
+            }
             _50kgOutput = '';
         });
 
        Timbangan_1.on('error', (error) => {
+            console.log({kg50Error: error});
         }); 
         if (response != undefined && response != null) {
             res.status(200).json(response);
