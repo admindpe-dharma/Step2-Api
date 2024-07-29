@@ -31,7 +31,6 @@ export const getScales4Kg = (io) => {
             if (temp != '\n')
             {
                 _4kgOutput += temp;
-                console.log({d2:_4kgOutput});
                 return;
             }
             _4kgOutput = _4kgOutput.replace("\n","").replace("\r","");
@@ -44,7 +43,6 @@ export const getScales4Kg = (io) => {
             }
             else
             {
-                console.log({d2:_4kgOutput});
                 Timbangan.close();
                 getScales4Kg(io);
                 return;
