@@ -15,6 +15,7 @@ export const ScanBadgeid = async (req, res) => {
     try {
         const user = await Users.findOne({ attributes: ['badgeId',"username"], where: { badgeId } });
         if (user) {
+            
             res.json({ user: user });
         } else {
             res.json({ error: 'Badge ID not found' });
@@ -234,7 +235,7 @@ export const syncTransaction = async (req,res)=>{
 }
 export const UpdateTransaksi = async (req,res) =>{
     const {idscraplog} = req.params;
-    const {status,type,weight} = req.body;
+    const {status,type,weight,logindate} = req.body;
     const _transaction = await transaction.findOne({
         where:{
             idscraplog: idscraplog
@@ -247,7 +248,7 @@ export const UpdateTransaksi = async (req,res) =>{
         return res.json({msg:"Transaction Not Found"},404);
     try
     {
-        const _res =await  axios.put(`http://${process.env.STEP1}/step1/`+idscraplog,{status:"Done"});
+        const _res =await  axios.put(`http://${process.env.STEP1}/step1/`+idscraplog,{status:"Done",logindate: logindate});
         _transaction.setDataValue("status",status);
         _transaction.setDataValue("type",type);
         _transaction.setDataValue("weight",weight);
