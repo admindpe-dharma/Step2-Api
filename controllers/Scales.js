@@ -20,6 +20,9 @@ export const getScales4Kg = (io) => {
         });
         Timbangan.on('error', (error) => {
             console.log({kg4Error: error});
+            Timbangan.close();
+            getScales4Kg(io);
+            return;
         });
         let response;
         io.on('connectScale', () => {
@@ -96,6 +99,9 @@ export const getScales50Kg = (io) => {
 
        Timbangan_1.on('error', (error) => {
             console.log({kg50Error: error});
+            Timbangan_1.close();
+            getScales50Kg(io);
+            return;
         }); 
         if (response != undefined && response != null) {
             res.status(200).json(response);
