@@ -54,7 +54,8 @@ export const getScales4Kg = (io) => {
         });  
     } catch (error) {
         console.log(error);
-        process.exit();
+        getScales4Kg(io);
+        return;
         //        res.status(500).json({ msg: error.message });
     } 
 };
@@ -108,7 +109,8 @@ export const getScales50Kg = (io) => {
         }
     } catch (error) {
         console.log(error);
-        process.exit();
+        getScales50Kg(io);
+        return;
         //    res.status(500).json({ msg: error.message });
     }
 };
