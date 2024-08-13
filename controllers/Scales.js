@@ -8,7 +8,9 @@ let _4kgOutput = '';
 let _50kgOutput = '';
 export const getScales4Kg = (io) => {
     try {
-        
+        console.log(process.env.TIMBAGAN4KG);
+        if (process.env.TIMBAGAN4KG != "1")
+            return;
         const Timbangan = new SerialPort({
             path: '/dev/ttyUSB1',
             baudRate: 9600,
@@ -62,6 +64,9 @@ export const getScales4Kg = (io) => {
 
 export const getScales50Kg = (io) => {
     try {
+        console.log(process.env.TIMBAGAN50KG);
+        if (process.env.TIMBAGAN50KG != "1")
+            return;
         const Timbangan_1 = new SerialPort({
             path: '/dev/ttyUSB0',
             lock:false,
