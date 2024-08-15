@@ -283,11 +283,23 @@ export const UpdateBinWeight = async (req,res) =>{
 //   await switchLamp(data.id,"RED",data.weight >= parseFloat(data.max_weight))
     res.status(200).json({msg:'ok'});
 };
-
+export const UpdateStep3Value = async (containerName,weight)=>{
+    try
+    {
+        const res = await axios.post(`http://${process.env.STEP3}/Step2Value/`+containerName,{value:weight});
+        return true;
+    }
+    catch (err)
+    {
+        return false;
+    }
+}
 export const UpdateBinWeightCollection = async (req, res) => {
     const { binId } = req.body; // neto is not needed as weight will be set to 0
     const data = await Bin.findOne({ where: { id: binId } });
 
+    const sendWeight = data.dataValues.weight;
+    await UpdateStep3Value(data.dataValues.name,sendWeight);
     if (data) {
         const binData = await Bin.findAll({where: {name: data.dataValues.name}});
         for (let i=0;i<binData.length;i++)
