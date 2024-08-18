@@ -45,6 +45,9 @@ const transaction = db.define('transaction', {
    },
    toBin : {
     type: DataTypes.STRING
+   },
+   status:{
+    type: DataTypes.BOOLEAN
    }
 }, {
     freezeTableName: true,
