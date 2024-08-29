@@ -272,7 +272,8 @@ export const SaveTransaksiCollection = async (req,res) => {
 export const UpdateBinWeight = async (req,res) =>{
     const {binId,neto} = req.body;
     const data = await Bin.findOne({where: {id:binId}});
-    
+    if ((parseFloat(neto)+parseInt(data.dataValues.weight) )>= data.dataValues.max_weight)
+        return res.status(500).json({error:'Berat Melampaui Kapasitas maksimum bin'});
     const binData = await Bin.findAll({where: {name: data.dataValues.name}});
     for (let i=0;i<binData.length;i++)
     {
