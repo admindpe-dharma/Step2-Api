@@ -12,7 +12,7 @@ export const getScales4Kg = (io) => {
         if (process.env.TIMBANGAN4KG != "1")
             return;
         const Timbangan = new SerialPort({
-            path: '/dev/ttyUSB0',
+            path: '/dev/ttyUSB1',
             baudRate: 9600,
             dataBits: 8,
             lock:false,
@@ -40,7 +40,6 @@ export const getScales4Kg = (io) => {
             }
             _4kgOutput = _4kgOutput.replace("\n","").replace("\r","");
             const match = _4kgOutput.toString().match(/WT:(\d+\.\d+)g/);
-            console.log([_4kgOutput,match]);
             if (match ) {
                 const weight =  match[1] ;
                 response = { weight: parseFloat(weight) };
