@@ -39,7 +39,7 @@ export const getScales4Kg = (io) => {
                 return;
             }
             _4kgOutput = _4kgOutput.replace("\n","").replace("\r","");
-            const match = _4kgOutput.toString().match(/WT:(\d+\.\d+)g/);
+            const match = _4kgOutput.toString().match(/WT:(\d+\.\d+)dwt/);
             console.log([_4kgOutput,match]);
             if (match) {
                 const weight = match[1];
@@ -86,7 +86,7 @@ export const getScales50Kg = (io) => {
                 return;
             }*/
             _50kgOutput = data.toString().replace("\r","").replace("\n","");
-            const match = _50kgOutput.toString().match(/[\d]+\.\d{2}(?=dwt)/);
+            const match = _50kgOutput.toString().match(/[\d]+\.\d{2}(?=Kg)/);
 
             if (match) {
                 const weight = match[0];
