@@ -33,6 +33,7 @@ export const getScales4Kg = (io) => {
         });
        Timbangan.on('data', (data) => {
             let temp = data.toString();
+            console.log({raw: temp});
             if (temp != '\n'  && temp != ' ' && temp != '\t' && temp != '\0')
             {
                 _4kgOutput += temp;
