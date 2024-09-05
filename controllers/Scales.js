@@ -86,7 +86,7 @@ export const getScales50Kg = (io) => {
                 return;
             }*/
             _50kgOutput = data.toString().replace("\r","").replace("\n","");
-            const match = _50kgOutput.toString().match(/[\d]+\.\d{2}(?=Kg)/);
+            const match = _50kgOutput.toString().match(/[\d]+\.\d{2}(?=dwt)/);
 
             if (match) {
                 const weight = match[0];
