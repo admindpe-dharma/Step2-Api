@@ -40,6 +40,7 @@ export const getScales4Kg = (io) => {
             }
             _4kgOutput = _4kgOutput.replace("\n","").replace("\r","");
             const match = _4kgOutput.toString().match(/WT:(\d+\.\d+)g/);
+            console.log([_4kgOutput,match]);
             if (match) {
                 const weight = match[1];
                 response = { weight: parseFloat(weight) };
