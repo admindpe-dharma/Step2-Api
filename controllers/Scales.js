@@ -98,7 +98,6 @@ export const getScales50Kg = (io) => {
             {
                 Timbangan_1.close();
                 getScales50Kg(io);
-                return;
             }
             _50kgOutput = '';
         });
