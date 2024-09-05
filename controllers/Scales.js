@@ -51,7 +51,6 @@ export const getScales4Kg = (io) => {
             {
                 Timbangan.close();
                 getScales4Kg(io);
-                return;
             }
             _4kgOutput = '';
         });  
