@@ -72,4 +72,4 @@ getScales50Kg(io);
 setInterval(()=>{
   BroadcastBinWeight();
 },1000);
-//getWeightBin(io);
+//getWeightBin(io); 
