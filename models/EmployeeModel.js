@@ -10,6 +10,12 @@ const employee = db.define('employee', {
     },
     username: {
         type: DataTypes.STRING,
+    },
+    IN:{
+        type: DataTypes.BOOLEAN
+    },
+    OUT:{
+        type: DataTypes.BOOLEAN        
     }
 }, {
     freezeTableName: true

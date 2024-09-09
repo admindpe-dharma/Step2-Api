@@ -13,7 +13,7 @@ import { Op } from "sequelize";
 export const ScanBadgeid = async (req, res) => {
     const { badgeId } = req.body;
     try {
-        const user = await Users.findOne({ attributes: ['badgeId',"username"], where: { badgeId } });
+        const user = await Users.findOne({ attributes: ['badgeId',"username","IN","OUT"], where: { badgeId } });
         if (user) {
             
             res.json({ user: user });
