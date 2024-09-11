@@ -173,7 +173,10 @@ export const getTransaction = async (req,res)=>{
             idscraplog: {
                 [Op.ne]: 'Fail'
             }
-        }
+        },
+        order:[
+            'recordDate','DESC'
+        ]
     });
     return res.status(!tr ? 404 : 200).json(!tr? {msg:"not found"} : tr);
 }
