@@ -175,7 +175,7 @@ export const getTransaction = async (req,res)=>{
             }
         },
         order:[
-            'recordDate','DESC'
+        ['recordDate','DESC']
         ]
     });
     return res.status(!tr ? 404 : 200).json(!tr? {msg:"not found"} : tr);
