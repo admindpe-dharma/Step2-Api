@@ -1,6 +1,6 @@
 import { clientList, io } from "../index.js";
 import Bin from "../models/BinModel.js";
-
+import os,{networkInterfaces} from 'os';
 
 export const getWeightBin =  (socket) => {
     try {
