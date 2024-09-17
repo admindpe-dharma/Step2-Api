@@ -97,3 +97,25 @@ export const getTimbanganData = async (req, res) => {
         res.status(500).json({ msg: 'Terjadi kesalahan server' });
     }
 };
+
+export const getIp = (req,res)=>{
+    const nets = networkInterfaces();
+    const results = Object.create({});
+
+    for (const name of Object.keys(nets)) {
+        for (const net of nets[name]) {
+    
+            const familyV4Value = typeof net.family === 'string' ? 'IPv4' : 4
+            if (net.family === familyV4Value && !net.internal) {
+                if (!results[name]) {
+                    results[name] = [];
+                }
+                results[name].push(net.address);
+            }
+        }
+    }
+    let result = results;
+    if (process.env.ETH_INTERFACE)
+        result = results[process.env.ETH_INTERFACE];
+    return res.status(200).json(result);
+}
