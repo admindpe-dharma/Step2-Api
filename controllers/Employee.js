@@ -249,19 +249,33 @@ export const UpdateTransaksi = async (req,res) =>{
     });
     if (!_transaction)
         return res.json({msg:"Transaction Not Found"},404);
-    try
+    let count = 0;
+    while (count < 100)
     {
-        const _res =await  axios.put(`http://${process.env.STEP1}/step1/`+idscraplog,{status:"Done",logindate: logindate});
-        _transaction.setDataValue("status",status);
-        _transaction.setDataValue("type",type);
-        _transaction.setDataValue("weight",weight);
-        await _transaction.save();
-        
-        return res.json({msg:"Ok"},200);
-    }
-    catch(err)
-    {
-        return res.json({msg: err.response ? err.response.data : err},500);
+        try
+        {
+            const _res =await  axios.put(`http://${process.env.STEP1}/step1/`+idscraplog,{status:"Done",logindate: logindate},
+            {validateStatus: (status)=>{
+                return (status >= 200 && status <300) || (status==404)
+            }});
+            if (_res.data?.msg != "Ok")
+                console.log(_res.data);
+            _transaction.setDataValue("status",status);
+            _transaction.setDataValue("type",type);
+            _transaction.setDataValue("weight",weight);
+            await _transaction.save();
+            
+            return res.json({msg:"Ok"},200);
+        }
+        catch(err)
+        {
+            if (count < 100)
+            {
+                count = count+1;
+                continue;
+            }
+            return res.json({msg: err.response ? err.response.data : err},500);
+        }
     }
 }
 
