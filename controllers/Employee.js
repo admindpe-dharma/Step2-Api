@@ -412,7 +412,7 @@ export const syncPendingTransaction = async ()=>{
     }
     return transactionPending;
 }
-export const syncPendingTransactionAPI = async ()=>{
+export const syncPendingTransactionAPI = async (req,res)=>{
     const data = await syncPendingTransaction();
     return res.status(200).json({msg: data});
 }
