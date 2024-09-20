@@ -333,7 +333,7 @@ export const UpdateBinWeightCollection = async (req, res) => {
         res.status(404).json({ msg: 'Bin not found' });
     }
 };
-const syncPendingTransaction = async ()=>{
+export const syncPendingTransaction = async ()=>{
     const transactionPending = await db.query("Select c.station,t.toBin,t.fromContainer,t.weight,t.type,t.badgeId,t.status from transaction t left join container c on t.idContainer=c.containerId where t.status like '%PENDING%' ");
     if (!transactionPending || transactionPending.length < 1)
         return [];
