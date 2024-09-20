@@ -336,11 +336,12 @@ export const UpdateBinWeightCollection = async (req, res) => {
 export const syncPendingTransaction = async ()=>{
     const transactionPending = await db.query("Select c.station,t.toBin,t.fromContainer,t.weight,t.type,t.badgeId,t.status from transaction t left join container c on t.idContainer=c.containerId where t.status like '%PENDING%' ");
     if (!transactionPending || transactionPending.length < 1)
-        return [];
+        return res.status(200).json({msg:transactionPending});
     for (let i=0;i<transactionPending.length;i++)
     {
+        console.log(transactionPending);
         const statuses = transactionPending[i].status.split('|');
-        statuses.spliec(statuses.indexOf('PENDING'));
+        statuses.splice(statuses.indexOf('PENDING'));
         if (statuses.include("PIDSG"))
         {
             await axios.get(`http://${process.env.PIDSG}/api/pid/pibadgeverify?f1=${transactionPending[i].container.station}&f2=${transactionPending[i].badgeId}`);
