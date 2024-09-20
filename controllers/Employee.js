@@ -402,7 +402,7 @@ export const syncPendingTransaction = async ()=>{
             transactionPending[i].success = false;
         }
         
-        const query = `Upddate Transaction set success='${transactionPending[i].status}',status=${transactionPending[i].success ? 1 : 0}  where Id='${transactionPending[i].id}'`;
+        const query = `Update Transaction set success='${transactionPending[i].status}',status=${transactionPending[i].success ? 1 : 0}  where Id='${transactionPending[i].id}'`;
         console.log([query,transactionPending[i]]);
         await db.query(query,{
             type: QueryTypes.BULKUPDATE
