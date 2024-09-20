@@ -8,7 +8,7 @@ import { updateBinWeightData } from "./Bin.js";
 import employee from "../models/EmployeeModel.js";
 import axios from 'axios';
 import os from  'os';
-import { Op } from "sequelize";
+import { Op,QueryTypes } from "sequelize";
 import db from "../config/db.js";
 export const ScanBadgeid = async (req, res) => {
     const { badgeId } = req.body;
@@ -334,7 +334,7 @@ export const UpdateBinWeightCollection = async (req, res) => {
     }
 };
 export const syncPendingTransaction = async ()=>{
-    const transactionPendingRecords = await db.query("Select c.station,t.toBin,t.fromContainer,t.weight,t.type,t.badgeId,t.status from transaction t left join container c on t.idContainer=c.containerId where t.status like '%PENDING%' ");
+    const transactionPendingRecords = await db.query("Select t.id,c.station,t.toBin,t.fromContainer,t.weight,t.type,t.badgeId,t.status from transaction t left join container c on t.idContainer=c.containerId where t.status like '%PENDING%' ");
     if (!transactionPendingRecords || transactionPendingRecords.length < 1)
         return res.status(200).json({msg:transactionPending});
     const transactionPending = transactionPendingRecords[0];
@@ -342,7 +342,7 @@ export const syncPendingTransaction = async ()=>{
         return res.status(200).json({msg:transactionPending});
     for (let i=0;i<transactionPending.length;i++)
     {
-        console.log(transactionPending);
+        console.log(transactionPending[i]);
         const statuses = transactionPending[i].status.split('|');
         statuses.splice(statuses.indexOf('PENDING'),1);
         if (statuses.includes("PIDSG"))
@@ -392,15 +392,21 @@ export const syncPendingTransaction = async ()=>{
         }
         if (statuses.length < 1)
         {
+            query 
             transactionPending[i].status = "Done";
             transactionPending[i].success = true;
         }
         else
         {
             transactionPending[i].status = `PENDING|${statuses.join("|")}`;
-            transactionPending[i].status = false;
+            transactionPending[i].success = false;
         }
-        await transactionPending[i].save();
+        
+        const query = `Upddate Transaction set success=${transactionPending[i].status},status=${transactionPending[i].success}  where Id='${transactionPending[i].id}'`;
+        console.log([query,transactionPending[i]]);
+        await db.query(query,{
+            type: QueryTypes.BULKUPDATE
+        });
     }
     return res.status(200).json({msg: transactionPending});
 }
