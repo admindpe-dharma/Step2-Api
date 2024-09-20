@@ -345,7 +345,7 @@ export const syncPendingTransaction = async ()=>{
         console.log(transactionPending);
         const statuses = transactionPending[i].status.split('|');
         statuses.splice(statuses.indexOf('PENDING'),1);
-        if (statuses.include("PIDSG"))
+        if (statuses.includes("PIDSG"))
         {
             await axios.get(`http://${process.env.PIDSG}/api/pid/pibadgeverify?f1=${transactionPending[i].station}&f2=${transactionPending[i].badgeId}`,{validateStatus: (s)=>true});
             const res = await axios.post(`http://${process.env.PIDSG}/api/pid/pidatalog`, {
@@ -367,7 +367,7 @@ export const syncPendingTransaction = async ()=>{
                 statuses.splice(index,1);
             }
         }
-        if (statuses.include("STEP1"))
+        if (statuses.includes("STEP1"))
         {
             
             await  axios.put(`http://${process.env.STEP1}/step1/`+idscraplog,{status:"Done",logindate: formatDate(new Date().toISOString())},
@@ -381,7 +381,7 @@ export const syncPendingTransaction = async ()=>{
                 statuses.splice(index,1);
             }
         }
-        if (statuses.include("STEP3"))
+        if (statuses.includes("STEP3"))
         {
             const res = await axios.post(`http://${process.env.STEP3}/Step2Value/`+containerName,{value:weight},{timeout:3000,validateStatus:(s)=>true});
             if (res.status>=200 && res.status <300)
