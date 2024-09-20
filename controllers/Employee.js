@@ -9,7 +9,7 @@ import employee from "../models/EmployeeModel.js";
 import axios from 'axios';
 import os from  'os';
 import { Op } from "sequelize";
-
+import db from "../config/db.js";
 export const ScanBadgeid = async (req, res) => {
     const { badgeId } = req.body;
     try {
@@ -274,6 +274,8 @@ export const UpdateTransaksi = async (req,res) =>{
                 count = count+1;
                 continue;
             }
+            _transaction.setDataValue("status","PENDING|STEP1");
+            _transaction.setDataValue("success",false);
             return res.json({msg: err.response ? err.response.data : err},500);
         }
     }
@@ -317,7 +319,7 @@ export const UpdateBinWeightCollection = async (req, res) => {
     const data = await Bin.findOne({ where: { id: binId } });
 
     const sendWeight = data.dataValues.weight;
-    await UpdateStep3Value(data.dataValues.name,sendWeight);
+    const step3 = await UpdateStep3Value(data.dataValues.name,sendWeight);
     if (data) {
         const binData = await Bin.findAll({where: {name: data.dataValues.name}});
         for (let i=0;i<binData.length;i++)
@@ -326,11 +328,74 @@ export const UpdateBinWeightCollection = async (req, res) => {
             await binData[i].save();
         }
         await updateBinWeightData(data.name_hostname);
-        res.status(200).json({ msg: 'ok' });
+        res.status(200).json({ msg: 'ok',step3: step3 });
     } else {
         res.status(404).json({ msg: 'Bin not found' });
     }
 };
+const syncPendingTransaction = async ()=>{
+    const transactionPending = await db.query("Select c.station,t.toBin,t.fromContainer,t.weight,t.type,t.badgeId,t.status from transaction t left join container c on t.idContainer=c.containerId where t.status like '%PENDING%' ");
+    if (!transactionPending || transactionPending.length < 1)
+        return [];
+    for (let i=0;i<transactionPending.length;i++)
+    {
+        const statuses = transactionPending[i].status.split('|');
+        statuses.spliec(statuses.indexOf('PENDING'));
+        if (statuses.include("PIDSG"))
+        {
+            await axios.get(`http://${process.env.PIDSG}/api/pid/pibadgeverify?f1=${transactionPending[i].container.station}&f2=${transactionPending[i].badgeId}`);
+            await axios.post(`http://${process.env.PIDSG}/api/pid/pidatalog`, {
+                badgeno: transactionPending[i].badgeId,
+                logindate: '',
+                stationname: transactionPending[i].station,
+                frombinname: transactionPending[i].fromContainer,
+                tobinname: transactionPending[i].toBin,
+                weight: transactionPending[i].weight,
+                activity: transactionPending[i].type
+
+            });
+            if (res.status>=200 && res.status <300)
+            {
+                const index=  statuses.indexOf("PIDSG");
+                statuses.splice(index,1);
+            }
+        }
+        if (statuses.include("STEP1"))
+        {
+            
+            await  axios.put(`http://${process.env.STEP1}/step1/`+idscraplog,{status:"Done",logindate: logindate},
+            {validateStatus: (status)=>{
+                return true;
+            }});
+            if (res.status>=200 && res.status <300)
+            {
+                const index=  statuses.indexOf("STEP1");
+                statuses.splice(index,1);
+            }
+        }
+        if (statuses.include("STEP3"))
+        {
+            const res = await axios.post(`http://${process.env.STEP3}/Step2Value/`+containerName,{value:weight},{timeout:3000,validateStatus:(s)=>true});
+            if (res.status>=200 && res.status <300)
+            {
+                const index=  statuses.indexOf("STEP3");
+                statuses.splice(index,1);
+            }
+        }
+        if (statuses.length < 1)
+        {
+            transactionPending[i].status = "Done";
+            transactionPending[i].success = true;
+        }
+        else
+        {
+            transactionPending[i].status = `PENDING|${statuses.join("|")}`;
+            transactionPending[i].status = false;
+        }
+        await transactionPending[i].save();
+    }
+    return res.status(200).json({msg: transactionPending});
+}
 
 export const UpdateContainerStatus = async (req,res) =>{
     const {containerName,status} = req.body;
