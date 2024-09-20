@@ -334,18 +334,21 @@ export const UpdateBinWeightCollection = async (req, res) => {
     }
 };
 export const syncPendingTransaction = async ()=>{
-    const transactionPending = await db.query("Select c.station,t.toBin,t.fromContainer,t.weight,t.type,t.badgeId,t.status from transaction t left join container c on t.idContainer=c.containerId where t.status like '%PENDING%' ");
+    const transactionPendingRecords = await db.query("Select c.station,t.toBin,t.fromContainer,t.weight,t.type,t.badgeId,t.status from transaction t left join container c on t.idContainer=c.containerId where t.status like '%PENDING%' ");
+    if (!transactionPendingRecords || transactionPendingRecords.length < 1)
+        return res.status(200).json({msg:transactionPending});
+    const transactionPending = transactionPendingRecords[0];
     if (!transactionPending || transactionPending.length < 1)
         return res.status(200).json({msg:transactionPending});
     for (let i=0;i<transactionPending.length;i++)
     {
         console.log(transactionPending);
-        const statuses = transactionPending[i].dataValues.status.split('|');
+        const statuses = transactionPending[i].status.split('|');
         statuses.splice(statuses.indexOf('PENDING'));
         if (statuses.include("PIDSG"))
         {
-            await axios.get(`http://${process.env.PIDSG}/api/pid/pibadgeverify?f1=${transactionPending[i].dataValues.station}&f2=${transactionPending[i].dataValues.badgeId}`);
-            await axios.post(`http://${process.env.PIDSG}/api/pid/pidatalog`, {
+            await axios.get(`http://${process.env.PIDSG}/api/pid/pibadgeverify?f1=${transactionPending[i].station}&f2=${transactionPending[i].badgeId}`,{validateStatus: (s)=>true});
+            const res = await axios.post(`http://${process.env.PIDSG}/api/pid/pidatalog`, {
                 badgeno: transactionPending[i].badgeId,
                 logindate: '',
                 stationname: transactionPending[i].station,
@@ -354,6 +357,9 @@ export const syncPendingTransaction = async ()=>{
                 weight: transactionPending[i].weight,
                 activity: transactionPending[i].type
 
+            },{
+                validateStatus:(s)=>true,
+                timeout:3000
             });
             if (res.status>=200 && res.status <300)
             {
@@ -365,7 +371,8 @@ export const syncPendingTransaction = async ()=>{
         {
             
             await  axios.put(`http://${process.env.STEP1}/step1/`+idscraplog,{status:"Done",logindate: formatDate(new Date().toISOString())},
-            {validateStatus: (status)=>{
+            {timeout:3000,
+                validateStatus: (status)=>{
                 return true;
             }});
             if (res.status>=200 && res.status <300)
