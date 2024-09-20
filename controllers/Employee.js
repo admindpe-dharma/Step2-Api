@@ -162,8 +162,8 @@ export const SaveTransaksi = async (req,res) => {
     const {payload} = req.body;
     payload.recordDate = moment().format("YYYY-MM-DD HH:mm:ss");
     (await transaction.create(payload)).save();
-    await syncPendingTransaction();
-    res.status(200).json({msg:'ok'});
+    const data = await syncPendingTransaction();
+    res.status(200).json({msg:'ok',sync:data});
 };
 export const getTransaction = async (req,res)=>{
     const { containerName } = req.params;
@@ -286,8 +286,8 @@ export const SaveTransaksiCollection = async (req,res) => {
     const {payload} = req.body;
     payload.recordDate = moment().format("YYYY-MM-DD HH:mm:ss");
     (await transaction.create(payload)).save();
-    await syncPendingTransaction();
-    res.status(200).json({msg:'ok'});
+    const data = await syncPendingTransaction();
+    res.status(200).json({msg:'ok',sync:data});
 };
 
 export const UpdateBinWeight = async (req,res) =>{
@@ -338,10 +338,10 @@ export const UpdateBinWeightCollection = async (req, res) => {
 export const syncPendingTransaction = async ()=>{
     const transactionPendingRecords = await db.query("Select t.id,c.station,t.toBin,t.fromContainer,t.weight,t.type,t.badgeId,t.status from transaction t left join container c on t.idContainer=c.containerId where t.status like '%PENDING%' ");
     if (!transactionPendingRecords || transactionPendingRecords.length < 1)
-        return res.status(200).json({msg:transactionPending});
+        return transactionPendingRecords;
     const transactionPending = transactionPendingRecords[0];
     if (!transactionPending || transactionPending.length < 1)
-        return res.status(200).json({msg:transactionPending});
+        return transactionPending;
     for (let i=0;i<transactionPending.length;i++)
     {
         console.log(transactionPending[i]);
@@ -404,13 +404,17 @@ export const syncPendingTransaction = async ()=>{
             transactionPending[i].success = false;
         }
         
-        const query = `Update transaction set success='${transactionPending[i].status}',status=${transactionPending[i].success ? 1 : 0}  where Id='${transactionPending[i].id}'`;
+        const query = `Update transaction set status='${transactionPending[i].status}',success=${transactionPending[i].success ? 1 : 0}  where Id='${transactionPending[i].id}'`;
         console.log([query,transactionPending[i]]);
         await db.query(query,{
             type: QueryTypes.BULKUPDATE
         });
     }
-    return res.status(200).json({msg: transactionPending});
+    return transactionPending;
+}
+export const syncPendingTransactionAPI = async ()=>{
+    const data = await syncPendingTransaction();
+    return res.status(200).json({msg: data});
 }
 const formatDate = (date)=> {
     let d = new Date(date),
