@@ -162,6 +162,7 @@ export const SaveTransaksi = async (req,res) => {
     const {payload} = req.body;
     payload.recordDate = moment().format("YYYY-MM-DD HH:mm:ss");
     (await transaction.create(payload)).save();
+    await syncPendingTransaction();
     res.status(200).json({msg:'ok'});
 };
 export const getTransaction = async (req,res)=>{
@@ -285,6 +286,7 @@ export const SaveTransaksiCollection = async (req,res) => {
     const {payload} = req.body;
     payload.recordDate = moment().format("YYYY-MM-DD HH:mm:ss");
     (await transaction.create(payload)).save();
+    await syncPendingTransaction();
     res.status(200).json({msg:'ok'});
 };
 
@@ -392,7 +394,7 @@ export const syncPendingTransaction = async ()=>{
         }
         if (statuses.length < 1)
         {
-            query 
+
             transactionPending[i].status = "Done";
             transactionPending[i].success = true;
         }
@@ -402,7 +404,7 @@ export const syncPendingTransaction = async ()=>{
             transactionPending[i].success = false;
         }
         
-        const query = `Update Transaction set success='${transactionPending[i].status}',status=${transactionPending[i].success ? 1 : 0}  where Id='${transactionPending[i].id}'`;
+        const query = `Update transaction set success='${transactionPending[i].status}',status=${transactionPending[i].success ? 1 : 0}  where Id='${transactionPending[i].id}'`;
         console.log([query,transactionPending[i]]);
         await db.query(query,{
             type: QueryTypes.BULKUPDATE
