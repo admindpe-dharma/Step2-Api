@@ -340,11 +340,11 @@ export const syncPendingTransaction = async ()=>{
     for (let i=0;i<transactionPending.length;i++)
     {
         console.log(transactionPending);
-        const statuses = transactionPending[i].status.split('|');
+        const statuses = transactionPending[i].dataValues.status.split('|');
         statuses.splice(statuses.indexOf('PENDING'));
         if (statuses.include("PIDSG"))
         {
-            await axios.get(`http://${process.env.PIDSG}/api/pid/pibadgeverify?f1=${transactionPending[i].container.station}&f2=${transactionPending[i].badgeId}`);
+            await axios.get(`http://${process.env.PIDSG}/api/pid/pibadgeverify?f1=${transactionPending[i].dataValues.station}&f2=${transactionPending[i].dataValues.badgeId}`);
             await axios.post(`http://${process.env.PIDSG}/api/pid/pidatalog`, {
                 badgeno: transactionPending[i].badgeId,
                 logindate: '',
@@ -364,7 +364,7 @@ export const syncPendingTransaction = async ()=>{
         if (statuses.include("STEP1"))
         {
             
-            await  axios.put(`http://${process.env.STEP1}/step1/`+idscraplog,{status:"Done",logindate: logindate},
+            await  axios.put(`http://${process.env.STEP1}/step1/`+idscraplog,{status:"Done",logindate: formatDate(new Date().toISOString())},
             {validateStatus: (status)=>{
                 return true;
             }});
@@ -397,7 +397,19 @@ export const syncPendingTransaction = async ()=>{
     }
     return res.status(200).json({msg: transactionPending});
 }
+const formatDate = (date)=> {
+    let d = new Date(date),
+        month = '' + (d.getMonth() + 1),
+        day = '' + d.getDate(),
+        year = d.getFullYear();
 
+    if (month.length < 2) 
+        month = '0' + month;
+    if (day.length < 2) 
+        day = '0' + day;
+
+    return [year, month, day].join('-');
+}
 export const UpdateContainerStatus = async (req,res) =>{
     const {containerName,status} = req.body;
     const data = await Bin.findOne({where: {name:containerName}});
