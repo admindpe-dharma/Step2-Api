@@ -324,6 +324,16 @@ export const UpdateBinWeightCollection = async (req, res) => {
     const step3 = await UpdateStep3Value(data.dataValues.name,sendWeight);
     if (data) {
         const binData = await Bin.findAll({where: {name: data.dataValues.name}});
+        try
+        {
+            await axios.post(`http://${binData.name_hostname}/Start`,{bin: {...binData,type:"Collection"}},{
+                timeout:1000,
+                withCredentials:false
+            });
+        }
+        catch (er){
+            return res.status(500).json(er);
+        }
         for (let i=0;i<binData.length;i++)
         {
             binData[i].weight =0;
