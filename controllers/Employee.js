@@ -358,6 +358,7 @@ export const syncPendingTransaction = async ()=>{
         const statuses = transactionPending[i].status.split('|');
         statuses.splice(statuses.indexOf('PENDING'),1);
         statuses.splice(statuses.indexOf('Pending'),1);
+        console.log(statuses);
         if (statuses.includes("PIDSG"))
         {
             await axios.get(`http://${process.env.PIDSG}/api/pid/pibadgeverify?f1=${transactionPending[i].station}&f2=${transactionPending[i].badgeId}`,{validateStatus: (s)=>true});
@@ -374,7 +375,7 @@ export const syncPendingTransaction = async ()=>{
                 validateStatus:(s)=>true,
                 timeout:3000
             });
-            console.log(res);
+            console.log({pidsg_res: res});
             if (res.status>=200 && res.status <300)
             {
                 const index=  statuses.indexOf("PIDSG");
@@ -417,7 +418,7 @@ export const syncPendingTransaction = async ()=>{
         }
         
         const query = `Update transaction set status='${transactionPending[i].status}',success=${transactionPending[i].success ? 1 : 0}  where Id='${transactionPending[i].id}'`;
-        console.log([query,transactionPending[i]]);
+        console.log([query,statuses,transactionPending[i]]);
         await db.query(query,{
             type: QueryTypes.BULKUPDATE
         });
