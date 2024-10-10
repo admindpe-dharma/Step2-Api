@@ -374,6 +374,7 @@ export const syncPendingTransaction = async ()=>{
                 validateStatus:(s)=>true,
                 timeout:3000
             });
+            console.log(res);
             if (res.status>=200 && res.status <300)
             {
                 const index=  statuses.indexOf("PIDSG");
