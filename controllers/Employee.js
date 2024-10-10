@@ -364,49 +364,63 @@ export const syncPendingTransaction = async ()=>{
             statuses.splice(index,1);
         if (statuses.includes("PIDSG"))
         {
-            await axios.get(`http://${process.env.PIDSG}/api/pid/pibadgeverify?f1=${transactionPending[i].station}&f2=${transactionPending[i].badgeId}`,{validateStatus: (s)=>true});
-            const res = await axios.post(`http://${process.env.PIDSG}/api/pid/pidatalog`, {
-                badgeno: transactionPending[i].badgeId,
-                logindate: '',
-                stationname: transactionPending[i].station,
-                frombinname: transactionPending[i].fromContainer,
-                tobinname: transactionPending[i].toBin,
-                weight: transactionPending[i].weight,
-                activity: transactionPending[i].type
-
-            },{
-                validateStatus:(s)=>true,
-                timeout:3000
-            });
-            console.log({pidsg_res: res});
-            if (res.status>=200 && res.status <300)
+            try
             {
-                const index=  statuses.indexOf("PIDSG");
-                statuses.splice(index,1);
+                await axios.get(`http://${process.env.PIDSG}/api/pid/pibadgeverify?f1=${transactionPending[i].station}&f2=${transactionPending[i].badgeId}`,{validateStatus: (s)=>true});
+                const res = await axios.post(`http://${process.env.PIDSG}/api/pid/pidatalog`, {
+                    badgeno: transactionPending[i].badgeId,
+                    logindate: '',
+                    stationname: transactionPending[i].station,
+                    frombinname: transactionPending[i].fromContainer,
+                    tobinname: transactionPending[i].toBin,
+                    weight: transactionPending[i].weight,
+                    activity: transactionPending[i].type
+
+                },{
+                    validateStatus:(s)=>true,
+                    timeout:3000
+                });
+                console.log({pidsg_res: res});
+                if (res.status>=200 && res.status <300)
+                {
+                    const index=  statuses.indexOf("PIDSG");
+                    statuses.splice(index,1);
+                }
             }
+            catch{}
         }
         if (statuses.includes("STEP1"))
         {
-            
-            await  axios.put(`http://${process.env.STEP1}/step1/`+idscraplog,{status:"Done",logindate: formatDate(new Date().toISOString())},
-            {timeout:3000,
-                validateStatus: (status)=>{
-                return true;
-            }});
-            if (res.status>=200 && res.status <300)
+            try
             {
-                const index=  statuses.indexOf("STEP1");
-                statuses.splice(index,1);
+                await  axios.put(`http://${process.env.STEP1}/step1/`+idscraplog,{status:"Done",logindate: formatDate(new Date().toISOString())},
+                {timeout:3000,
+                    validateStatus: (status)=>{
+                    return true;
+                }});
+                if (res.status>=200 && res.status <300)
+                {
+                    const index=  statuses.indexOf("STEP1");
+                    statuses.splice(index,1);
+                }
+            }
+            catch (e)
+            {
+
             }
         }
         if (statuses.includes("STEP3"))
         {
-            const res = await axios.post(`http://${process.env.STEP3}/Step2Value/`+containerName,{value:weight},{timeout:3000,validateStatus:(s)=>true});
-            if (res.status>=200 && res.status <300)
+            try
             {
-                const index=  statuses.indexOf("STEP3");
-                statuses.splice(index,1);
+                const res = await axios.post(`http://${process.env.STEP3}/Step2Value/`+containerName,{value:weight},{timeout:3000,validateStatus:(s)=>true});
+                if (res.status>=200 && res.status <300)
+                {
+                    const index=  statuses.indexOf("STEP3");
+                    statuses.splice(index,1);
+                }
             }
+            catch{}
         }
         if (statuses.length < 1)
         {
