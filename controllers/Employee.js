@@ -356,9 +356,12 @@ export const syncPendingTransaction = async ()=>{
     {
         console.log(transactionPending[i]);
         const statuses = transactionPending[i].status.split('|');
-        statuses.splice(statuses.indexOf('PENDING'),1);
-        statuses.splice(statuses.indexOf('Pending'),1);
-        console.log(statuses);
+        let index= statuses.indexOf('PENDING');
+        if (index > -1)
+            statuses.splice(index,1);   
+        index = statuses.indexOf('Pending');
+        if (index > -1)
+            statuses.splice(index,1);
         if (statuses.includes("PIDSG"))
         {
             await axios.get(`http://${process.env.PIDSG}/api/pid/pibadgeverify?f1=${transactionPending[i].station}&f2=${transactionPending[i].badgeId}`,{validateStatus: (s)=>true});
