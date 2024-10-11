@@ -286,7 +286,6 @@ export const SaveTransaksiCollection = async (req,res) => {
     const {payload} = req.body;
     payload.recordDate = moment().format("YYYY-MM-DD HH:mm:ss");
     (await transaction.create(payload)).save();
-    const data = await syncPendingTransaction();
     res.status(200).json({msg:'ok',sync:data});
 };
 
@@ -352,7 +351,8 @@ export const syncPendingTransaction = async ()=>{
     const transactionPending = transactionPendingRecords[0];
     if (!transactionPending || transactionPending.length < 1)
         return transactionPending;
-    for (let i=0;i<transactionPending.length;i++)
+    let cancel=  false;
+    for (let i=0;i<transactionPending.length ;i++)
     {
         console.log(transactionPending[i]);
         const statuses = transactionPending[i].status.split('|');
@@ -362,6 +362,7 @@ export const syncPendingTransaction = async ()=>{
         index = statuses.indexOf('Pending');
         if (index > -1)
             statuses.splice(index,1);
+
         if (statuses.includes("PIDSG"))
         {
             try
@@ -378,7 +379,7 @@ export const syncPendingTransaction = async ()=>{
 
                 },{
                     validateStatus:(s)=>true,
-                    timeout:3000
+                    timeout:1000
                 });
                 console.log({pidsg_res: res});
                 if (res.status>=200 && res.status <300)
@@ -387,14 +388,16 @@ export const syncPendingTransaction = async ()=>{
                     statuses.splice(index,1);
                 }
             }
-            catch{}
+            catch{
+                return transactionPending;
+            }
         }
         if (statuses.includes("STEP1"))
         {
             try
             {
                 await  axios.put(`http://${process.env.STEP1}/step1/`+idscraplog,{status:"Done",logindate: formatDate(new Date().toISOString())},
-                {timeout:3000,
+                {timeout:1000,
                     validateStatus: (status)=>{
                     return true;
                 }});
@@ -406,7 +409,7 @@ export const syncPendingTransaction = async ()=>{
             }
             catch (e)
             {
-
+                return transactionPending;
             }
         }
         if (statuses.includes("STEP3"))
@@ -420,7 +423,9 @@ export const syncPendingTransaction = async ()=>{
                     statuses.splice(index,1);
                 }
             }
-            catch{}
+            catch{
+                return transactionPending;
+            }
         }
         if (statuses.length < 1)
         {
