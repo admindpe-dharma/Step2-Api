@@ -163,7 +163,7 @@ export const SaveTransaksi = async (req,res) => {
     payload.recordDate = moment().format("YYYY-MM-DD HH:mm:ss");
     (await transaction.create(payload)).save();
 //    const data = await syncPendingTransaction();
-    res.status(200).json({msg:'ok',sync:data});
+    res.status(200).json({msg:'ok'});
 };
 export const getTransaction = async (req,res)=>{
     const { containerName } = req.params;
@@ -286,7 +286,7 @@ export const SaveTransaksiCollection = async (req,res) => {
     const {payload} = req.body;
     payload.recordDate = moment().format("YYYY-MM-DD HH:mm:ss");
     (await transaction.create(payload)).save();
-    res.status(200).json({msg:'ok',sync:data});
+    res.status(200).json({msg:'ok'});
 };
 
 export const UpdateBinWeight = async (req,res) =>{
