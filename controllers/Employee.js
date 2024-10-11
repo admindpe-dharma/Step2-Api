@@ -162,7 +162,7 @@ export const SaveTransaksi = async (req,res) => {
     const {payload} = req.body;
     payload.recordDate = moment().format("YYYY-MM-DD HH:mm:ss");
     (await transaction.create(payload)).save();
-    const data = await syncPendingTransaction();
+//    const data = await syncPendingTransaction();
     res.status(200).json({msg:'ok',sync:data});
 };
 export const getTransaction = async (req,res)=>{
