@@ -76,10 +76,7 @@ setInterval(()=>{
 },1000);
 const syncWork = async ()=>{
   
-  console.log('sync pending transaction...');
   const data = await syncPendingTransaction();
-  console.log(data);
-  console.log('sync transaction end');
 };
 const loopWork = async()=>{
   await syncWork();
