@@ -312,7 +312,7 @@ export const UpdateStep3Value = async (containerName,weight)=>{
     }
     catch (err)
     {
-        console.log(c)
+        console.log(err)
         return false;
     }
 }
