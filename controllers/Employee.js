@@ -307,11 +307,12 @@ export const UpdateBinWeight = async (req,res) =>{
 export const UpdateStep3Value = async (containerName,weight)=>{
     try
     {
-        const res = await axios.post(`http://${process.env.STEP3}/Step2Value/`+containerName,{value:weight},{timeout:3000});
+        const res = await axios.put(`http://${process.env.STEP3}/Step2Value/`+containerName,{value:weight},{timeout:3000});
         return true;
     }
     catch (err)
     {
+        console.log(c)
         return false;
     }
 }
