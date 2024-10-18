@@ -77,7 +77,7 @@ setInterval(()=>{
 const syncWork = async ()=>{
   
   const data = await syncPendingTransaction();
-cd  };
+  };
 const loopWork = async()=>{
   await syncWork();
   setImmediate(loopWork);
