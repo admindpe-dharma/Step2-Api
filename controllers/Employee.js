@@ -181,55 +181,59 @@ export const getTransaction = async (req,res)=>{
     });
     return res.status(!tr ? 404 : 200).json(!tr? {msg:"not found"} : tr);
 }
+export const syncTransactionStep1 = async ()=>{
+    let _data;
+    const _res = await axios.get(`http://${process.env.STEP1}/sync/`+os.hostname(),{timeout:1500});
+    const trData = _res.data;
+    if (!trData.length)
+        return _res.status(200).json({msg:"Empty Transaction",tr:tr});
+    _data = _res.data;
+    for (let i=0;i<trData.length;i++)
+    {
+        const tr = trData[i];
+        const _container = await Container.findOne({
+            where:{
+                name: tr.container.name
+            }
+        });
+        if (!_container)
+            continue;
+        _data = {i:i,data:trData[i]};
+        const _waste = await Waste.findOne({
+            where:{
+                name: tr.waste.name
+            }
+        });
+        const data = await transaction.findOne({
+            where:{
+                fromContainer: _container.name,
+                toBin: tr.bin,
+                idscraplog : tr.idscraplog,
+                status: 'Step-1'
+            }
+        }) ;
+        _data = data;
+        if (data)
+            continue;
+        const state = await transaction.create({
+            idscraplog: tr.idscraplog,
+            IdWaste: _waste.getDataValue("Id"),
+            idContainer : _container.getDataValue("containerId"),
+            badgeId: tr.badgeId,
+            status: "Step-1",
+            weight: 0,
+            type: '',
+            toBin: tr.bin,
+            fromContainer: _container.name,
+        });
+        state.save();
+        return _data;
+    }
+}
 export const syncTransaction = async (req,res)=>{
-    let _data=null;
     try
     {
-        const _res = await axios.get(`http://${process.env.STEP1}/sync/`+os.hostname());
-        const trData = _res.data;
-        if (!trData.length)
-            return _res.status(200).json({msg:"Empty Transaction",tr:tr});
-        _data = _res.data;
-        for (let i=0;i<trData.length;i++)
-        {
-            const tr = trData[i];
-            const _container = await Container.findOne({
-                where:{
-                    name: tr.container.name
-                }
-            });
-            if (!_container)
-                continue;
-            _data = {i:i,data:trData[i]};
-            const _waste = await Waste.findOne({
-                where:{
-                    name: tr.waste.name
-                }
-            });
-            const data = await transaction.findOne({
-                where:{
-                    fromContainer: _container.name,
-                    toBin: tr.bin,
-                    idscraplog : tr.idscraplog,
-                    status: 'Step-1'
-                }
-            }) ;
-            _data = data;
-            if (data)
-                continue;
-            const state = await transaction.create({
-                idscraplog: tr.idscraplog,
-                IdWaste: _waste.getDataValue("Id"),
-                idContainer : _container.getDataValue("containerId"),
-                badgeId: tr.badgeId,
-                status: "Step-1",
-                weight: 0,
-                type: '',
-                toBin: tr.bin,
-                fromContainer: _container.name,
-            });
-            state.save();
-        }
+        await syncTransactionStep1();
         return res.status(200).json({msg:"Sync Success"});
     }
     catch(err)
@@ -307,7 +311,7 @@ export const UpdateBinWeight = async (req,res) =>{
 export const UpdateStep3Value = async (containerName,weight)=>{
     try
     {
-        const res = await axios.put(`http://${process.env.STEP3}/Step2Value/`+containerName,{value:weight},{timeout:3000});
+        const res = await axios.put(`http://${process.env.STEP3}/step2value/`+containerName,{value:weight},{timeout:3000});
         return true;
     }
     catch (err)
