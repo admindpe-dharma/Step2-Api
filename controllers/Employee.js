@@ -183,6 +183,8 @@ export const getTransaction = async (req,res)=>{
 }
 export const syncTransactionStep1 = async ()=>{
     let _data;
+    try
+    {
     const _res = await axios.get(`http://${process.env.STEP1}/sync/`+os.hostname(),{timeout:1500});
     const trData = _res.data;
     if (!trData.length)
@@ -229,6 +231,11 @@ export const syncTransactionStep1 = async ()=>{
         state.save();
         return _data;
     }
+}
+catch(er)
+{
+    console.log(er);
+}
 }
 export const syncTransaction = async (req,res)=>{
     try
