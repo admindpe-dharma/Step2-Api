@@ -235,6 +235,7 @@ export const syncTransactionStep1 = async ()=>{
 catch(er)
 {
     console.log(er);
+    return null;
 }
 }
 export const syncTransaction = async (req,res)=>{
