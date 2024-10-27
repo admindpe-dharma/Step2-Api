@@ -271,8 +271,12 @@ export const UpdateTransaksi = async (req,res) =>{
             {validateStatus: (status)=>{
                 return (status >= 200 && status <300) || (status==404)
             }});
-            if (_res.data?.msg != "Ok")
-                console.log(_res.data);
+            if (status==404)
+                {
+                    console.log(`${idscraplog} - ${_transaction.dataValues.id} NOT FOUND`);                    
+                    _transaction.setDataValue("status","PENDING|STEP1");
+                    _transaction.setDataValue("success",false);
+                }
             _transaction.setDataValue("status",status);
             _transaction.setDataValue("type",type);
             _transaction.setDataValue("weight",weight);
@@ -316,10 +320,11 @@ export const UpdateBinWeight = async (req,res) =>{
 //   await switchLamp(data.id,"RED",data.weight >= parseFloat(data.max_weight))
     res.status(200).json({msg:'ok'});
 };
-export const UpdateStep3Value = async (containerName,weight)=>{
+export const UpdateStep3Value = async (containerName,isRack,weight)=>{
     try
     {
-        const res = await axios.put(`http://${process.env.STEP3}/step2value/`+containerName,{value:weight},{timeout:3000});
+        const _containerName = isRack ? process.env.RACK_TARGET_CONTAINER :    containerName;
+        const res = await axios.put(`http://${process.env.STEP3}/step2value/`+_containerName,{value:weight,fromRack: isRack},{timeout:3000});
         return true;
     }
     catch (err)
@@ -330,10 +335,20 @@ export const UpdateStep3Value = async (containerName,weight)=>{
 }
 export const UpdateBinWeightCollection = async (req, res) => {
     const { binId } = req.body; // neto is not needed as weight will be set to 0
-    const data = await Bin.findOne({ where: { id: binId } });
+    const data = await Bin.findOne({ where: { id: binId },include:[
+        {
+            model: Waste,
+            as: 'waste',
+            required: true,
+            duplicating: true,
+            foreignKey: 'IdWaste',
+            attributes: ['name','scales','handletype','step1']
+        }
+    ] });
 
     const sendWeight = data.dataValues.weight;
-    const step3 = await UpdateStep3Value(data.dataValues.name,sendWeight);
+    console.log({handleType:data.dataValues.waste.handletype=='Rack'});
+    const step3 = await UpdateStep3Value(data.dataValues.name,data.dataValues.waste.handletype=='Rack',sendWeight);
     if (data) {
         const binData = await Bin.findAll({where: {name: data.dataValues.name}});
         /*try
