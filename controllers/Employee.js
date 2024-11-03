@@ -346,8 +346,17 @@ export const UpdateBinWeightCollection = async (req, res) => {
         }
     ] });
 
-    const sendWeight = data.dataValues.weight;
-    console.log({handleType:data.dataValues.waste.handletype=='Rack'});
+    let sendWeight = data.dataValues.weight;
+    const isRack = data.dataValues.waste.handletype=='Rack';
+    console.log({handleType:isRack});
+    if (isRack)
+    {
+        const allRacks = await db.query("Select sum(b.weight) as totalWeight from bin b inner join waste w on b.IdWaste=w.Id where w.handletype='Rack';",
+        {
+            type: QueryTypes.SELECT
+        });
+        sendWeight = parseFloat(allRacks[0].totalWeight);
+    }
     const step3 = await UpdateStep3Value(data.dataValues.name,data.dataValues.waste.handletype=='Rack',sendWeight);
     if (data) {
         const binData = await Bin.findAll({where: {name: data.dataValues.name}});
@@ -393,6 +402,17 @@ export const syncPendingTransaction = async ()=>{
 
         if (statuses.includes("PIDSG"))
         {
+            try
+            {        
+                await axios.post(`http://${process.env.PIDSG}/api/pid/sendWeight`, {
+                    binname: transactionPending[i].fromContainer,
+                    weight: transactionPending[i].weight,
+                });
+            }
+            catch
+            {
+
+            }
             try
             {
                 await axios.get(`http://${process.env.PIDSG}/api/pid/pibadgeverify?f1=${transactionPending[i].station}&f2=${transactionPending[i].badgeId}`,{validateStatus: (s)=>true});
