@@ -544,3 +544,40 @@ export const UpdateContainerStatus = async (req, res) => {
     const hostname = os.hostname();
     res.status(200).json({ hostname });
 } */
+export const syncEmployeePIDSGAPI = async (req,res)=>{
+    return res.json(await syncEmployeePIDSG());
+}
+
+export const syncEmployeePIDSG = async ()=>{
+    try
+    {
+        const apiRes = await axios.get(
+            `http://${process.env.PIDSG}/api/pid/employee-sync?f1=${process.env.STATION}`);
+        const syncEmp = apiRes.data.result[0];
+        for (let i=0;i<syncEmp.length;i++)
+        {
+            const empRes = await db.query("Select badgeId,username,`IN` as in_1,`OUT` as out_1 from employee where badgeId=?",{type:QueryTypes.SELECT,replacements:[syncEmp[i].badgeno]});
+            if (empRes.length < 1)
+            {
+                await db.query("Insert Into employee(username,isactive,badgeId,`IN`,`OUT`) values(?,1,?,?,?)",
+                {
+                    type:QueryTypes.INSERT,
+                    replacements: [syncEmp[i].employeename,syncEmp[i].badgeno,syncEmp[i].IN==1,syncEmp[i].OUT==1]
+                });
+            }
+            else
+            {
+                await db.query("Update employee set username=?,`IN`=?,`OUT`=? where badgeId=?",{
+                    type: QueryTypes.UPDATE,
+                    replacements: [syncEmp[i].employeename,syncEmp[i].IN,syncEmp[i].OUT,syncEmp[i].badgeno]
+                })
+            }
+        }
+        return syncEmp;
+    }
+    catch (er)
+    {
+        console.log(er);
+        return  er.message || er;
+    }
+}

@@ -83,5 +83,5 @@ const loopWork = async()=>{
   await syncWork();
   setImmediate(loopWork);
 }
-loopWork();
+//loopWork();
 //getWeightBin(io); 
