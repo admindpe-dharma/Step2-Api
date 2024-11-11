@@ -35,7 +35,7 @@ const getBinByHostname = async (hostname)=>{
     return payload;
 }
 export const BroadcastBinWeight = async ()=>{
-    console.log(clientList);
+//    console.log(clientList);
     if (!clientList || clientList == null )
         return;
     if (clientList.length < 0)
