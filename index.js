@@ -10,7 +10,7 @@ import { getScales4Kg ,getScales50Kg} from "./controllers/Scales.js";
 import bodyParser from "body-parser";
 import {BroadcastBinWeight, getWeightBin} from "./controllers/Bin.js"
 import { config } from "dotenv";
-import { syncPendingTransaction, syncTransaction, syncTransactionStep1 } from "./controllers/Employee.js";
+import { syncEmployeePIDSG, syncPendingTransaction, syncTransaction, syncTransactionStep1 } from "./controllers/Employee.js";
 import { setTimeout } from "timers/promises";
 config();
 const app = express();
@@ -83,5 +83,11 @@ const loopWork = async()=>{
   await syncWork();
   setImmediate(loopWork);
 }
-//loopWork();
+const syncEmp = async ()=>{
+  await syncEmployeePIDSG();
+  console.log('Sync Employee');
+  setTimeout(syncEmp,10*10*1000);
+}
+syncEmp();
+loopWork();
 //getWeightBin(io); 

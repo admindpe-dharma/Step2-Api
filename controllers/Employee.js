@@ -562,14 +562,14 @@ export const syncEmployeePIDSG = async ()=>{
                 await db.query("Insert Into employee(username,isactive,badgeId,`IN`,`OUT`) values(?,1,?,?,?)",
                 {
                     type:QueryTypes.INSERT,
-                    replacements: [syncEmp[i].employeename,syncEmp[i].badgeno,syncEmp[i].IN==1,syncEmp[i].OUT==1]
+                    replacements: [syncEmp[i].employeename,syncEmp[i].badgeno,syncEmp[i].IN>=1,syncEmp[i].OUT>=1]
                 });
             }
             else
             {
                 await db.query("Update employee set username=?,`IN`=?,`OUT`=? where badgeId=?",{
                     type: QueryTypes.UPDATE,
-                    replacements: [syncEmp[i].employeename,syncEmp[i].IN,syncEmp[i].OUT,syncEmp[i].badgeno]
+                    replacements: [syncEmp[i].employeename,syncEmp[i].IN>=1,syncEmp[i].OUT>=1,syncEmp[i].badgeno]
                 })
             }
         }
