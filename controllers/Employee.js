@@ -547,7 +547,12 @@ export const UpdateContainerStatus = async (req, res) => {
 export const syncEmployeePIDSGAPI = async (req,res)=>{
     return res.json(await syncEmployeePIDSG());
 }
-
+export const getEmpData = async (req,res)=>{
+  const data = await db.query("Select badgeid,username from employee",{
+    type: QueryTypes.SELECT
+  });
+  return res.json({data:data});
+}
 export const syncEmployeePIDSG = async ()=>{
     try
     {

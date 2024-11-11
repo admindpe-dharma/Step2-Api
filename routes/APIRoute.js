@@ -10,4 +10,6 @@ routes.get("/Sync",syncTransaction);
 routes.get('/ip',getIp);
 routes.get('/Pending-List',syncPendingTransactionAPI);
 routes.get('/employee-sync',syncEmployeePIDSGAPI);
+routes.get('/employee',syncEmployeePIDSGAPI);
+
 export default routes;
