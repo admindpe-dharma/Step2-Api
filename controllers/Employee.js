@@ -505,7 +505,7 @@ export const syncPendingTransaction = async () => {
     }
     catch(er)
     {
-        console.log(er);
+        console.log(er); 
     }
     finally
     {
