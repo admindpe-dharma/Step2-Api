@@ -455,8 +455,8 @@ export const syncPendingTransaction = async () => {
           const index = statuses.indexOf("PIDSG");
           statuses.splice(index, 1);
         }
-      } catch {
-        return transactionPending;
+      } catch(e) {
+        console.log(e);
       }
     }
     if (statuses.includes("STEP1")) {
@@ -476,7 +476,7 @@ export const syncPendingTransaction = async () => {
           statuses.splice(index, 1);
         }
       } catch (e) {
-        return transactionPending;
+        console.log(e);
       }
     }
     if (statuses.includes("STEP3")) {
@@ -490,8 +490,8 @@ export const syncPendingTransaction = async () => {
           const index = statuses.indexOf("STEP3");
           statuses.splice(index, 1);
         }
-      } catch {
-        return transactionPending;
+      } catch (er) {
+        console.log(er);
       }
     }
     if (statuses.length < 1) {
