@@ -482,8 +482,8 @@ export const syncPendingTransaction = async () => {
     if (statuses.includes("STEP3")) {
       try {
         const res = await axios.post(
-          `http://${process.env.STEP3}/Step2Value/` + containerName,
-          { value: weight },
+          `http://${process.env.STEP3}/Step2Value/` + transactionPending[i].fromContainer,
+          { value: transactionPending[i].weight },
           { timeout: 3000, validateStatus: (s) => true }
         );
         if (res.status >= 200 && res.status < 300) {
