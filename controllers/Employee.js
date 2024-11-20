@@ -421,96 +421,104 @@ export const syncPendingTransaction = async () => {
     if (index > -1) statuses.splice(index, 1);
     index = statuses.indexOf("Pending");
     if (index > -1) statuses.splice(index, 1);
-
-    if (statuses.includes("PIDSG")) {
-      try {
-        await axios.post(`http://${process.env.PIDSG}/api/pid/sendWeight`, {
-          binname: transactionPending[i].fromContainer,
-          weight: transactionPending[i].weight,
-        });
-      } catch {}
-      try {
-        await axios.get(
-          `http://${process.env.PIDSG}/api/pid/pibadgeverify?f1=${transactionPending[i].station}&f2=${transactionPending[i].badgeId}`,
-          { validateStatus: (s) => true }
-        );
-        const res = await axios.post(
-          `http://${process.env.PIDSG}/api/pid/pidatalog`,
-          {
-            badgeno: transactionPending[i].badgeId,
-            logindate: "",
-            stationname: transactionPending[i].station,
-            frombinname: transactionPending[i].fromContainer,
-            tobinname: transactionPending[i].toBin,
+    try
+    {
+      if (statuses.includes("PIDSG")) {
+        try {
+          await axios.post(`http://${process.env.PIDSG}/api/pid/sendWeight`, {
+            binname: transactionPending[i].fromContainer,
             weight: transactionPending[i].weight,
-            activity: transactionPending[i].type,
-          },
-          {
-            validateStatus: (s) => true,
-            timeout: 1000,
-          }
-        );
-        console.log({ pidsg_res: res });
-        if (res.status >= 200 && res.status < 300) {
-          const index = statuses.indexOf("PIDSG");
-          statuses.splice(index, 1);
-        }
-      } catch {
-        return transactionPending;
-      }
-    }
-    if (statuses.includes("STEP1")) {
-      try {
-        await axios.put(
-          `http://${process.env.STEP1}/step1/` + idscraplog,
-          { status: "Done", logindate: formatDate(new Date().toISOString()) },
-          {
-            timeout: 1000,
-            validateStatus: (status) => {
-              return true;
+          });
+        } catch {}
+        try {
+          await axios.get(
+            `http://${process.env.PIDSG}/api/pid/pibadgeverify?f1=${transactionPending[i].station}&f2=${transactionPending[i].badgeId}`,
+            { validateStatus: (s) => true }
+          );
+          const res = await axios.post(
+            `http://${process.env.PIDSG}/api/pid/pidatalog`,
+            {
+              badgeno: transactionPending[i].badgeId,
+              logindate: "",
+              stationname: transactionPending[i].station,
+              frombinname: transactionPending[i].fromContainer,
+              tobinname: transactionPending[i].toBin,
+              weight: transactionPending[i].weight,
+              activity: transactionPending[i].type,
             },
+            {
+              validateStatus: (s) => true,
+              timeout: 1000,
+            }
+          );
+          console.log({ pidsg_res: res });
+          if (res.status >= 200 && res.status < 300) {
+            const index = statuses.indexOf("PIDSG");
+            statuses.splice(index, 1);
           }
-        );
-        if (res.status >= 200 && res.status < 300) {
-          const index = statuses.indexOf("STEP1");
-          statuses.splice(index, 1);
+        } catch(er) {
+          console.log(er);
         }
-      } catch (e) {
-        return transactionPending;
+      }
+      if (statuses.includes("STEP1")) {
+        try {
+          await axios.put(
+            `http://${process.env.STEP1}/step1/` + idscraplog,
+            { status: "Done", logindate: formatDate(new Date().toISOString()) },
+            {
+              timeout: 1000,
+              validateStatus: (status) => {
+                return true;
+              },
+            }
+          );
+          if (res.status >= 200 && res.status < 300) {
+            const index = statuses.indexOf("STEP1");
+            statuses.splice(index, 1);
+          }
+        } catch (e) {
+          console.log(e);
+        }
+      }
+      if (statuses.includes("STEP3")) {
+        try {
+          const res = await axios.post(
+            `http://${process.env.STEP3}/Step2Value/` + transactionPending[i].fromContainer,
+            { value: transactionPending[i].weight },
+            { timeout: 3000, validateStatus: (s) => true }
+          );
+          if (res.status >= 200 && res.status < 300) {
+            const index = statuses.indexOf("STEP3");
+            statuses.splice(index, 1);
+          }
+        } catch(er) {
+          console.log(er);
+        }
+      }
+      if (statuses.length < 1) {
+        transactionPending[i].status = "Done";
+        transactionPending[i].success = true;
+      } else {
+        transactionPending[i].status = `PENDING|${statuses.join("|")}`;
+        transactionPending[i].success = false;
       }
     }
-    if (statuses.includes("STEP3")) {
-      try {
-        const res = await axios.post(
-          `http://${process.env.STEP3}/Step2Value/` + containerName,
-          { value: weight },
-          { timeout: 3000, validateStatus: (s) => true }
-        );
-        if (res.status >= 200 && res.status < 300) {
-          const index = statuses.indexOf("STEP3");
-          statuses.splice(index, 1);
-        }
-      } catch {
-        return transactionPending;
-      }
+    catch(er)
+    {
+        console.log(er);
     }
-    if (statuses.length < 1) {
-      transactionPending[i].status = "Done";
-      transactionPending[i].success = true;
-    } else {
-      transactionPending[i].status = `PENDING|${statuses.join("|")}`;
-      transactionPending[i].success = false;
+    finally
+    {
+      const query = `Update transaction set status='${
+        transactionPending[i].status
+      }',success=${transactionPending[i].success ? 1 : 0}  where Id='${
+        transactionPending[i].id
+      }'`;
+      console.log([query, statuses, transactionPending[i]]);
+      await db.query(query, {
+        type: QueryTypes.BULKUPDATE,
+      });
     }
-
-    const query = `Update transaction set status='${
-      transactionPending[i].status
-    }',success=${transactionPending[i].success ? 1 : 0}  where Id='${
-      transactionPending[i].id
-    }'`;
-    console.log([query, statuses, transactionPending[i]]);
-    await db.query(query, {
-      type: QueryTypes.BULKUPDATE,
-    });
   }
   return transactionPending;
 };
@@ -561,21 +569,34 @@ export const syncEmployeePIDSG = async ()=>{
         const syncEmp = apiRes.data.result[0];
         for (let i=0;i<syncEmp.length;i++)
         {
-            const empRes = await db.query("Select badgeId,username,`IN` as in_1,`OUT` as out_1 from employee where badgeId=?",{type:QueryTypes.SELECT,replacements:[syncEmp[i].badgeno]});
-            if (empRes.length < 1)
+            const empAcc = await db.query("Select badgeId,username,INAccess,OutAccess from employee e inner join employeeaccess ea on e.badgeId=ea.badgeId  where e.badgeId=? and e.station=?",{type:QueryTypes.SELECT,replacements:[syncEmp[i].badgeno,syncEmp[i].name]});
+            if (empAcc.length < 1)
             {
-                await db.query("Insert Into employee(username,isactive,badgeId,`IN`,`OUT`) values(?,1,?,?,?)",
+                
+                const empRes = await db.query("Select badgeId,username from employee where badgeId=?",{type:QueryTypes.SELECT,replacements:[syncEmp[i].badgeno]});
+                if (empRes.length  <1)
                 {
-                    type:QueryTypes.INSERT,
-                    replacements: [syncEmp[i].employeename,syncEmp[i].badgeno,syncEmp[i].IN>=1,syncEmp[i].OUT>=1]
-                });
+                  await db.query("Insert Into employee(username,isactive,badgeId) values(?,1,?)",
+                  {
+                      type:QueryTypes.INSERT,
+                      replacements: [syncEmp[i].employeename,syncEmp[i].badgeno]
+                  });
+                }
+                await db.query("Insert into employeeaccess(badgeId,station,INAccess,OutAccess) values (?,?,?,?)",{
+                  type: QueryTypes.INSERT,
+                  replacements: [syncEmp[i].badgeno,syncEmp[i].name,syncEmp[i].IN>=1,syncEmp[i].OUT>=1]
+                })
             }
             else
             {
-                await db.query("Update employee set username=?,`IN`=?,`OUT`=? where badgeId=?",{
+                await db.query("Update employee set username=? where badgeId=?",{
                     type: QueryTypes.UPDATE,
-                    replacements: [syncEmp[i].employeename,syncEmp[i].IN>=1,syncEmp[i].OUT>=1,syncEmp[i].badgeno]
+                    replacements: [syncEmp[i].employeename,syncEmp[i].badgeno]
                 })
+                await db.query("Update employeeaccess set INAcess=?,OutAccess=? where badgeNo=? and Station=?",{
+                  type:QueryTypes.UPDATE,
+                  replacements: [syncEmp[i].IN>=1,syncEmp[i].OUT>=1,syncEmp[i].badgeno,syncEmp[i].name]
+                });
             }
         }
         return syncEmp;
