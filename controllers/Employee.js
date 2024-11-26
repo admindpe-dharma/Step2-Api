@@ -559,9 +559,11 @@ export const syncEmployeePIDSG = async ()=>{
         const apiRes = await axios.get(
             `http://${process.env.PIDSG}/api/pid/employee-sync?f1=${process.env.STATION}`);
         const syncEmp = apiRes.data.result[0];
+        const apiEmpBadgeNo= [];
         for (let i=0;i<syncEmp.length;i++)
         {
             const empRes = await db.query("Select badgeId,username,`IN` as in_1,`OUT` as out_1 from employee where badgeId=?",{type:QueryTypes.SELECT,replacements:[syncEmp[i].badgeno]});
+            apiEmpBadgeNo.push(`'${syncEmp[i].badgeno}'`);
             if (empRes.length < 1)
             {
                 await db.query("Insert Into employee(username,isactive,badgeId,`IN`,`OUT`) values(?,1,?,?,?)",
@@ -578,7 +580,40 @@ export const syncEmployeePIDSG = async ()=>{
                 })
             }
         }
-        return syncEmp;
+
+        await db.query(`Update employee set username=?,``IN``=0,``OUT``=0 where badgeId not in (${apiEmpBadgeNo.join(",")})`,{
+          type: QueryTypes.UPDATE,
+        });
+    }
+    catch (er)
+    {
+        console.log(er);
+        return  er.message || er;
+    }
+}
+export const syncPIDSGBinAPI = async (req,res)=>{
+  return res.json(await syncPIDSGBin());
+}
+export const syncPIDSGBin = async()=>{
+  try
+    {
+        const dataBin = await db.query(" select b.id,b.name,c.station from bin b left join container c on b.name=c.name",{
+        type: QueryTypes.SELECT
+        });
+        const binNames = dataBin.map(x=>x.name); 
+        console.log(
+          `http://${process.env.PIDSG}/api/pid/bin-sync?f1=${JSON.stringify(binNames)}`);
+        const apiRes = await axios.get(
+            `http://${process.env.PIDSG}/api/pid/bin-sync?f1=${JSON.stringify(binNames)}`);
+        const syncBin = apiRes.data.result[0];
+        for (let i=0;i<syncBin.length;i++)
+        {
+            await db.query("update bin b left join container c on b.name=c.name  set max_weight=? where b.name=? and c.station=?",{
+                    type: QueryTypes.UPDATE,
+                    replacements: [syncBin[i].capacity,syncBin[i].name,syncBin[i].station]
+                })
+        }
+        return syncBin;
     }
     catch (er)
     {
