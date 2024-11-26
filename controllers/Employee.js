@@ -15,7 +15,7 @@ export const ScanBadgeid = async (req, res) => {
   try {
     const user = await Users.findOne({
       attributes: ["badgeId", "username", "IN", "OUT"],
-      where: { badgeId },
+      where: { badgeId:badgeId,active:1 },
     });
     if (user) {
       res.json({ user: user });
@@ -581,7 +581,7 @@ export const syncEmployeePIDSG = async ()=>{
             }
         }
 
-        await db.query(`Update employee set username=?,``IN``=0,``OUT``=0 where badgeId not in (${apiEmpBadgeNo.join(",")})`,{
+        await db.query(`Update employee set username=?,``IN``=0,``OUT``=0,active=0 where badgeId not in (${apiEmpBadgeNo.join(",")})`,{
           type: QueryTypes.UPDATE,
         });
     }
@@ -608,7 +608,7 @@ export const syncPIDSGBin = async()=>{
         const syncBin = apiRes.data.result[0];
         for (let i=0;i<syncBin.length;i++)
         {
-            await db.query("update bin b left join container c on b.name=c.name  set max_weight=? where b.name=? and c.station=?",{
+            await db.query("update bin b left join container c on b.name=c.name  set max_weight=? where b.name=? and station=?",{
                     type: QueryTypes.UPDATE,
                     replacements: [syncBin[i].capacity,syncBin[i].name,syncBin[i].station]
                 })
@@ -620,4 +620,36 @@ export const syncPIDSGBin = async()=>{
         console.log(er);
         return  er.message || er;
     }
+}
+
+export const syncPIDSGContainer = async()=>{
+  try
+    {
+        const dataBin = await db.query(" select containerid,name,station,weightbin from container",{
+        type: QueryTypes.SELECT
+        });
+        const binNames = dataBin.map(x=>x.name); 
+        console.log(
+          `http://${process.env.PIDSG}/api/pid/bin-sync?f1=${JSON.stringify(binNames)}`);
+        const apiRes = await axios.get(
+            `http://${process.env.PIDSG}/api/pid/bin-sync?f1=${JSON.stringify(binNames)}`);
+        const syncBin = apiRes.data.result[0];
+        for (let i=0;i<syncBin.length;i++)
+        {
+            await db.query("update   container set weightbin=? where name=? and station=?",{
+                    type: QueryTypes.UPDATE,
+                    replacements: [syncBin[i].weight,syncBin[i].name,syncBin[i].station]
+                })
+        }
+        return syncBin;
+    }
+    catch (er)
+    {
+        console.log(er);
+        return  er.message || er;
+    }
+}
+
+export const syncPIDSGBinContainerAPI = async (req,res)=>{
+  return res.json(await syncPIDSGContainer());
 }
