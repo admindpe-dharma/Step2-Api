@@ -15,7 +15,7 @@ export const ScanBadgeid = async (req, res) => {
   try {
     const user = await Users.findOne({
       attributes: ["badgeId", "username", "`IN`", "`OUT`"],
-      where: { badgeId:badgeId,active:1 },
+      where: { badgeId:badgeId,isactive:1 },
     });
     if (user) {
       res.json({ user: user });
@@ -581,7 +581,7 @@ export const syncEmployeePIDSG = async ()=>{
             }
         }
 
-        await db.query("Update employee set username=?,`IN`=0,``OUT``=0,active=0 where badgeId not in (" + apiEmpBadgeNo.join(",") + ")",{
+        await db.query("Update employee set username=?,`IN`=0,``OUT``=0,isactive=0 where badgeId not in (" + apiEmpBadgeNo.join(",") + ")",{
           type: QueryTypes.UPDATE,
         });
     }
