@@ -574,7 +574,7 @@ export const syncEmployeePIDSG = async ()=>{
             }
             else
             {
-                await db.query("Update employee set username=?,`IN`=?,`OUT`=? where badgeId=?",{
+                await db.query("Update employee set username=?,`IN`=?,`OUT`=?,isactive=1 where badgeId=?",{
                     type: QueryTypes.UPDATE,
                     replacements: [syncEmp[i].employeename,syncEmp[i].IN>=1,syncEmp[i].OUT>=1,syncEmp[i].badgeno]
                 })
