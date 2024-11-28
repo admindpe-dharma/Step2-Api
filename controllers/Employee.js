@@ -14,7 +14,7 @@ export const ScanBadgeid = async (req, res) => {
   const { badgeId } = req.body;
   try {
     const user = await Users.findOne({
-      attributes: ["badgeId", "username", "`IN`", "`OUT`"],
+      attributes: ["badgeId", "username", "IN", "OUT"],
       where: { badgeId:badgeId,isactive:1 },
     });
     if (user) {
