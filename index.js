@@ -88,8 +88,7 @@ const syncEmp = async ()=>{
   await syncPIDSGBin();
   await syncPIDSGContainer();
   console.log('Sync Employee');
-  setTimeout(syncEmp,10*10*1000);
 }
-syncEmp();
+setInterval(syncEmp,60*1000);
 loopWork();
 //getWeightBin(io); 
