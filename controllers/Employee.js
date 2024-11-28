@@ -581,9 +581,8 @@ export const syncEmployeePIDSG = async ()=>{
             }
         }
 
-        await db.query("Update employee set username=?,`IN`=0,`OUT`=0,isactive=0 where badgeId not in (" + apiEmpBadgeNo.join(",") + ")",{
-          type: QueryTypes.UPDATE,
-          replacements:[syncEmp[i].username]
+        await db.query("Update employee set `IN`=0,`OUT`=0,isactive=0 where badgeId not in (" + apiEmpBadgeNo.join(",") + ")",{
+          type: QueryTypes.UPDATE
         });
     }
     catch (er)
