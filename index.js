@@ -72,4 +72,21 @@ getScales50Kg(io);
 setInterval(()=>{
   BroadcastBinWeight();
 },1000);
+const syncWork = async ()=>{
+  
+  const data = await syncPendingTransaction();
+  await syncTransactionStep1();
+  };
+const loopWork = async()=>{
+  await syncWork();
+  setImmediate(loopWork);
+}
+const syncEmp = async ()=>{
+  await syncEmployeePIDSG();
+  await syncPIDSGBin();
+  await syncPIDSGContainer();
+  console.log('Sync Employee');
+}
+setInterval(syncEmp,60*1000);
+loopWork();
 //getWeightBin(io); 
