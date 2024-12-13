@@ -10,6 +10,8 @@ import { getScales4Kg ,getScales50Kg} from "./controllers/Scales.js";
 import bodyParser from "body-parser";
 import {BroadcastBinWeight, getWeightBin} from "./controllers/Bin.js"
 import { config } from "dotenv";
+import { syncEmployeePIDSG, syncPendingTransaction, syncPIDSGBin, syncPIDSGContainer, syncTransaction, syncTransactionStep1 } from "./controllers/Employee.js";
+import { setTimeout } from "timers/promises";
 config();
 const app = express();
 const server = http.createServer(app);
