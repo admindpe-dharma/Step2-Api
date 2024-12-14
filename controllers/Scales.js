@@ -40,11 +40,12 @@ export const getScales4Kg = (io) => {
             }
             _4kgOutput = _4kgOutput.replace("\n","").replace("\r","");
             const match = processWeight(_4kgOutput,io);
+            
+            _4kgOutput = '';
             if (!match ) {
                 Timbangan.close();
                 getScales4Kg(io);
             }
-            _4kgOutput = '';
         });  
     } catch (error) {
         console.log(error);
@@ -98,12 +99,11 @@ export const getScales50Kg = (io) => {
             }*/
             _50kgOutput = data.toString().replace("\r","").replace("\n","");
             const match = processWeight(_50kgOutput,io);
-
+            _50kgOutput = '';
             if (!match) {
                 Timbangan_1.close();
                 getScales50Kg(io);
             }
-            _50kgOutput = '';
         });
 
        Timbangan_1.on('error', (error) => {
