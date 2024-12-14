@@ -183,6 +183,14 @@ export const SaveTransaksi = async (req, res) => {
   const { payload } = req.body;
   payload.recordDate = moment().format("YYYY-MM-DD HH:mm:ss");
   (await transaction.create(payload)).save();
+  setTimeout(()=>{
+     syncPendingTransaction();
+     syncTransactionStep1();
+    
+    syncEmployeePIDSG();
+     syncPIDSGBin();
+     syncPIDSGContainer();
+  },100);
   //    const data = await syncPendingTransaction();
   res.status(200).json({ msg: "ok" });
 };
@@ -319,6 +327,14 @@ export const SaveTransaksiCollection = async (req, res) => {
   const { payload } = req.body;
   payload.recordDate = moment().format("YYYY-MM-DD HH:mm:ss");
   (await transaction.create(payload)).save();
+  setTimeout(()=>{
+    syncPendingTransaction();
+    syncTransactionStep1();
+   
+   syncEmployeePIDSG();
+    syncPIDSGBin();
+    syncPIDSGContainer();
+ },100);
   res.status(200).json({ msg: "ok" });
 };
 
