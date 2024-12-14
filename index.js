@@ -87,7 +87,6 @@ const syncEmp = async ()=>{
   await syncEmployeePIDSG();
   await syncPIDSGBin();
   await syncPIDSGContainer();
-  console.log('Sync Employee');
 }
 setInterval(syncEmp,60*1000);
 loopWork();
