@@ -12,19 +12,52 @@ import {BroadcastBinWeight, getWeightBin} from "./controllers/Bin.js"
 import { config } from "dotenv";
 import { syncEmployeePIDSG, syncPendingTransaction, syncPIDSGBin, syncPIDSGContainer, syncTransaction, syncTransactionStep1 } from "./controllers/Employee.js";
 import { setTimeout } from "timers/promises";
+import  kue from 'kue';
+import { createQueue} from 'kue';
 config();
 const app = express();
 const server = http.createServer(app);
 const clientList= [];
 const port = 5000;
+const queue = createQueue();
+queue.process('sync-weightbin',async (job,done)=>{
+  try
+  {
+    await syncPIDSGContainer();
+    await syncPIDSGBin();
+  }
+  catch
+  {
 
+  }
+  done();
+});
+queue.process('sync-employee',async (job,done)=>{
+  try
+  {
+    console.log('run');
+    await syncEmployeePIDSG();
+  }
+  catch{}
+  done();
+});
+queue.process('sync-pending',async (job,done)=>{
+  try
+  {
+    await syncPendingTransaction();
+    await syncTransactionStep1();
+  }
+  catch{
+
+  }
+});
  app.use(cors({
   origin: '*', // Allow any origin
   methods: ['GET', 'POST', 'PUT', 'DELETE'], // Allow specific HTTP methods
 /*  allowedHeaders: ['Content-Type', 'Authorization'], // Allow specific headers*/
   credentials:false 
 }));
-
+app.use('/kue/',kue.app);
 /* app.use(cors({
   credentials:false,
   origin: '*'
@@ -74,20 +107,22 @@ getScales50Kg(io);
 setInterval(()=>{
   BroadcastBinWeight();
 },1000);
-const syncWork = async ()=>{
+// const syncWork = async ()=>{
   
-  const data = await syncPendingTransaction();
-  await syncTransactionStep1();
-  };
-const loopWork = async()=>{
-  await syncWork();
-  setImmediate(loopWork);
-}
-const syncEmp = async ()=>{
-  await syncEmployeePIDSG();
-  await syncPIDSGBin();
-  await syncPIDSGContainer();
-}
-setInterval(syncEmp,60*1000);
-loopWork();
+//   const data = await syncPendingTransaction();
+//   await syncTransactionStep1();
+//   };
+// const loopWork = async()=>{
+//   await syncWork();
+//   setImmediate(loopWork);
+// }
+// const syncEmp = async ()=>{
+//   await syncEmployeePIDSG();
+//   await syncPIDSGBin();
+//   await syncPIDSGContainer();
+// }
+// setInterval(syncEmp,60*1000);
+// loopWork();
 //getWeightBin(io); 
+
+export {queue};

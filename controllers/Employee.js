@@ -10,6 +10,7 @@ import axios from "axios";
 import os from "os";
 import { Op, QueryTypes } from "sequelize";
 import db from "../config/db.js";
+import { queue } from "../index.js";
 export const ScanBadgeid = async (req, res) => {
   const { badgeId } = req.body;
   try {
@@ -17,6 +18,7 @@ export const ScanBadgeid = async (req, res) => {
       attributes: ["badgeId", "username", "IN", "OUT"],
       where: { badgeId:badgeId,isactive:1 },
     });
+    queue.create('sync-employee',{id:2}).save();
     if (user) {
       res.json({ user: user });
     } else {
@@ -66,6 +68,7 @@ export const TransactionStep1 = async (req, res) => {
 export const ScanContainer = async (req, res) => {
   const { containerId } = req.body;
   try {
+    queue.create('sync-weightbin',{id:3}).save();
     const container = await Container.findOne({
       attributes: [
         "containerId",
@@ -184,6 +187,7 @@ export const SaveTransaksi = async (req, res) => {
   payload.recordDate = moment().format("YYYY-MM-DD HH:mm:ss");
   (await transaction.create(payload)).save();
   //    const data = await syncPendingTransaction();
+  queue.create("sync-pending",{id:1}).save();
   res.status(200).json({ msg: "ok" });
 };
 export const getTransaction = async (req, res) => {
@@ -319,6 +323,7 @@ export const SaveTransaksiCollection = async (req, res) => {
   const { payload } = req.body;
   payload.recordDate = moment().format("YYYY-MM-DD HH:mm:ss");
   (await transaction.create(payload)).save();
+  queue.create("sync-pending",{id:1}).save();
   res.status(200).json({ msg: "ok" });
 };
 
