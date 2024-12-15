@@ -11,53 +11,22 @@ import bodyParser from "body-parser";
 import {BroadcastBinWeight, getWeightBin} from "./controllers/Bin.js"
 import { config } from "dotenv";
 import { syncEmployeePIDSG, syncPendingTransaction, syncPIDSGBin, syncPIDSGContainer, syncTransaction, syncTransactionStep1 } from "./controllers/Employee.js";
-import { setTimeout } from "timers/promises";
-import  kue from 'kue';
-import { createQueue} from 'kue';
+import Queue from 'bull';
+import { ExpressAdapter } from '@bull-board/express';
+import {createBullBoard} from '@bull-board/api';
+import {BullAdapter} from '@bull-board/api/bullAdapter.js';
 config();
 const app = express();
 const server = http.createServer(app);
 const clientList= [];
 const port = 5000;
-const queue = createQueue();
-queue.process('sync-weightbin',async (job,done)=>{
-  try
-  {
-    await syncPIDSGContainer();
-    await syncPIDSGBin();
-  }
-  catch
-  {
 
-  }
-  done();
-});
-queue.process('sync-employee',async (job,done)=>{
-  try
-  {
-    console.log('run');
-    await syncEmployeePIDSG();
-  }
-  catch{}
-  done();
-});
-queue.process('sync-pending',async (job,done)=>{
-  try
-  {
-    await syncPendingTransaction();
-    await syncTransactionStep1();
-  }
-  catch{
-
-  }
-});
  app.use(cors({
   origin: '*', // Allow any origin
   methods: ['GET', 'POST', 'PUT', 'DELETE'], // Allow specific HTTP methods
 /*  allowedHeaders: ['Content-Type', 'Authorization'], // Allow specific headers*/
   credentials:false 
 }));
-app.use('/kue/',kue.app);
 /* app.use(cors({
   credentials:false,
   origin: '*'
@@ -98,15 +67,57 @@ socket.on('disconnect',()=>{
 });
 
 });
-server.listen(port, () => {
-  console.log(`Server up and running on port ${port}`);
-});
-export {clientList,io,Server};
-getScales4Kg(io);
-getScales50Kg(io);
+
 setInterval(()=>{
   BroadcastBinWeight();
 },1000);
+
+const [scale4Queue,scale50Queue,pendingQueue,employeeQueue,weightbinQueue]
+ = [Queue('scale4Queue',{limiter:{max:3,duration:1000}}),Queue('scale50Queue',{limiter:{max:3,duration:1000}}),Queue('pending'),Queue('employee'),Queue('weightbin')];
+scale4Queue.process((job,done)=>{
+console.log('scale 2 loading');
+getScales4Kg();
+done();
+});
+scale50Queue.process((job,done)=>{
+  getScales50Kg();
+  done();
+});
+pendingQueue.process(async (job,done)=>{
+const res = [await syncPendingTransaction(),await syncTransactionStep1()];
+
+done(null,res);
+});
+employeeQueue.process(async(job,done)=>{
+const res = await syncEmployeePIDSG();
+done(null,res);
+});
+weightbinQueue.process(async(job,done)=>{
+const res1= await syncPIDSGContainer();
+const res2= await syncPIDSGBin();
+done(null,[res1,res2]);
+});
+const serverAdapter = new ExpressAdapter();
+serverAdapter.setBasePath('/queues');
+const bullBoard = createBullBoard({
+  queues: [new BullAdapter(scale4Queue),new BullAdapter(scale50Queue),new BullAdapter(pendingQueue),new BullAdapter(employeeQueue),new BullAdapter(weightbinQueue)],
+  serverAdapter: serverAdapter,
+  options:{
+    uiConfig:{
+      boardTitle:process.env.NAME
+    }
+  }
+});
+app.use('/queues',serverAdapter.getRouter());
+server.listen(port, () => {
+  scale4Queue.add({id:4});
+  scale50Queue.add({id:50});
+  console.log(`Server up and running on port ${port}`);
+}); 
+export { clientList,Server, io,scale50Queue,scale4Queue,employeeQueue,weightbinQueue,pendingQueue };
+
+
+
 // const syncWork = async ()=>{
   
 //   const data = await syncPendingTransaction();
@@ -124,5 +135,3 @@ setInterval(()=>{
 // setInterval(syncEmp,60*1000);
 // loopWork();
 //getWeightBin(io); 
-
-export {queue};

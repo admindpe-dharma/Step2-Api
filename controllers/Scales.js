@@ -1,12 +1,12 @@
 import { SerialPort } from 'serialport';
-
+import { io, scale4Queue, scale50Queue } from '../index.js';
 
 
 
 
 let _4kgOutput = '';
 let _50kgOutput = '';
-export const getScales4Kg = (io) => {
+export const getScales4Kg = () => {
     try {
 //        console.log(process.env.TIMBANGAN4KG);
         if (process.env.TIMBANGAN4KG != "1")
@@ -22,13 +22,10 @@ export const getScales4Kg = (io) => {
         });
         Timbangan.on('error', (error) => {
             console.log({kg4Error: error});
-            Timbangan.close();
-            getScales4Kg(io);
-            return;
-        });
-        let response;
-        io.on('connectScale', () => {
-            Timbangan.open(() => {
+            Timbangan.close(()=>{
+                scale4Queue.add({id:4},{
+                    delay: 3000
+                })
             });
         });
        Timbangan.on('data', (data) => {
@@ -39,22 +36,26 @@ export const getScales4Kg = (io) => {
                 return;
             }
             _4kgOutput = _4kgOutput.replace("\n","").replace("\r","");
-            const match = processWeight(_4kgOutput,io);
+            const match = processWeight(_4kgOutput);
             
             _4kgOutput = '';
             if (!match ) {
-                Timbangan.close();
-                getScales4Kg(io);
+                Timbangan.close(()=>{
+                    scale4Queue.add({id:4},{
+                        delay: 3000
+                    })
+                });
             }
         });  
     } catch (error) {
         console.log(error);
-        getScales4Kg(io);
-        return;
+        scale4Queue.add({id:4},{
+            delay: 3000
+        });
         //        res.status(500).json({ msg: error.message });
     } 
 };
-const processWeight = async (payload,io) =>{
+const processWeight = async (payload) =>{
     const match = payload.toString().match(/[\d]+\.\d{2}(?=Kg)/);
     const match4 = payload.toString().match(/WT:(\d+\.\d+)g/);
     if (match ) {
@@ -74,7 +75,7 @@ const processWeight = async (payload,io) =>{
         return false;
     
 }
-export const getScales50Kg = (io) => {
+export const getScales50Kg = () => {
     try {
   //      console.log(process.env.TIMBANGAN50KG);
         if (process.env.TIMBANGAN50KG != "1")
@@ -89,8 +90,6 @@ export const getScales50Kg = (io) => {
             stopBits: 1,
             parity: 'none',
         }); 
-        
-        let response;
         Timbangan_1.on('data', (data) => {
             /*if (data.toString()!='\n')
             {
@@ -98,26 +97,32 @@ export const getScales50Kg = (io) => {
                 return;
             }*/
             _50kgOutput = data.toString().replace("\r","").replace("\n","");
-            const match = processWeight(_50kgOutput,io);
+            const match = processWeight(_50kgOutput);
             _50kgOutput = '';
             if (!match) {
-                Timbangan_1.close();
-                getScales50Kg(io);
+                Timbangan_1.close(()=>{
+                    scale50Queue.add({id:50},{
+                        delay: 3000
+                    })
+                });
             }
         });
 
        Timbangan_1.on('error', (error) => {
             console.log({kg50Error: error});
-            Timbangan_1.close();
-            getScales50Kg(io);
+            Timbangan_1.close(()=>{
+                scale50Queue.add({id:50},{
+                    delay: 3000
+                })
+            });
             return;
         }); 
-        if (response != undefined && response != null) {
-            res.status(200).json(response);
-        }
+
     } catch (error) {
         console.log(error);
-        getScales50Kg(io);
+        scale50Queue.add({id:50},{
+                delay: 3000
+            });
         return;
         //    res.status(500).json({ msg: error.message });
     }
