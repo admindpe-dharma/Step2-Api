@@ -112,6 +112,9 @@ app.use('/queues',serverAdapter.getRouter());
 server.listen(port, () => {
   scale4Queue.add({id:4});
   scale50Queue.add({id:50});
+  pendingQueue.add({id:1});
+  weightbinQueue.add({id:2});
+  employeeQueue.add({id:3});
   console.log(`Server up and running on port ${port}`);
 }); 
 export { clientList,Server, io,scale50Queue,scale4Queue,employeeQueue,weightbinQueue,pendingQueue };
@@ -135,3 +138,4 @@ export { clientList,Server, io,scale50Queue,scale4Queue,employeeQueue,weightbinQ
 // setInterval(syncEmp,60*1000);
 // loopWork();
 //getWeightBin(io); 
+
