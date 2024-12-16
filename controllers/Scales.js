@@ -55,15 +55,15 @@ export const getScales4Kg = (io) => {
     } 
 };
 const processWeight = async (payload,io) =>{
-    const match = payload.toString().match(/[\d]+\.\d{2}(?=Kg)/);
-    const match4 = payload.toString().match(/WT:(\d+\.\d+)g/);
-    if (match ) {
-        const weight =  match[1] ;
+    const match4 = payload.toString().match(/[\d]+\.\d{2}(?=Kg)/);
+    const match = payload.toString().match(/WT:(\d+\.\d+)g/);
+    if (match4 ) {
+        const weight =  match4[1] ;
         response = { weight: parseFloat(weight) };
         io.emit('data', response);
         return true;
     }
-    else if (match4) {
+    else if (match) {
         const weight = match[0];
         response = { weight: parseFloat(weight) };
         response = { weight50Kg: weight };
