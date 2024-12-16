@@ -60,14 +60,14 @@ const processWeight = async (payload) =>{
     const match4 = payload.toString().match(/WT:(\d+\.\d+)g/);
     if (match ) {
         const weight =  match[1] ;
-        response = { weight: parseFloat(weight) };
+        const response = { weight: parseFloat(weight) };
         io.emit('data', response);
         return true;
     }
     else if (match4) {
         const weight = match[0];
-        response = { weight: parseFloat(weight) };
-        response = { weight50Kg: weight };
+        //response = { weight: parseFloat(weight) };
+        const response = { weight50Kg: weight };
         io.emit('data1', response);
         return true;
     }
