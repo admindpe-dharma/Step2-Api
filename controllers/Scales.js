@@ -65,7 +65,7 @@ const processWeight = async (payload) =>{
         return true;
     }
     else if (match4 && match4.length && match4.length > 0) {
-        const weight = match[1];
+        const weight = match4[1];
         //response = { weight: parseFloat(weight) };
         const response = { weight50Kg: weight };
         io.emit('data1', response);
