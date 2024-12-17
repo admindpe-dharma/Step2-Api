@@ -30,10 +30,13 @@ export const getScales4Kg = () => {
         });
        Timbangan.on('data', (data) => {
             let temp = data.toString();
-            if (temp != '\n'  && temp != ' ' && temp != '\t' && temp != '\0')
+            if (temp.length < 5)
             {
-                _4kgOutput += temp;
-                return;
+                if (temp != '\n'  && temp != ' ' && temp != '\t' && temp != '\0')
+                {
+                    _4kgOutput += temp;
+                    return;
+                }
             }
             _4kgOutput = _4kgOutput.replace("\n","").replace("\r","");
             const match = processWeight(_4kgOutput);
@@ -96,7 +99,16 @@ export const getScales50Kg = () => {
                 _50kgOutput = _50kgOutput+ data.toString();
                 return;
             }*/
-            _50kgOutput = data.toString().replace("\r","").replace("\n","");
+            let temp = data.toString();
+            if (temp.length < 5)
+            {
+                if (temp != '\n'  && temp != ' ' && temp != '\t' && temp != '\0')
+                {
+                    _50kgOutput += temp;
+                    return;
+                }
+            }
+            _50kgOutput = _50kgOutput.replace("\r","").replace("\n","");
             const match = processWeight(_50kgOutput);
             _50kgOutput = '';
             if (!match) {
