@@ -324,7 +324,7 @@ export const SaveTransaksiCollection = async (req, res) => {
   const { payload } = req.body;
   payload.recordDate = moment().format("YYYY-MM-DD HH:mm:ss");
   (await transaction.create(payload)).save();
-  queue.create("sync-pending",{id:1}).save();
+  pendingQueue.add({id:0});
   res.status(200).json({ msg: "ok" });
 };
 
