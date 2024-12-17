@@ -38,6 +38,8 @@ export const getScales4Kg = () => {
                     return;
                 }
             }
+            else 
+                _4kgOutput = temp;
             _4kgOutput = _4kgOutput.replace("\n","").replace("\r","");
             const match = processWeight(_4kgOutput);
             
@@ -108,6 +110,8 @@ export const getScales50Kg = () => {
                     return;
                 }
             }
+            else
+                _50kgOutput = temp;
             _50kgOutput = _50kgOutput.replace("\r","").replace("\n","");
             const match = processWeight(_50kgOutput);
             _50kgOutput = '';
