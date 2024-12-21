@@ -103,7 +103,7 @@ if (Array.isArray(res1))
   RackSyncQueue.add({type: 'weightbin',payload:{syncBin: res1} });
 done(null,[res1,res2]);
 });
-RackSyncQueue.add(async (job,done)=>{
+RackSyncQueue.process(async (job,done)=>{
   const url = `http://${process.env.RACK_API}/${( job.data.type=='weightbin' ? "weightbin" :"employee")}-sync`; 
   const payload  = {...job.data.payload};
   try
