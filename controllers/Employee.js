@@ -313,8 +313,7 @@ export const UpdateTransaksi = async (req, res) => {
 export const SyncAll = async (req,res)=>{
   await syncPendingTransaction();
   await syncTransactionStep1();
- 
- await syncEmployeePIDSG();
+  await syncEmployeePIDSG();
   await syncPIDSGBin();
   await syncPIDSGContainer();
   return res.json({msg:"ok"},200);
@@ -599,6 +598,7 @@ export const syncEmployeePIDSG = async ()=>{
         await db.query("Update employee set `IN`=0,`OUT`=0,isactive=0 where badgeId not in (" + apiEmpBadgeNo.join(",") + ")",{
           type: QueryTypes.UPDATE
         });
+        return syncEmp;
     }
     catch (er)
     {

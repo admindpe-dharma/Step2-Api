@@ -15,6 +15,7 @@ import Queue from 'bull';
 import { ExpressAdapter } from '@bull-board/express';
 import {createBullBoard} from '@bull-board/api';
 import {BullAdapter} from '@bull-board/api/bullAdapter.js';
+import axios from "axios";
 config();
 const app = express();
 const server = http.createServer(app);
@@ -72,8 +73,8 @@ setInterval(()=>{
   BroadcastBinWeight();
 },1000);
 
-const [scale4Queue,scale50Queue,pendingQueue,employeeQueue,weightbinQueue]
- = [Queue('scale4Queue',{limiter:{max:3,duration:1000}}),Queue('scale50Queue',{limiter:{max:3,duration:1000}}),Queue('pending'),Queue('employee'),Queue('weightbin')];
+const [scale4Queue,scale50Queue,pendingQueue,employeeQueue,weightbinQueue,RackSyncQueue]
+ = [Queue('scale4Queue',{limiter:{max:3,duration:1000}}),Queue('scale50Queue',{limiter:{max:3,duration:1000}}),Queue('pending'),Queue('employee'),Queue('weightbin'),Queue('Rack Sync Queue')];
 scale4Queue.process((job,done)=>{
 console.log('scale 2 loading');
 getScales4Kg();
@@ -90,17 +91,38 @@ done(null,res);
 });
 employeeQueue.process(async(job,done)=>{
 const res = await syncEmployeePIDSG();
+
+if (Array.isArray(res))
+  RackSyncQueue.add({type: 'employee',payload:{syncEmp: res} });
 done(null,res);
 });
 weightbinQueue.process(async(job,done)=>{
 const res1= await syncPIDSGContainer();
 const res2= await syncPIDSGBin();
+if (Array.isArray(res1))
+  RackSyncQueue.add({type: 'weightbin',payload:{syncBin: res1} });
 done(null,[res1,res2]);
 });
+RackSyncQueue.add(async (job,done)=>{
+  const url = `http://${process.env.RACK_API}/${( job.data.type=='weightbin' ? "weightbin" :"employee")}-sync`; 
+  const payload  = {...job.data.payload};
+  try
+  {
+    const res = await axios.post(url,payload,{
+      withCredentials:false,
+      timeout: 5000,
+    });
+    done(null,res.data);
+  }
+  catch (err)
+  {
+    done(err.toJSON() || err,null);
+  }
+})
 const serverAdapter = new ExpressAdapter();
 serverAdapter.setBasePath('/queues');
 const bullBoard = createBullBoard({
-  queues: [new BullAdapter(scale4Queue),new BullAdapter(scale50Queue),new BullAdapter(pendingQueue),new BullAdapter(employeeQueue),new BullAdapter(weightbinQueue)],
+  queues: [new BullAdapter(scale4Queue),new BullAdapter(scale50Queue),new BullAdapter(pendingQueue),new BullAdapter(employeeQueue),new BullAdapter(weightbinQueue),new BullAdapter(RackSyncQueue)],
   serverAdapter: serverAdapter,
   options:{
     uiConfig:{
