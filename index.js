@@ -1,3 +1,4 @@
+import './env.js';
 import express from "express";
 //import ScalesRoute from "./routes/ScalesRoute.js";
 import ScannerRoute from "./routes/ScannerRoute.js";
@@ -9,14 +10,12 @@ import { Server } from "socket.io";
 import { getScales4Kg ,getScales50Kg} from "./controllers/Scales.js";
 import bodyParser from "body-parser";
 import {BroadcastBinWeight, getWeightBin} from "./controllers/Bin.js"
-import { config } from "dotenv";
 import { syncEmployeePIDSG, syncPendingTransaction, syncPIDSGBin, syncPIDSGContainer, syncTransaction, syncTransactionStep1 } from "./controllers/Employee.js";
 import Queue from 'bull';
 import { ExpressAdapter } from '@bull-board/express';
 import {createBullBoard} from '@bull-board/api';
 import {BullAdapter} from '@bull-board/api/bullAdapter.js';
 import axios from "axios";
-config();
 const app = express();
 const server = http.createServer(app);
 const clientList= [];
