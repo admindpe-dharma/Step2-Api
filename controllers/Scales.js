@@ -1,9 +1,12 @@
 import { SerialPort } from 'serialport';
 import { io, scale4Queue, scale50Queue } from '../index.js';
+import { fileURLToPath } from "url";
+import { dirname, resolve } from "path";
 import fs from 'fs';
+const __dirname = dirname( fileURLToPath(import.meta.url));
 
 
-const fileNames = {usb0: 'USB0',usb1:'USB1'};
+const fileNames = {usb0: __dirname+"/"+'USB0',usb1:__dirname+"/"+'USB1'};
 let _4kgOutput = '';
 let _50kgOutput = '';
 export const getScales4Kg = () => {
