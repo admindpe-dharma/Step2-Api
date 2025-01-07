@@ -34,7 +34,7 @@ export const getScales4Kg = () => {
        Timbangan.on('data', (data) => {
             let temp = data.toString();
             if (process.env.RECORD_SCALE==1)
-                fs.writeFileSync(fileNames.usb1+".txt",temp,{flag:'a+'});
+                fs.writeFileSync(fileNames.usb1+".txt",temp+" - " + new Date().toLocaleString(),{flag:'a+'});
             if (temp.length < 5)
             {
                 if (temp != '\n'  && temp != ' ' && temp != '\t' && temp != '\0')
@@ -47,7 +47,7 @@ export const getScales4Kg = () => {
                 _4kgOutput = temp;
             
             if (process.env.RECORD_SCALE==1)
-                fs.writeFileSync(fileNames.usb1+"_2.txt",temp,{flag:'a+'});
+                fs.writeFileSync(fileNames.usb1+"_2.txt",temp+" - " + new Date().toLocaleString(),{flag:'a+'});
             _4kgOutput = _4kgOutput.replace("\n","").replace("\r","");
             const match = processWeight(_4kgOutput);
             
@@ -111,7 +111,7 @@ export const getScales50Kg = () => {
             }*/
             let temp = data.toString();
             if (process.env.RECORD_SCALE==1)
-                fs.writeFileSync(fileNames.usb0+".txt",temp,{flag:'a+'});
+                fs.writeFileSync(fileNames.usb0+".txt",temp +" - " + new Date().toLocaleString(),{flag:'a+'});
             if (temp.length < 5)
             {
                 if (temp != '\n'  && temp != ' ' && temp != '\t' && temp != '\0')
@@ -123,7 +123,7 @@ export const getScales50Kg = () => {
             else
                 _50kgOutput = temp;
             if (process.env.RECORD_SCALE==1)
-                fs.writeFileSync(fileNames.usb0+"_2.txt",temp,{flag:'a+'});
+                fs.writeFileSync(fileNames.usb0+"_2.txt",temp +" - " + new Date().toLocaleString(),{flag:'a+'});
             _50kgOutput = _50kgOutput.replace("\r","").replace("\n","");
             const match = processWeight(_50kgOutput);
             _50kgOutput = '';
