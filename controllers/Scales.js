@@ -1,9 +1,9 @@
 import { SerialPort } from 'serialport';
 import { io, scale4Queue, scale50Queue } from '../index.js';
+import fs from 'fs';
 
 
-
-
+const fileNames = {usb0: 'USB0',usb1:'USB1'};
 let _4kgOutput = '';
 let _50kgOutput = '';
 export const getScales4Kg = () => {
@@ -25,11 +25,13 @@ export const getScales4Kg = () => {
             Timbangan.close(()=>{
                 scale4Queue.add({id:4},{
                     delay: 3000
-                })
+                });
             });
         });
        Timbangan.on('data', (data) => {
             let temp = data.toString();
+            if (process.env.RECORD_SCALE==1)
+                fs.writeFileSync(fileNames.usb0+".txt",temp,{flag:'a+'});
             if (temp.length < 5)
             {
                 if (temp != '\n'  && temp != ' ' && temp != '\t' && temp != '\0')
@@ -40,6 +42,9 @@ export const getScales4Kg = () => {
             }
             else 
                 _4kgOutput = temp;
+            
+            if (process.env.RECORD_SCALE==1)
+                fs.writeFileSync(fileNames.usb0+"_2.txt",temp,{flag:'a+'});
             _4kgOutput = _4kgOutput.replace("\n","").replace("\r","");
             const match = processWeight(_4kgOutput);
             
@@ -102,6 +107,8 @@ export const getScales50Kg = () => {
                 return;
             }*/
             let temp = data.toString();
+            if (process.env.RECORD_SCALE==1)
+                fs.writeFileSync(fileNames.usb1+".txt",temp,{flag:'a+'});
             if (temp.length < 5)
             {
                 if (temp != '\n'  && temp != ' ' && temp != '\t' && temp != '\0')
@@ -112,6 +119,8 @@ export const getScales50Kg = () => {
             }
             else
                 _50kgOutput = temp;
+            if (process.env.RECORD_SCALE==1)
+                fs.writeFileSync(fileNames.usb1+"_2.txt",temp,{flag:'a+'});
             _50kgOutput = _50kgOutput.replace("\r","").replace("\n","");
             const match = processWeight(_50kgOutput);
             _50kgOutput = '';
