@@ -47,7 +47,7 @@ export const getScales4Kg = () => {
                 _4kgOutput = temp;
             
             if (process.env.RECORD_SCALE==1)
-                fs.writeFileSync(fileNames.usb1+"_2.txt",temp+" - " + new Date().toLocaleString()+"\n",{flag:'a+'});
+                fs.writeFileSync(fileNames.usb1+"_2.txt",_4kgOutput+" - " + new Date().toLocaleString()+"\n",{flag:'a+'});
             _4kgOutput = _4kgOutput.replace("\n","").replace("\r","");
             const match = processWeight(_4kgOutput);
             
@@ -123,7 +123,7 @@ export const getScales50Kg = () => {
             else
                 _50kgOutput = temp;
             if (process.env.RECORD_SCALE==1)
-                fs.writeFileSync(fileNames.usb0+"_2.txt",temp +" - " + new Date().toLocaleString()+"\n",{flag:'a+'});
+                fs.writeFileSync(fileNames.usb0+"_2.txt",_50kgOutput +" - " + new Date().toLocaleString()+"\n",{flag:'a+'});
             _50kgOutput = _50kgOutput.replace("\r","").replace("\n","");
             const match = processWeight(_50kgOutput);
             _50kgOutput = '';
