@@ -18,7 +18,7 @@ router.post('/UpdateContainerStatus',UpdateContainerStatus)
 router.get('/getbinData',getbinData);
 routes.put("/Transaksi/:idscraplog",UpdateTransaksi);
 router.get("/Transaksi/:containerName",getTransaction);
-router.get("/Bin/:binName",getBin);
+router.get("/Bin/:binName",getBin); 
 router.get('/ping',(req,res)=>res.json({msg:"ok"}));
 //router.get('/Hostname',Hostname)
 export default router;
