@@ -104,7 +104,7 @@ export const getScales50Kg = () => {
             parity: 'none',
         }); 
         Timbangan_1.on('data', (data) => {
-            let temp = data.toString();
+            /*let temp = data.toString();
             if (temp.length < 5)
             {
                 _50kgOutput = _50kgOutput+ data.toString();
