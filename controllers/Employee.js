@@ -10,6 +10,7 @@ import axios from "axios";
 import os from "os";
 import { Op, QueryTypes } from "sequelize";
 import db from "../config/db.js";
+import { employeeQueue, pendingQueue, weightbinQueue } from "../index.js";
 export const ScanBadgeid = async (req, res) => {
   const { badgeId } = req.body;
   try {
@@ -17,6 +18,7 @@ export const ScanBadgeid = async (req, res) => {
       attributes: ["badgeId", "username", "IN", "OUT"],
       where: { badgeId:badgeId,isactive:1 },
     });
+    employeeQueue.add({id:1});
     if (user) {
       res.json({ user: user });
     } else {
@@ -61,11 +63,13 @@ export const TransactionStep1 = async (req, res) => {
   };
   const state = await transaction.create(transactionData);
   state.save();
+  pendingQueue.add({id:2});
   return res.status(200).json({ msg: "OK" });
 };
 export const ScanContainer = async (req, res) => {
   const { containerId } = req.body;
   try {
+    weightbinQueue.add({id:3});
     const container = await Container.findOne({
       attributes: [
         "containerId",
@@ -184,6 +188,7 @@ export const SaveTransaksi = async (req, res) => {
   payload.recordDate = moment().format("YYYY-MM-DD HH:mm:ss");
   (await transaction.create(payload)).save();
   //    const data = await syncPendingTransaction();
+  pendingQueue.add({id:0});
   res.status(200).json({ msg: "ok" });
 };
 export const getTransaction = async (req, res) => {
@@ -305,11 +310,20 @@ export const UpdateTransaksi = async (req, res) => {
     }
   }
 };
+export const SyncAll = async (req,res)=>{
+  await syncPendingTransaction();
+  await syncTransactionStep1();
+  await syncEmployeePIDSG();
+  await syncPIDSGBin();
+  await syncPIDSGContainer();
+  return res.json({msg:"ok"},200);
+}
 
 export const SaveTransaksiCollection = async (req, res) => {
   const { payload } = req.body;
   payload.recordDate = moment().format("YYYY-MM-DD HH:mm:ss");
   (await transaction.create(payload)).save();
+  pendingQueue.add({id:0});
   res.status(200).json({ msg: "ok" });
 };
 
@@ -584,6 +598,7 @@ export const syncEmployeePIDSG = async ()=>{
         await db.query("Update employee set `IN`=0,`OUT`=0,isactive=0 where badgeId not in (" + apiEmpBadgeNo.join(",") + ")",{
           type: QueryTypes.UPDATE
         });
+        return syncEmp;
     }
     catch (er)
     {
