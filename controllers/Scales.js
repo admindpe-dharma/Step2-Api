@@ -26,8 +26,10 @@ const reloadTimbangan = (index,Timbangan)=>{
         }
         finally
         {
+            console.log(`Reconnect /dev/ttyUSB${index==0 ? 1: 0}...`);
             if (index==0)
             {
+                
                 scale4Queue.add({id:4},{
                     delay: 3000
                 });
@@ -46,7 +48,7 @@ export const getScales4Kg = () => {
 //        console.log(process.env.TIMBANGAN4KG);
         if (process.env.TIMBANGAN4KG != "1")
             return;
-        
+        console.log('Connect /dev/ttyUSB1...');
         const Timbangan = new SerialPort({
             path: '/dev/ttyUSB1',
             baudRate: 9600,
@@ -129,6 +131,8 @@ export const getScales50Kg = () => {
   //      console.log(process.env.TIMBANGAN50KG);
         if (process.env.TIMBANGAN50KG != "1")
             return;
+        
+        console.log('Connect /dev/ttyUSB0...');
         const Timbangan_1 = new SerialPort({
             path: '/dev/ttyUSB0',
             lock:false,
