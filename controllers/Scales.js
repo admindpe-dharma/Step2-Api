@@ -9,11 +9,44 @@ const __dirname = dirname( fileURLToPath(import.meta.url));
 const fileNames = {usb0: __dirname+"/"+'USB0',usb1:__dirname+"/"+'USB1'};
 let _4kgOutput = '';
 let _50kgOutput = '';
+let scaleTimeout = [null,null];
+
+const reloadTimbangan = (index,Timbangan)=>{
+    if (scaleTimeout[index] != null)
+            clearTimeout(scaleTimeout[index]);
+    scaleTimeout[index] = setTimeout(()=>{
+        try
+        {
+            Timbangan.flush();
+            Timbangan.close();
+        }  
+        catch (er)
+        {
+            console.log(er);
+        }
+        finally
+        {
+            if (index==0)
+            {
+                scale4Queue.add({id:4},{
+                    delay: 3000
+                });
+            }
+            else
+            {
+                scale50Queue.add({id:50},{
+                    delay: 3000
+                });
+            }
+        }
+    },10 * 1000);
+}
 export const getScales4Kg = () => {
     try {
 //        console.log(process.env.TIMBANGAN4KG);
         if (process.env.TIMBANGAN4KG != "1")
             return;
+        
         const Timbangan = new SerialPort({
             path: '/dev/ttyUSB1',
             baudRate: 9600,
@@ -23,12 +56,14 @@ export const getScales4Kg = () => {
             stopBits: 1,
             parity: 'none',
         });
+        reloadTimbangan(0,Timbangan);
         Timbangan.on('error', (error) => {
             console.log({kg4Error: error});
             Timbangan.close(()=>{
-                scale4Queue.add({id:4},{
-                    delay: 3000
-                });
+                
+            });
+            scale4Queue.add({id:4},{
+                delay: 3000
             });
         });
        Timbangan.on('data', (data) => {
@@ -53,12 +88,13 @@ export const getScales4Kg = () => {
             
             _4kgOutput = '';
             if (!match ) {
-                Timbangan.close(()=>{
-                    scale4Queue.add({id:4},{
-                        delay: 3000
-                    })
+                Timbangan.close(()=>{    
+                });
+                scale4Queue.add({id:4},{
+                    delay: 3000
                 });
             }
+            reloadTimbangan(0,Timbangan);
         });  
     } catch (error) {
         console.log(error);
@@ -103,6 +139,8 @@ export const getScales50Kg = () => {
             stopBits: 1,
             parity: 'none',
         }); 
+        
+        reloadTimbangan(1,Timbangan_1);
         Timbangan_1.on('data', (data) => {
             /*let temp = data.toString();
             if (temp.length < 5)
@@ -130,19 +168,22 @@ export const getScales50Kg = () => {
             _50kgOutput = '';
             if (!match) {
                 Timbangan_1.close(()=>{
-                    scale50Queue.add({id:50},{
-                        delay: 3000
-                    })
+
                 });
+                scale50Queue.add({id:50},{
+                    delay: 3000
+                })
             }
+            reloadTimbangan(1,Timbangan_1);
         });
 
        Timbangan_1.on('error', (error) => {
             console.log({kg50Error: error});
             Timbangan_1.close(()=>{
-                scale50Queue.add({id:50},{
-                    delay: 3000
-                })
+                
+            });
+            scale50Queue.add({id:50},{
+                delay: 3000
             });
             return;
         }); 
