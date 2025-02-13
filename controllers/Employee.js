@@ -209,7 +209,7 @@ export const syncTransactionStep1 = async () => {
   let _data;
   try {
     const _res = await axios.get(
-      `http://${process.env.STEP1}/sync/` + os.hostname(),
+      `http://${process.env.STEP1}/sync/` + process.env.STATION,
       { timeout: 1500 }
     );
     const trData = _res.data;
