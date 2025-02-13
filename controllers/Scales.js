@@ -17,7 +17,7 @@ const reloadTimbangan = (index,Timbangan)=>{
     if (checkSerial)
     {
         const name = index==0 ? fileNames.usb1 : fileNames.usb0;
-        fs.writeFileSync(name+"_2_Serial_status.txt", Timbangan.isOpen ? "Terkoneksi" : "Tidak Terkoneksi" +" - " + new Date().toLocaleString()+"\n",{flag:'a+'});
+        fs.writeFileSync(name+"_2_Serial_status.txt", (Timbangan.isOpen ? "Terkoneksi" : "Tidak Terkoneksi") +" - " + new Date().toLocaleString()+"\n",{flag:'a+'});
     }
     scaleTimeout[index] = setTimeout(()=>{
         try
