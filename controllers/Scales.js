@@ -1,7 +1,7 @@
-import { SerialPort } from 'serialport';
+import { ReadlineParser, SerialPort } from 'serialport';
 import { io, scale4Queue, scale50Queue } from '../index.js';
 import { fileURLToPath } from "url";
-import { dirname, resolve } from "path";
+import { dirname, parse, resolve } from "path";
 import fs from 'fs';
 const __dirname = dirname( fileURLToPath(import.meta.url));
 
@@ -65,16 +65,17 @@ export const getScales4Kg = () => {
             parity: 'none',
         });
         reloadTimbangan(0,Timbangan);
+        const parser = Timbangan.pipe(new ReadlineParser({delimiter:"\r\n"}));
         Timbangan.on('error', (error) => {
             console.log({kg4Error: error});
-            Timbangan.close(()=>{
-                
+            Timbangan.destroy((err)=>{
+                console.log(err);
             });
             scale4Queue.add({id:4},{
                 delay: 3000
             });
         });
-       Timbangan.on('data', (data) => {
+       parser.on('data', (data) => {
             let temp = data.toString();
             if (process.env.RECORD_SCALE==1)
                 fs.writeFileSync(fileNames.usb1+".txt",temp+" - " + new Date().toLocaleString()+"\n",{flag:'a+'});
@@ -151,7 +152,8 @@ export const getScales50Kg = () => {
         }); 
         
         reloadTimbangan(1,Timbangan_1);
-        Timbangan_1.on('data', (data) => {
+        const parser = Timbangan_1.pipe(new ReadlineParser({delimiter:"\r\n"}));
+        parser.on('data', (data) => {
             /*let temp = data.toString();
             if (temp.length < 5)
             {
@@ -177,8 +179,8 @@ export const getScales50Kg = () => {
             const match = processWeight(_50kgOutput);
             _50kgOutput = '';
             if (!match) {
-                Timbangan_1.close(()=>{
-
+                Timbangan_1.destroy((err)=>{
+                    console.log(err);
                 });
                 scale50Queue.add({id:50},{
                     delay: 3000
