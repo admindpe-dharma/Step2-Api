@@ -14,16 +14,17 @@ let checkSerial = true;
 const reloadTimbangan = (index,Timbangan)=>{
     if (scaleTimeout[index] != null)
             clearTimeout(scaleTimeout[index]);
-    if (checkSerial)
-    {
-        const name = index==0 ? fileNames.usb1 : fileNames.usb0;
-        fs.writeFileSync(name+"_2_Serial_status.txt", (Timbangan.isOpen ? "Terkoneksi" : "Tidak Terkoneksi") +" - " + new Date().toLocaleString()+"\n",{flag:'a+'});
-    }
     scaleTimeout[index] = setTimeout(()=>{
+        if (checkSerial)
+        {
+            const name = index==0 ? fileNames.usb1 : fileNames.usb0;
+            fs.writeFileSync(name+"_2_Serial_status.txt", (Timbangan.isOpen ? "Terkoneksi" : "Tidak Terkoneksi") +" - " + new Date().toLocaleString()+"\n",{flag:'a+'});
+//            checkSerial = false;
+        }
         try
         {
             Timbangan.flush();
-            Timbangan.close();
+            Timbangan.destroy();
         }  
         catch (er)
         {
