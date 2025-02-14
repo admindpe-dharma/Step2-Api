@@ -429,7 +429,6 @@ export const syncPendingTransaction = async () => {
     return transactionPending;
   let cancel = false;
   for (let i = 0; i < transactionPending.length; i++) {
-    console.log(transactionPending[i]);
     const statuses = transactionPending[i].status.split("|");
     let index = statuses.indexOf("PENDING");
     if (index > -1) statuses.splice(index, 1);
@@ -464,7 +463,6 @@ export const syncPendingTransaction = async () => {
             timeout: 1000,
           }
         );
-        console.log({ pidsg_res: res });
         if (res.status >= 200 && res.status < 300) {
           const index = statuses.indexOf("PIDSG");
           statuses.splice(index, 1);
@@ -521,7 +519,6 @@ export const syncPendingTransaction = async () => {
     }',success=${transactionPending[i].success ? 1 : 0}  where Id='${
       transactionPending[i].id
     }'`;
-    console.log([query, statuses, transactionPending[i]]);
     await db.query(query, {
       type: QueryTypes.BULKUPDATE,
     });
@@ -616,8 +613,6 @@ export const syncPIDSGBin = async()=>{
         type: QueryTypes.SELECT
         });
         const binNames = dataBin.map(x=>x.name); 
-        console.log(
-          `http://${process.env.PIDSG}/api/pid/bin-sync?f1=${JSON.stringify(binNames)}`);
         const apiRes = await axios.get(
             `http://${process.env.PIDSG}/api/pid/bin-sync?f1=${JSON.stringify(binNames)}`);
         const syncBin = apiRes.data.result[0];
@@ -644,8 +639,6 @@ export const syncPIDSGContainer = async()=>{
         type: QueryTypes.SELECT
         });
         const binNames = dataBin.map(x=>x.name); 
-        console.log(
-          `http://${process.env.PIDSG}/api/pid/bin-sync?f1=${JSON.stringify(binNames)}`);
         const apiRes = await axios.get(
             `http://${process.env.PIDSG}/api/pid/bin-sync?f1=${JSON.stringify(binNames)}`);
         const syncBin = apiRes.data.result[0];
