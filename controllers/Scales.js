@@ -19,7 +19,7 @@ const reloadTimbangan = (index,Timbangan)=>{
         if (checkSerial)
         {
             const name = index==0 ? fileNames.usb1 : fileNames.usb0;
-            const filename = name+"_2_Serial_status_" + moment(new Date()).format('yyyy_mm_dd') + ".txt";
+            const filename = name+"_2_Serial_status_" + moment(new Date()).format('YYYY_MM_DD') + ".txt";
             fs.writeFileSync(filename, (Timbangan.isOpen ? "Terkoneksi" : "Tidak Terkoneksi") +" - " + new Date().toLocaleString()+"\n",{flag:'a+'});
 //            checkSerial = false;
         }
@@ -81,7 +81,7 @@ export const getScales4Kg = () => {
             let temp = data.toString();
             if (process.env.RECORD_SCALE==1)
             {
-                const filename = fileNames.usb1 + moment(new Date()).format('yyyy_mm_dd') + ".txt";
+                const filename = fileNames.usb1 + moment(new Date()).format('YYYY_MM_DD') + ".txt";
                 fs.writeFileSync(filename,temp+" - " + new Date().toLocaleString()+"\n",{flag:'a+'});
             }
             if (temp.length < 5)
@@ -97,7 +97,7 @@ export const getScales4Kg = () => {
             
             if (process.env.RECORD_SCALE==1)
             {
-                const filename = fileNames.usb1 + moment(new Date()).format('yyyy_mm_dd') + "_2.txt";
+                const filename = fileNames.usb1 + moment(new Date()).format('YYYY_MM_DD') + "_2.txt";
                 fs.writeFileSync(filename,_4kgOutput+" - " + new Date().toLocaleString()+"\n",{flag:'a+'});
             }
             _4kgOutput = _4kgOutput.replace("\n","").replace("\r","");
@@ -186,7 +186,7 @@ export const getScales50Kg = () => {
                 _50kgOutput = temp;
             if (process.env.RECORD_SCALE==1)
             {
-                const filename = fileNames.usb0 + moment(new Date()).format('yyyy_mm_dd') + "_2.txt";
+                const filename = fileNames.usb0 + moment(new Date()).format('YYYY_MM_DD') + "_2.txt";
                 fs.writeFileSync(filename,_50kgOutput +" - " + new Date().toLocaleString()+"\n",{flag:'a+'});
             }
             _50kgOutput = _50kgOutput.replace("\r","").replace("\n","");
