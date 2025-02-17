@@ -171,7 +171,7 @@ export const getScales50Kg = () => {
             let temp = data.toString();
             if (process.env.RECORD_SCALE==1)
             {
-                const filename = fileNames.usb0 + moment(new Date()).format('yyyy_mm_dd') + ".txt";
+                const filename = fileNames.usb0 + moment(new Date()).format('YYYY_MM_DD') + ".txt";
                 fs.writeFileSync(filename,temp +" - " + new Date().toLocaleString()+"\n",{flag:'a+'});
             }
             if (temp.length < 5)
