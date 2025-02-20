@@ -72,7 +72,7 @@ export const getScales4Kg = () => {
             parity: 'none',
         });
         
-        fs.writeFileSync(_name, "Sesudah Connect: "+ (Timbangan.isOpen ? "Terkoneksi" : "Tidak Terkoneksi") +" - " + new Date().toLocaleString()+"\n",{flag:'a+'});
+        fs.writeFileSync(_name, "Membuka Koneksi "+ " - " + new Date().toLocaleString()+"\n",{flag:'a+'});
         reloadTimbangan(0,Timbangan);
         const parser = Timbangan.pipe(new ReadlineParser({delimiter:"\r\n"}));
         Timbangan.on('error', (error) => {
@@ -172,8 +172,8 @@ export const getScales50Kg = () => {
             stopBits: 1,
             parity: 'none',
         }); 
-        
-        fs.writeFileSync(_name, "Sesudah Connect: "+ (Timbangan_1.isOpen ? "Terkoneksi" : "Tidak Terkoneksi") +" - " + new Date().toLocaleString()+"\n",{flag:'a+'});
+        Timbangan_1.on('')
+        fs.writeFileSync(_name, "Membuka Koneksi" +" - " + new Date().toLocaleString()+"\n",{flag:'a+'});
         reloadTimbangan(1,Timbangan_1);
         const parser = Timbangan_1.pipe(new ReadlineParser({delimiter:"\r\n"}));
         parser.on('data', (data) => {
