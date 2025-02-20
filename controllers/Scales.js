@@ -20,7 +20,7 @@ const reloadTimbangan = (index,Timbangan)=>{
         {
             const name = index==0 ? fileNames.usb1 : fileNames.usb0;
             const filename = name+"_2_Serial_status_" + moment(new Date()).format('YYYY_MM_DD') + ".txt";
-            fs.writeFileSync(filename, (Timbangan.isOpen ? "Terkoneksi" : "Tidak Terkoneksi") +" - " + new Date().toLocaleString()+"\n",{flag:'a+'});
+            fs.writeFileSync(filename, "Sebelum Disconnect: "+ (Timbangan.isOpen ? "Terkoneksi" : "Tidak Terkoneksi") +" - " + new Date().toLocaleString()+"\n",{flag:'a+'});
 //            checkSerial = false;
         }
         try
@@ -30,10 +30,12 @@ const reloadTimbangan = (index,Timbangan)=>{
         }  
         catch (er)
         {
+            fs.writeFileSync(filename, "Error Disconnect: "+ er?.message || er +" - " + new Date().toLocaleString()+"\n",{flag:'a+'});
             console.log(er);
         }
         finally
         {
+            fs.writeFileSync(filename, "Sesudah Disconnect: "+ (Timbangan.isOpen ? "Terkoneksi" : "Tidak Terkoneksi") +" - " + new Date().toLocaleString()+"\n",{flag:'a+'});
             console.log(`Reconnect /dev/ttyUSB${index==0 ? 1: 0}...`);
             if (index==0)
             {
@@ -49,7 +51,7 @@ const reloadTimbangan = (index,Timbangan)=>{
                 });
             }
         }
-    },10 * 1000);
+    }, 10000);
 }
 export const getScales4Kg = () => {
     try {
@@ -57,6 +59,9 @@ export const getScales4Kg = () => {
         if (process.env.TIMBANGAN4KG != "1")
             return;
         console.log('Connect /dev/ttyUSB1...');
+        const _name = fileNames.usb1+"_2_Serial_status_" + moment(new Date()).format('YYYY_MM_DD') + ".txt";
+        
+        fs.writeFileSync(_name, "Sebelum Connect "+" - " + new Date().toLocaleString()+"\n",{flag:'a+'});
         const Timbangan = new SerialPort({
             path: '/dev/ttyUSB1',
             baudRate: 9600,
@@ -66,10 +71,13 @@ export const getScales4Kg = () => {
             stopBits: 1,
             parity: 'none',
         });
+        
+        fs.writeFileSync(_name, "Sesudah Connect: "+ (Timbangan.isOpen ? "Terkoneksi" : "Tidak Terkoneksi") +" - " + new Date().toLocaleString()+"\n",{flag:'a+'});
         reloadTimbangan(0,Timbangan);
         const parser = Timbangan.pipe(new ReadlineParser({delimiter:"\r\n"}));
         Timbangan.on('error', (error) => {
             console.log({kg4Error: error});
+            
             Timbangan.destroy((err)=>{
                 console.log(err);
             });
@@ -114,6 +122,9 @@ export const getScales4Kg = () => {
             reloadTimbangan(0,Timbangan);
         });  
     } catch (error) {
+        const _name = fileNames.usb1+"_2_Serial_status_" + moment(new Date()).format('YYYY_MM_DD') + ".txt";
+        
+        fs.writeFileSync(_name, "Error Connect:  " + error?.message || error +" - " + new Date().toLocaleString()+"\n",{flag:'a+'});
         console.log(error);
         scale4Queue.add({id:4},{
             delay: 3000
@@ -148,6 +159,9 @@ export const getScales50Kg = () => {
             return;
         
         console.log('Connect /dev/ttyUSB0...');
+        const _name = fileNames.usb0+"_2_Serial_status_" + moment(new Date()).format('YYYY_MM_DD') + ".txt";
+        
+        fs.writeFileSync(_name, "Sebelum Connect "+" - " + new Date().toLocaleString()+"\n",{flag:'a+'});
         const Timbangan_1 = new SerialPort({
             path: '/dev/ttyUSB0',
             lock:false,
@@ -159,6 +173,7 @@ export const getScales50Kg = () => {
             parity: 'none',
         }); 
         
+        fs.writeFileSync(_name, "Sesudah Connect: "+ (Timbangan_1.isOpen ? "Terkoneksi" : "Tidak Terkoneksi") +" - " + new Date().toLocaleString()+"\n",{flag:'a+'});
         reloadTimbangan(1,Timbangan_1);
         const parser = Timbangan_1.pipe(new ReadlineParser({delimiter:"\r\n"}));
         parser.on('data', (data) => {
@@ -215,6 +230,9 @@ export const getScales50Kg = () => {
         }); 
 
     } catch (error) {
+        const _name = fileNames.usb0+"_2_Serial_status_" + moment(new Date()).format('YYYY_MM_DD') + ".txt";
+        
+        fs.writeFileSync(_name, "Error Connect:  " + error?.message || error +" - " + new Date().toLocaleString()+"\n",{flag:'a+'});
         console.log(error);
         scale50Queue.add({id:50},{
                 delay: 3000
