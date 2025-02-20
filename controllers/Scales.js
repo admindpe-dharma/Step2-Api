@@ -172,7 +172,6 @@ export const getScales50Kg = () => {
             stopBits: 1,
             parity: 'none',
         }); 
-        Timbangan_1.on('')
         fs.writeFileSync(_name, "Membuka Koneksi" +" - " + new Date().toLocaleString()+"\n",{flag:'a+'});
         reloadTimbangan(1,Timbangan_1);
         const parser = Timbangan_1.pipe(new ReadlineParser({delimiter:"\r\n"}));
