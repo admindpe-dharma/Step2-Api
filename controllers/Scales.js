@@ -16,10 +16,11 @@ const reloadTimbangan = (index,Timbangan)=>{
     if (scaleTimeout[index] != null)
             clearTimeout(scaleTimeout[index]);
     scaleTimeout[index] = setTimeout(()=>{
+        
+        const name = index==0 ? fileNames.usb1 : fileNames.usb0;
         const filename = name+"_2_Serial_status_" + moment(new Date()).format('YYYY_MM_DD') + ".txt";
         if (checkSerial)
         {
-            const name = index==0 ? fileNames.usb1 : fileNames.usb0;
             fs.writeFileSync(filename, "Sebelum Disconnect: "+ (Timbangan.isOpen ? "Terkoneksi" : "Tidak Terkoneksi") +" - " + new Date().toLocaleString()+"\n",{flag:'a+'});
 //            checkSerial = false;
         }
