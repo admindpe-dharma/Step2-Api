@@ -30,7 +30,7 @@ const reloadTimbangan = (index,Timbangan)=>{
             Timbangan.flush();
             Timbangan.destroy();
             const msg  = ResetUsb();
-            fs.writeFileSync(filename,'Reset USB: ' + msg + ' - '+ new Date().toLocaleString());
+            fs.writeFileSync(filename,'Reset USB: ' + msg + ' - '+ new Date().toLocaleString()+"\n");
             console.log('Reset USB: ' + msg + ' - '+ new Date().toLocaleString());
         }  
         catch (er)
