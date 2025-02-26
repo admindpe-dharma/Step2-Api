@@ -2,6 +2,7 @@ import { ReadlineParser, SerialPort } from 'serialport';
 import { io, scale4Queue, scale50Queue } from '../index.js';
 import { fileURLToPath } from "url";
 import { dirname, parse, resolve } from "path";
+import { exec, execSync } from 'child_process';
 import fs from 'fs';
 import moment from 'moment';
 const __dirname = dirname( fileURLToPath(import.meta.url));
@@ -13,8 +14,7 @@ let _50kgOutput = '';
 let scaleTimeout = [null,null];
 let checkSerial = true;
 const reloadTimbangan = (index,Timbangan)=>{
-    if (scaleTimeout[index] != null)
-            clearTimeout(scaleTimeout[index]);
+    clearTimeout(scaleTimeout[index]);
     scaleTimeout[index] = setTimeout(()=>{
         
         const name = index==0 ? fileNames.usb1 : fileNames.usb0;
@@ -71,8 +71,7 @@ export const getScales4Kg = () => {
             rtscts:true,
             stopBits: 1,
             parity: 'none',
-        });
-        
+        });        
         fs.writeFileSync(_name, "Membuka Koneksi "+ " - " + new Date().toLocaleString()+"\n",{flag:'a+'});
         reloadTimbangan(0,Timbangan);
         const parser = Timbangan.pipe(new ReadlineParser({delimiter:"\r\n"}));
@@ -241,3 +240,8 @@ export const getScales50Kg = () => {
         //    res.status(500).json({ msg: error.message });
     }
 };
+
+export const ResetUsb =  ()=>{
+    const reset = execSync(`usbreset ${process.env.USB_ID}`);
+    return reset.toString();
+}

@@ -1,6 +1,7 @@
 import express from 'express';
 import { SyncAll, syncEmployeePIDSGAPI, syncPendingTransaction, syncPendingTransactionAPI, syncPIDSGBinAPI, syncPIDSGBinContainerAPI, syncTransaction, TransactionStep1 } from '../controllers/Employee.js';
 import { getIp } from '../controllers/Bin.js';
+import { ResetUsb } from '../controllers/Scales.js';
 
 const routes = express.Router();
 
@@ -13,4 +14,7 @@ routes.get('/employee',syncEmployeePIDSGAPI);
 routes.get('/bin-sync',syncPIDSGBinAPI);
 routes.get('/container-sync',syncPIDSGBinContainerAPI);
 routes.get('/sync-all',SyncAll)
+routes.get('/reset',(req,res)=>{
+    return res.json(ResetUsb());
+});
 export default routes;
