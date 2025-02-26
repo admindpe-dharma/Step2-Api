@@ -19,6 +19,7 @@ const reloadTimbangan = (index,Timbangan)=>{
         
         const name = index==0 ? fileNames.usb1 : fileNames.usb0;
         const filename = name+"_2_Serial_status_" + moment(new Date()).format('YYYY_MM_DD') + ".txt";
+        console.log('reconnecting');
         if (checkSerial)
         {
             fs.writeFileSync(filename, "Sebelum Disconnect: "+ (Timbangan.isOpen ? "Terkoneksi" : "Tidak Terkoneksi") +" - " + new Date().toLocaleString()+"\n",{flag:'a+'});
@@ -28,6 +29,9 @@ const reloadTimbangan = (index,Timbangan)=>{
         {
             Timbangan.flush();
             Timbangan.destroy();
+            const msg  = ResetUsb();
+            fs.writeFileSync(filename,'Reset USB: ' + msg + ' - '+ new Date().toLocaleString());
+            console.log('Reset USB: ' + msg + ' - '+ new Date().toLocaleString());
         }  
         catch (er)
         {
