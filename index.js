@@ -7,7 +7,7 @@ import db from "./config/db.js";
 import cors from  "cors";
 import http from 'http';
 import { Server } from "socket.io";
-import { getScales4Kg ,getScales50Kg} from "./controllers/Scales.js";
+import { getScales4Kg ,getScales50Kg, ResetUsb} from "./controllers/Scales.js";
 import bodyParser from "body-parser";
 import {BroadcastBinWeight, getWeightBin} from "./controllers/Bin.js"
 import { syncEmployeePIDSG, syncPendingTransaction, syncPIDSGBin, syncPIDSGContainer, syncTransaction, syncTransactionStep1 } from "./controllers/Employee.js";
@@ -131,6 +131,7 @@ const bullBoard = createBullBoard({
 });
 app.use('/queues',serverAdapter.getRouter());
 server.listen(port, () => {
+  console.log(ResetUsb());
   scale4Queue.add({id:4});
   scale50Queue.add({id:50});
   pendingQueue.add({id:1});
