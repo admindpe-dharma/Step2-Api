@@ -242,6 +242,6 @@ export const getScales50Kg = () => {
 };
 
 export const ResetUsb =  ()=>{
-    const reset = execSync(`usbreset ${process.env.USB_ID}`);
+    const reset = execSync(`sudo usbreset ${process.env.USB_ID}`);
     return reset.toString();
 }
