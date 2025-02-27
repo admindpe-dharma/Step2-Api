@@ -29,9 +29,6 @@ const reloadTimbangan = (index,Timbangan)=>{
         {
             Timbangan.flush();
             Timbangan.destroy();
-            const msg  = ResetUsb();
-            fs.writeFileSync(filename,'Reset USB: ' + msg + ' - '+ new Date().toLocaleString()+"\n");
-            console.log('Reset USB: ' + msg + ' - '+ new Date().toLocaleString());
         }  
         catch (er)
         {
@@ -40,6 +37,9 @@ const reloadTimbangan = (index,Timbangan)=>{
         }
         finally
         {
+            const msg  = ResetUsb();
+            fs.writeFileSync(filename,'Reset USB: ' + msg + ' - '+ new Date().toLocaleString()+"\n");
+            console.log('Reset USB: ' + msg + ' - '+ new Date().toLocaleString());
             fs.writeFileSync(filename, "Sesudah Disconnect: "+ (Timbangan.isOpen ? "Terkoneksi" : "Tidak Terkoneksi") +" - " + new Date().toLocaleString()+"\n",{flag:'a+'});
             console.log(`Reconnect /dev/ttyUSB${index==0 ? 1: 0}...`);
             if (index==0)
@@ -64,11 +64,12 @@ export const getScales4Kg = () => {
         if (process.env.TIMBANGAN4KG != "1")
             return;
         console.log('Connect /dev/ttyUSB1...');
+        console.log(`Connect /dev/${process.env.USB1}...`);
         const _name = fileNames.usb1+"_2_Serial_status_" + moment(new Date()).format('YYYY_MM_DD') + ".txt";
         
         fs.writeFileSync(_name, "Sebelum Connect "+" - " + new Date().toLocaleString()+"\n",{flag:'a+'});
         const Timbangan = new SerialPort({
-            path: '/dev/ttyUSB1',
+            path: process.env.USB1,
             baudRate: 9600,
             dataBits: 8,
             lock:false,
@@ -163,11 +164,12 @@ export const getScales50Kg = () => {
             return;
         
         console.log('Connect /dev/ttyUSB0...');
+        console.log(`Connect /dev/${process.env.USB0}...`);
         const _name = fileNames.usb0+"_2_Serial_status_" + moment(new Date()).format('YYYY_MM_DD') + ".txt";
         
         fs.writeFileSync(_name, "Sebelum Connect "+" - " + new Date().toLocaleString()+"\n",{flag:'a+'});
         const Timbangan_1 = new SerialPort({
-            path: '/dev/ttyUSB0',
+            path: process.env.USB0,
             lock:false,
             rtscts:true,
             
