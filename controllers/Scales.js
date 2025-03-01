@@ -247,7 +247,20 @@ export const getScales50Kg = () => {
     }
 };
 
-export const ResetUsb =  ()=>{
-    const reset = execSync(`sudo usbreset ${process.env.USB_ID}`);
+export const ResetUsb =   ()=>{
+    const reset  = (id,val) =>{  
+        try
+        {
+            return execSync(`sudo sh -c "echo ${val} > /sys/bus/usb/devices/${id}/authorized"`).toString();
+        }
+        catch (er)
+        {
+            return JSON.stringify(er?.message || er);
+        }
+    }
+    ;
+    const msg = [];
+    msg.push(reset(process.env.USB0_ID,i));
+    msg.push(reset(process.env.USB1_ID,i));
     return reset.toString();
 }
