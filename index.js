@@ -131,7 +131,7 @@ const bullBoard = createBullBoard({
 });
 app.use('/queues',serverAdapter.getRouter());
 server.listen(port, () => {
-  ResetUsb().then(val=>console.log(val));
+  console.log(ResetUsb());
   scale4Queue.add({id:4});
   scale50Queue.add({id:50});
   pendingQueue.add({id:1});
