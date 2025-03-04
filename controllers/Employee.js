@@ -11,6 +11,7 @@ import os from "os";
 import { Op, QueryTypes } from "sequelize";
 import db from "../config/db.js";
 import { employeeQueue, pendingQueue, weightbinQueue } from "../index.js";
+import { execSync } from "child_process";
 export const ScanBadgeid = async (req, res) => {
   const { badgeId } = req.body;
   try {
@@ -47,6 +48,7 @@ export const TransactionStep1 = async (req, res) => {
       badgeId: badgeId,
     },
   });
+
   if (!_waste) return res.json({ msg: "Waste Not Found" }, 404);
   if (!_container) return res.json({ msg: " Container Not Found" }, 404);
   if (!_badge) return res.json({ msg: "Badge not found" }, 404);
@@ -660,4 +662,8 @@ export const syncPIDSGContainer = async()=>{
 
 export const syncPIDSGBinContainerAPI = async (req,res)=>{
   return res.json(await syncPIDSGContainer());
+}
+export const ResetNetworkInterface = ()=>
+{
+    return execSync(`sudo service networking restart`).toString();
 }
