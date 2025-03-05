@@ -1,6 +1,8 @@
+import { createHmac } from "crypto";
 import { clientList, io } from "../index.js";
 import Bin from "../models/BinModel.js";
 import os,{networkInterfaces} from 'os';
+import { createClient } from "redis";
 
 export const getWeightBin =  (socket) => {
     try {
@@ -104,7 +106,6 @@ export const getIp = (req,res)=>{
 
     for (const name of Object.keys(nets)) {
         for (const net of nets[name]) {
-    
             const familyV4Value = typeof net.family === 'string' ? 'IPv4' : 4
             if (net.family === familyV4Value && !net.internal) {
                 if (!results[name]) {
@@ -118,4 +119,33 @@ export const getIp = (req,res)=>{
     if (process.env.ETH_INTERFACE)
         result = results[process.env.ETH_INTERFACE];
     return res.status(200).json(result);
+}
+const HashString = (text)=>{
+    return createHmac('sha512','Abcd1234').update(text).digest('base64');
+}
+export const SavePasswordTimbangan = async (req,res) =>{
+    const {old,_new} = req.body;
+    const redisClient = createClient();  
+    redisClient.on('error', err => console.log('Redis Client Error', err));
+    await redisClient.connect();
+    const passDb = await redisClient.get('passTimbangan');
+    const _res = {status:400,msg: "Password Mismatch"};
+    if (passDb == null || passDb == HashString(old))
+    {
+        await redisClient.set('passTimbangan',HashString(_new));
+        _res.status = 200;
+        _res.msg = "Password Modified";
+    }
+    
+    await redisClient.disconnect();
+    return res.status(_res.status).json(_res);
+}
+export const VerifyPassword = async (req,res)=>{
+    const {password} = req.body;
+    const redisClient = createClient();  
+    redisClient.on('error', err => console.log('Redis Client Error', err));
+    await redisClient.connect();
+    const passDb = await redisClient.get('passTimbangan');
+    await redisClient.disconnect();
+    return res.json({isValid: passDb==HashString(password) ? 1 : 0});
 }
