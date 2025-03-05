@@ -83,6 +83,7 @@ const [scale4Queue,scale50Queue,pendingQueue,employeeQueue,weightbinQueue,RackSy
 });
 EthObserverQueue.process(async (job,done)=>{
   const usbresetFn = "usbreset_"  + moment(new Date()).format('YYYY_MM_DD') + ".txt";
+  let result = "Eth1 Exists";
   try
   {
     const getAd = GetAddress();
@@ -90,6 +91,7 @@ EthObserverQueue.process(async (job,done)=>{
     {
       const msg  = ResetUsb().replace("\n","");
       fs.writeFileSync(usbresetFn,'Reset USB (Dari Pengecekan Berkala): ' + msg + ' - '+ new Date().toLocaleString()+"\n");
+      result = "Eth1 not found, resetting usb";
     }
   }
   catch (er)
@@ -103,7 +105,7 @@ EthObserverQueue.process(async (job,done)=>{
   EthObserverQueue.add({type:'observe'},{
     removeOnFail:{count:10},timeout:3000,delay: 5000,removeOnComplete:{count:5}
   }); 
-  done(null,'Reset USB');
+  done(null,result);
 })
 scale4Queue.process((job,done)=>{
 console.log('scale 2 loading');
