@@ -251,7 +251,9 @@ export const ResetUsb =   ()=>{
     const reset  = (id) =>{  
         try
         {
-            return execSync(`sudo usbreset ${id}`).toString();
+            const ret = execSync(`sudo usbreset ${id}`).toString();
+            execSync(`sudo service networking restart`).toString();
+            return ret;
         }
         catch (er)
         {
