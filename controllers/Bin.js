@@ -120,6 +120,23 @@ export const getIp = (req,res)=>{
         result = results[process.env.ETH_INTERFACE];
     return res.status(200).json(result);
 }
+export const GetAddress = ()=>{
+    const nets = networkInterfaces();
+    const results = Object.create({});
+
+    for (const name of Object.keys(nets)) {
+        for (const net of nets[name]) {
+            const familyV4Value = typeof net.family === 'string' ? 'IPv4' : 4
+            if (net.family === familyV4Value && !net.internal) {
+                if (!results[name]) {
+                    results[name] = [];
+                }
+                results[name].push(net.address);
+            }
+        }
+    }
+    return results;
+}
 const HashString = (text)=>{
     return createHmac('sha512','Abcd1234').update(text).digest('base64');
 }

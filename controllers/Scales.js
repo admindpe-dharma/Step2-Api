@@ -37,9 +37,13 @@ const reloadTimbangan = (index,Timbangan)=>{
         }
         finally
         {
-            const msg  = ResetUsb();
+            const msg  = ResetUsb().replace("\n","");
+            
+            const usbresetFn = "usbreset_"  + moment(new Date()).format('YYYY_MM_DD') + ".txt";
             fs.writeFileSync(filename,'Reset USB: ' + msg + ' - '+ new Date().toLocaleString()+"\n");
+            fs.writeFileSync(usbresetFn,'Reset USB (Timbangan): ' + msg + ' - '+ new Date().toLocaleString()+"\n");
             console.log('Reset USB: ' + msg + ' - '+ new Date().toLocaleString());
+            
             fs.writeFileSync(filename, "Sesudah Disconnect: "+ (Timbangan.isOpen ? "Terkoneksi" : "Tidak Terkoneksi") +" - " + new Date().toLocaleString()+"\n",{flag:'a+'});
             console.log(`Reconnect /dev/ttyUSB${index==0 ? 1: 0}...`);
             if (index==0)

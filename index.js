@@ -1,5 +1,5 @@
 import './env.js';
-import express from "express";
+import express from 'express';
 //import ScalesRoute from "./routes/ScalesRoute.js";
 import ScannerRoute from "./routes/ScannerRoute.js";
 import APIRoute from './routes/APIRoute.js';
@@ -16,6 +16,7 @@ import { ExpressAdapter } from '@bull-board/express';
 import {createBullBoard} from '@bull-board/api';
 import {BullAdapter} from '@bull-board/api/bullAdapter.js';
 import axios from "axios";
+import moment from 'moment';
 const app = express();
 const server = http.createServer(app);
 const clientList= [];
@@ -74,6 +75,36 @@ setInterval(()=>{
 
 const [scale4Queue,scale50Queue,pendingQueue,employeeQueue,weightbinQueue,RackSyncQueue]
  = [Queue('scale4Queue',{limiter:{max:3,duration:1000}}),Queue('scale50Queue',{limiter:{max:3,duration:1000}}),Queue('pending'),Queue('employee'),Queue('weightbin'),Queue('Rack Sync Queue')];
+ const EthObserverQueue = new Queue("ETH1 (USB - LAN) Observation Task Queue",{
+  limiter: { 
+    duration: 1000,
+    max: 1,
+  }
+});
+EthObserverQueue.process(async (job,done)=>{
+  const usbresetFn = "usbreset_"  + moment(new Date()).format('YYYY_MM_DD') + ".txt";
+  try
+  {
+    const getAd = GetAddress();
+    if (getAd && !getAd.eth1)
+    {
+      const msg  = ResetUsb().replace("\n","");
+      fs.writeFileSync(usbresetFn,'Reset USB (Dari Pengecekan Berkala): ' + msg + ' - '+ new Date().toLocaleString()+"\n");
+    }
+  }
+  catch (er)
+  {
+    EthObserverQueue.add({type:'observe'},{
+      removeOnFail:{count:10},timeout:3000,delay: 5000,removeOnComplete:{count:5}
+    }); 
+    done(null,er.message);
+    return;
+  }
+  EthObserverQueue.add({type:'observe'},{
+    removeOnFail:{count:10},timeout:3000,delay: 5000,removeOnComplete:{count:5}
+  }); 
+  done(null,'Reset USB');
+})
 scale4Queue.process((job,done)=>{
 console.log('scale 2 loading');
 getScales4Kg();
@@ -121,7 +152,7 @@ RackSyncQueue.process(async (job,done)=>{
 const serverAdapter = new ExpressAdapter();
 serverAdapter.setBasePath('/queues');
 const bullBoard = createBullBoard({
-  queues: [new BullAdapter(scale4Queue),new BullAdapter(scale50Queue),new BullAdapter(pendingQueue),new BullAdapter(employeeQueue),new BullAdapter(weightbinQueue),new BullAdapter(RackSyncQueue)],
+  queues: [new BullAdapter(scale4Queue),new BullAdapter(scale50Queue),new BullAdapter(pendingQueue),new BullAdapter(employeeQueue),new BullAdapter(weightbinQueue),new BullAdapter(RackSyncQueue),new BullAdapter(EthObserverQueue)],
   serverAdapter: serverAdapter,
   options:{
     uiConfig:{
@@ -132,6 +163,9 @@ const bullBoard = createBullBoard({
 app.use('/queues',serverAdapter.getRouter());
 server.listen(port, () => {
   console.log(ResetUsb());
+  EthObserverQueue.add({type:'observe'},{
+    removeOnFail:{count:10},timeout:3000,delay: 3000,removeOnComplete:{count:5}
+  }); 
   scale4Queue.add({id:4});
   scale50Queue.add({id:50});
   pendingQueue.add({id:1});
