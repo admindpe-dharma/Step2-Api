@@ -290,16 +290,18 @@ export const UpdateTransaksi = async (req, res) => {
           },
         }
       );
-      if (status == 404) {
+      if (_res.status && _res.status != 200) {
         console.log(`${idscraplog} - ${_transaction.dataValues.id} NOT FOUND`);
         _transaction.setDataValue("status", "PENDING|STEP1");
         _transaction.setDataValue("success", false);
       }
-      _transaction.setDataValue("status", status);
-      _transaction.setDataValue("type", type);
-      _transaction.setDataValue("weight", weight);
-      await _transaction.save();
-
+      else
+      {
+        _transaction.setDataValue("status", status);
+        _transaction.setDataValue("type", type);
+        _transaction.setDataValue("weight", weight);
+        await _transaction.save();
+      }
       return res.json({ msg: "Ok" }, 200);
     } catch (err) {
       if (count < 100) {
@@ -475,7 +477,7 @@ export const syncPendingTransaction = async () => {
     }
     if (statuses.includes("STEP1")) {
       try {
-        await axios.put(
+        const resStep1  = await axios.put(
           `http://${process.env.STEP1}/step1/` + idscraplog,
           { status: "Done", logindate: formatDate(new Date().toISOString()) },
           {
@@ -485,7 +487,7 @@ export const syncPendingTransaction = async () => {
             },
           }
         );
-        if (res.status >= 200 && res.status < 300) {
+        if (resStep1.status && resStep1.status >= 200 ) {
           const index = statuses.indexOf("STEP1");
           statuses.splice(index, 1);
         }
