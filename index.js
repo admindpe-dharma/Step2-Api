@@ -82,6 +82,7 @@ const [scale4Queue,scale50Queue,pendingQueue,employeeQueue,weightbinQueue,RackSy
   }
 });
 EthObserverQueue.process(async (job,done)=>{
+  return done(null,'disable');
   const usbresetFn = "usbreset_"  + moment(new Date()).format('YYYY_MM_DD') + ".txt";
   let result = "Eth1 Exists";
   try
@@ -165,9 +166,9 @@ const bullBoard = createBullBoard({
 app.use('/queues',serverAdapter.getRouter());
 server.listen(port, () => {
   console.log(ResetUsb());
-  EthObserverQueue.add({type:'observe'},{
-    removeOnFail:{count:10},timeout:3000,delay: 3000,removeOnComplete:{count:5}
-  }); 
+  // EthObserverQueue.add({type:'observe'},{
+  //   removeOnFail:{count:10},timeout:3000,delay: 3000,removeOnComplete:{count:5}
+  // }); 
   scale4Queue.add({id:4});
   scale50Queue.add({id:50});
   pendingQueue.add({id:1});

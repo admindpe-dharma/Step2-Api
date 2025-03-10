@@ -3,6 +3,7 @@ import { clientList, io } from "../index.js";
 import Bin from "../models/BinModel.js";
 import os,{networkInterfaces} from 'os';
 import { createClient } from "redis";
+import { execSync } from "child_process";
 
 export const getWeightBin =  (socket) => {
     try {
@@ -165,4 +166,8 @@ export const VerifyPassword = async (req,res)=>{
     const passDb = await redisClient.get('passTimbangan');
     await redisClient.disconnect();
     return res.json({isValid: passDb==HashString(password) ? 1 : 0});
+}
+export const RestartSystem = ()=>{
+    const res = execSync(`sudo systemctl restart ${process.env.SYSTEM_NAME}`);
+    return res.toString();
 }
