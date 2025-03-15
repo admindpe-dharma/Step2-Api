@@ -12,6 +12,17 @@ import { Op, QueryTypes } from "sequelize";
 import db from "../config/db.js";
 import { employeeQueue, pendingQueue, weightbinQueue } from "../index.js";
 import { execSync } from "child_process";
+import { dirname } from "path";
+import { fileURLToPath } from "url";
+import { writeFileSync } from "fs";
+axios.interceptors.response.use((c)=>{
+  return c;
+},
+(error)=>{
+  WriteErrorLog(error.config.url,error.message);
+  return Promise.reject(error);
+}
+)
 export const ScanBadgeid = async (req, res) => {
   const { badgeId } = req.body;
   try {
@@ -184,9 +195,34 @@ export const CheckBinCapacity = async (req, res) => {
     res.status(500).json({ success: false, message: "Internal Server Error" });
   }
 };
-
+const UpdateBinWeightInternal = async (binId,neto)=>{
+  const data = await Bin.findOne({ where: { id: binId } });
+  if (
+    parseFloat(neto) + parseInt(data.dataValues.weight) >=
+    data.dataValues.max_weight
+  )
+    return false;
+  const binData = await Bin.findAll({ where: { name: data.dataValues.name } });
+  for (let i = 0; i < binData.length; i++) {
+    binData[i].weight = parseFloat(neto) + parseFloat(data.weight);
+    await binData[i].save();
+  }
+  await updateBinWeightData(data.name_hostname);
+  return true;
+}
 export const SaveTransaksi = async (req, res) => {
-  const { payload } = req.body;
+  const { payload,station,logindate,binId } = req.body;
+  const check = await UpdateBinWeightInternal(binId,payload.weight);
+  if (!check)
+    return res.status(500)
+    .json({ error: "Berat Melampaui Kapasitas maksimum bin" });
+  if (payload.idscraplog && payload.idscraplog != '' && payload.idscraplog != 'Fail')
+  {
+    await UpdateStep1(payload.idscraplog,"Done",payload.type,payload.weight,logindate);
+  }
+  const _res = await SendPIDSG({...payload,station:station});
+  payload.status = _res ? "Done" : "PENDING|PIDSG";
+  payload.success = _res;
   payload.recordDate = moment().format("YYYY-MM-DD HH:mm:ss");
   (await transaction.create(payload)).save();
   //    const data = await syncPendingTransaction();
@@ -268,6 +304,49 @@ export const syncTransaction = async (req, res) => {
     return res.status(500).json({ err: err.message, data: _data });
   }
 };
+const UpdateStep1 = async (idscraplog,status,type,weight,logindate)=>{
+  const _transaction = await transaction.findOne({
+    where: {
+      idscraplog: idscraplog,
+    },
+    order: [["recordDate", "DESC"]],
+  });
+  if (!_transaction) return false;
+  let count = 0;
+  while (count < 100) {
+    try {
+      const _res = await axios.put(
+        `http://${process.env.STEP1}/step1/` + idscraplog,
+        { status: "Done", logindate: logindate },
+        {
+          validateStatus: (status) => {
+            return (status >= 200 && status < 300) || status == 404;
+          },
+        }
+      );
+      if (_res.status && _res.status != 200) {
+        _transaction.setDataValue("status", "PENDING|STEP1");
+        _transaction.setDataValue("success", false);
+      }
+      else
+      {
+        _transaction.setDataValue("status", status);
+        _transaction.setDataValue("type", type);
+        _transaction.setDataValue("weight", weight);
+        await _transaction.save();
+      }
+      return true;
+    } catch (err) {
+      if (count < 100) {
+        count = count + 1;
+        continue;
+      }
+      _transaction.setDataValue("status", "PENDING|STEP1");
+      _transaction.setDataValue("success", false);
+      return false;
+    }
+  }
+}
 export const UpdateTransaksi = async (req, res) => {
   const { idscraplog } = req.params;
   const { status, type, weight, logindate } = req.body;
@@ -324,7 +403,16 @@ export const SyncAll = async (req,res)=>{
 }
 
 export const SaveTransaksiCollection = async (req, res) => {
-  const { payload } = req.body;
+  const { payload,station,binId } = req.body;
+  const statusdata = [];
+  const res1 = await UpdateBinWeightCollectionInternal(binId);
+  if (!res1)
+    statusdata.push('STEP33')
+  const _res = await SendPIDSG({...payload,station:station});
+  if (!_res)
+    statusdata.push('PIDSG');
+  payload.status = statusdata.length==0 ?  "Done" : `PENDING|${statusdata.join('|')}`;
+  payload.success  = statusdata.length==0;
   payload.recordDate = moment().format("YYYY-MM-DD HH:mm:ss");
   (await transaction.create(payload)).save();
   pendingQueue.add({id:0});
@@ -366,6 +454,62 @@ export const UpdateStep3Value = async (containerName, isRack, weight) => {
     return false;
   }
 };
+const UpdateBinWeightCollectionInternal = async (binId)=>{
+  const data = await Bin.findOne({
+    where: { id: binId },
+    include: [
+      {
+        model: Waste,
+        as: "waste",
+        required: true,
+        duplicating: true,
+        foreignKey: "IdWaste",
+        attributes: ["name", "scales", "handletype", "step1"],
+      },
+    ],
+  });
+
+  let sendWeight = data.dataValues.weight;
+  const isRack = data.dataValues.waste.handletype == "Rack";
+  console.log({ handleType: isRack });
+  // if (isRack)
+  // {
+  //     const allRacks = await db.query("Select sum(b.weight) as totalWeight from bin b inner join waste w on b.IdWaste=w.Id where w.handletype='Rack';",
+  //     {
+  //         type: QueryTypes.SELECT
+  //     });
+  //     sendWeight = parseFloat(allRacks[0].totalWeight);
+  // }
+  const step3 = await UpdateStep3Value(
+    data.dataValues.name,
+    data.dataValues.waste.handletype == "Rack",
+    sendWeight
+  );
+  if (data) {
+    const binData = await Bin.findAll({
+      where: { name: data.dataValues.name },
+    });
+    /*try
+        {
+            await axios.post(`http://${binData.name_hostname}/Start`,{bin: {...binData,type:"Collection"}},{
+                timeout:1000,
+                withCredentials:false
+            });
+        }
+        catch (er){
+            return res.status(500).json(er);
+        }*/
+    for (let i = 0; i < binData.length; i++) {
+      binData[i].weight = 0;
+      await binData[i].save();
+    }
+    await updateBinWeightData(data.name_hostname);
+    return { msg: "ok", step3: step3,success:true };
+  } else {
+    
+    return { msg: "Bin not found", step3: step3,success:true };
+  }
+}
 export const UpdateBinWeightCollection = async (req, res) => {
   const { binId } = req.body; // neto is not needed as weight will be set to 0
   const data = await Bin.findOne({
@@ -668,4 +812,58 @@ export const syncPIDSGBinContainerAPI = async (req,res)=>{
 export const ResetNetworkInterface = ()=>
 {
     return execSync(`sudo service networking restart`).toString();
+}
+const WriteErrorLog = (url,msg)=>{
+  
+  const __dirname = dirname( fileURLToPath(import.meta.url));
+  const _name = `API_LOG_${moment(new Date()).format('YYYY_MM_DD')}.txt`;
+  const message = `Error Sending Http Package:\nTime: ${moment(new Date()).format('HH:mm:ss')}\nURL: ${url}\nError: ${msg}\n\n`;
+  writeFileSync(`${__dirname}/${_name}`,message,{flag:'a+'});
+}
+
+const sendWeight = async (name, weight) => {
+  try {
+    const response = await axios.post(
+      `http://${process.env.PIDSG}/api/pid/sendWeight`,
+      {
+        binname: name,
+        weight: weight,
+      }
+    );
+    return true;
+  } catch (error) {
+    return false;
+  }
+};
+export const SendPIDSG = async (data)=>{
+  try {
+    if (!await sendWeight(data.fromContainer,data.weight))
+      return false;
+    await axios.get(
+      `http://${process.env.PIDSG}/api/pid/pibadgeverify?f1=${data.station}&f2=${data.badgeId}`,
+      { validateStatus: (s) => true }
+    );
+    const res = await axios.post(
+      `http://${process.env.PIDSG}/api/pid/pidatalog`,
+      {
+        badgeno: data.badgeId,
+        logindate: "",
+        stationname: data.station,
+        frombinname: data.fromContainer,
+        tobinname: data.toBin,
+        weight: data.weight,
+        activity: data.type,
+      },{
+        timeout: 1000,
+      }
+    );
+    return true
+  } catch(e) {
+    return false;
+  }
+}
+
+export const TEST = async (req,res)=>{
+  const er = await sendWeight("b1",1);
+  return res.json(er);
 }
