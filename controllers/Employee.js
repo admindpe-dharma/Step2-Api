@@ -406,8 +406,12 @@ export const SaveTransaksiCollection = async (req, res) => {
   const { payload,station,binId } = req.body;
   const statusdata = [];
   const res1 = await UpdateBinWeightCollectionInternal(binId);
-  if (!res1)
-    statusdata.push('STEP33')
+  if (!res1.success)
+  {
+    return res.status(404).json({msg:res1.msg});
+  }
+  if (!res1.step3)
+    statusdata.push('STEP3');
   const _res = await SendPIDSG({...payload,station:station});
   if (!_res)
     statusdata.push('PIDSG');
@@ -446,7 +450,7 @@ export const UpdateStep3Value = async (containerName, isRack, weight) => {
     const res = await axios.put(
       `http://${process.env.STEP3}/step2value/` + _containerName,
       { value: weight, fromRack: isRack },
-      { timeout: 3000 }
+      { timeout: 1500 }
     );
     return true;
   } catch (err) {
@@ -507,7 +511,7 @@ const UpdateBinWeightCollectionInternal = async (binId)=>{
     return { msg: "ok", step3: step3,success:true };
   } else {
     
-    return { msg: "Bin not found", step3: step3,success:true };
+    return { msg: "Bin not found", step3: step3,success:false };
   }
 }
 export const UpdateBinWeightCollection = async (req, res) => {
@@ -828,6 +832,9 @@ const sendWeight = async (name, weight) => {
       {
         binname: name,
         weight: weight,
+      },
+      {
+        timeout:1500
       }
     );
     return true;
@@ -841,7 +848,7 @@ export const SendPIDSG = async (data)=>{
       return false;
     await axios.get(
       `http://${process.env.PIDSG}/api/pid/pibadgeverify?f1=${data.station}&f2=${data.badgeId}`,
-      { validateStatus: (s) => true }
+      { validateStatus: (s) => true,timeout:1500 }
     );
     const res = await axios.post(
       `http://${process.env.PIDSG}/api/pid/pidatalog`,
@@ -854,7 +861,7 @@ export const SendPIDSG = async (data)=>{
         weight: data.weight,
         activity: data.type,
       },{
-        timeout: 1000,
+        timeout: 1500,
       }
     );
     return true
