@@ -573,7 +573,7 @@ export const UpdateBinWeightCollection = async (req, res) => {
 };
 export const syncPendingTransaction = async () => {
   const transactionPendingRecords = await db.query(
-    "Select t.id,c.station,t.toBin,t.fromContainer,t.weight,t.type,t.badgeId,t.status from transaction t left join container c on t.idContainer=c.containerId where t.status like '%PENDING%' "
+    `Select t.id,c.station,t.toBin,t.fromContainer,t.weight,t.type,t.badgeId,t.status,w.handletype from transaction t inner join waste w on t.idWaste=w.id left join container c on t.idContainer=c.containerId where t.status like '%PENDING%';`
   );
   if (!transactionPendingRecords || transactionPendingRecords.length < 1)
     return transactionPendingRecords;
@@ -645,9 +645,12 @@ export const syncPendingTransaction = async () => {
       }
     }
     if (statuses.includes("STEP3")) {
-      try {
+      try {        
+        const _containerName = transactionPending[i].handletype=="Rack"
+        ? process.env.RACK_TARGET_CONTAINER
+        : transactionPending[i].fromContainer;
         const res = await axios.put(
-          `http://${process.env.STEP3}/Step2Value/` + transactionPending[i].fromContainer,
+          `http://${process.env.STEP3}/Step2Value/` + _containerName,
           { value: transactionPending[i].weight },
           { timeout: 10000, validateStatus: (s) => true }
         );
