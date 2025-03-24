@@ -451,7 +451,7 @@ export const UpdateStep3Value = async (containerName, isRack, weight) => {
     const res = await axios.put(
       `http://${process.env.STEP3}/step2value/` + _containerName,
       { value: weight, fromRack: isRack },
-      { timeout: 1500 }
+      { timeout: 5000 }
     );
     return true;
   } catch (err) {
@@ -646,7 +646,7 @@ export const syncPendingTransaction = async () => {
     }
     if (statuses.includes("STEP3")) {
       try {
-        const res = await axios.post(
+        const res = await axios.put(
           `http://${process.env.STEP3}/Step2Value/` + transactionPending[i].fromContainer,
           { value: transactionPending[i].weight },
           { timeout: 10000, validateStatus: (s) => true }
