@@ -838,7 +838,7 @@ const sendWeight = async (name, weight) => {
         weight: weight,
       },
       {
-        timeout:1500
+        timeout: 3000
       }
     );
     return true;
@@ -852,7 +852,7 @@ export const SendPIDSG = async (data)=>{
       return false;
     await axios.get(
       `http://${process.env.PIDSG}/api/pid/pibadgeverify?f1=${data.station}&f2=${data.badgeId}`,
-      { validateStatus: (s) => true,timeout:1500 }
+      { validateStatus: (s) => true,timeout:3000 }
     );
     const res = await axios.post(
       `http://${process.env.PIDSG}/api/pid/pidatalog`,
@@ -865,7 +865,7 @@ export const SendPIDSG = async (data)=>{
         weight: data.weight,
         activity: data.type,
       },{
-        timeout: 1500,
+        timeout: 3000,
       }
     );
     return true
