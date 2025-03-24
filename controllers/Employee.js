@@ -319,6 +319,7 @@ const UpdateStep1 = async (idscraplog,status,type,weight,logindate)=>{
         `http://${process.env.STEP1}/step1/` + idscraplog,
         { status: "Done", logindate: logindate },
         {
+          timeout:3000,
           validateStatus: (status) => {
             return (status >= 200 && status < 300) || status == 404;
           },
@@ -612,7 +613,7 @@ export const syncPendingTransaction = async () => {
           },
           {
             validateStatus: (s) => true,
-            timeout: 1000,
+            timeout: 5000,
           }
         );
         if (res.status >= 200 && res.status < 300) {
@@ -629,7 +630,7 @@ export const syncPendingTransaction = async () => {
           `http://${process.env.STEP1}/step1/` + idscraplog,
           { status: "Done", logindate: formatDate(new Date().toISOString()) },
           {
-            timeout: 1000,
+            timeout: 5000,
             validateStatus: (status) => {
               return true;
             },
@@ -648,7 +649,7 @@ export const syncPendingTransaction = async () => {
         const res = await axios.post(
           `http://${process.env.STEP3}/Step2Value/` + transactionPending[i].fromContainer,
           { value: transactionPending[i].weight },
-          { timeout: 3000, validateStatus: (s) => true }
+          { timeout: 10000, validateStatus: (s) => true }
         );
         if (res.status >= 200 && res.status < 300) {
           const index = statuses.indexOf("STEP3");
