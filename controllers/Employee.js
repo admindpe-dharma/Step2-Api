@@ -312,8 +312,6 @@ const UpdateStep1 = async (idscraplog,status,type,weight,logindate)=>{
     order: [["recordDate", "DESC"]],
   });
   if (!_transaction) return false;
-  let count = 0;
-  while (count < 100) {
     try {
       const _res = await axios.put(
         `http://${process.env.STEP1}/step1/` + idscraplog,
@@ -334,19 +332,16 @@ const UpdateStep1 = async (idscraplog,status,type,weight,logindate)=>{
         _transaction.setDataValue("status", status);
         _transaction.setDataValue("type", type);
         _transaction.setDataValue("weight", weight);
-        await _transaction.save();
       }
+      await _transaction.save();
       return true;
     } catch (err) {
-      if (count < 100) {
-        count = count + 1;
-        continue;
-      }
       _transaction.setDataValue("status", "PENDING|STEP1");
       _transaction.setDataValue("success", false);
+      await _transaction.save();
       return false;
     }
-  }
+  
 }
 export const UpdateTransaksi = async (req, res) => {
   const { idscraplog } = req.params;
@@ -358,8 +353,6 @@ export const UpdateTransaksi = async (req, res) => {
     order: [["recordDate", "DESC"]],
   });
   if (!_transaction) return res.json({ msg: "Transaction Not Found" }, 404);
-  let count = 0;
-  while (count < 100) {
     try {
       const _res = await axios.put(
         `http://${process.env.STEP1}/step1/` + idscraplog,
@@ -380,19 +373,16 @@ export const UpdateTransaksi = async (req, res) => {
         _transaction.setDataValue("status", status);
         _transaction.setDataValue("type", type);
         _transaction.setDataValue("weight", weight);
-        await _transaction.save();
       }
+      await _transaction.save();
       return res.json({ msg: "Ok" }, 200);
     } catch (err) {
-      if (count < 100) {
-        count = count + 1;
-        continue;
-      }
       _transaction.setDataValue("status", "PENDING|STEP1");
       _transaction.setDataValue("success", false);
+      await _transaction.save();
       return res.json({ msg: err.response ? err.response.data : err }, 500);
     }
-  }
+  
 };
 export const SyncAll = async (req,res)=>{
   await syncPendingTransaction();
