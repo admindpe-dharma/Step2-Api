@@ -218,9 +218,9 @@ export const SaveTransaksi = async (req, res) => {
     .json({ error: "Berat Melampaui Kapasitas maksimum bin" });
     
   const _res = await SendPIDSG({...payload,station:station});
-  if (payload.idscraplog  && _res)
+  if (payload.idscraplog )
   {
-    await UpdateStep1(payload.idscraplog,"Done",payload.type,payload.weight,logindate);
+      await UpdateStep1(payload.idscraplog,_res,payload.type,payload.weight,logindate);
   }
   payload.status = _res ? "Done" : "PENDING|PIDSG";
   payload.success = _res;
@@ -305,7 +305,7 @@ export const syncTransaction = async (req, res) => {
     return res.status(500).json({ err: err.message, data: _data });
   }
 };
-const UpdateStep1 = async (idscraplog,status,type,weight,logindate)=>{
+const UpdateStep1 = async (idscraplog,isDone,type,weight,logindate)=>{
   const _transaction = await transaction.findOne({
     where: {
       idscraplog: idscraplog,
@@ -314,16 +314,24 @@ const UpdateStep1 = async (idscraplog,status,type,weight,logindate)=>{
   });
   if (!_transaction) return false;
     try {
-      const _res = await axios.put(
-        `http://${process.env.STEP1}/step1/` + idscraplog,
-        { status: "Done", logindate: logindate },
-        {
-          timeout:3000,
-        }
-      );
-        _transaction.setDataValue("status", status);
-        _transaction.setDataValue("type", type);
-        _transaction.setDataValue("weight", weight);
+      if (isDone)
+      {
+        const _res = await axios.put(
+          `http://${process.env.STEP1}/step1/` + idscraplog,
+          { status: "Done", logindate: logindate },
+          {
+            timeout:3000,
+          }
+        );
+          _transaction.setDataValue("status", "Done");
+          _transaction.setDataValue("type", type);
+          _transaction.setDataValue("weight", weight);
+      }
+      else
+      {    
+        _transaction.setDataValue("status", "PENDING|STEP1");
+        _transaction.setDataValue("success", false);
+      }
       await _transaction.save();
       return true;
     } catch (err) {
