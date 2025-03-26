@@ -552,7 +552,7 @@ export const UpdateBinWeightCollection = async (req, res) => {
 };
 export const syncPendingTransaction = async () => {
   const transactionPendingRecords = await db.query(
-    `Select t.id,c.station,t.toBin,t.fromContainer,t.weight,t.type,t.badgeId,t.status,w.handletype from transaction t inner join waste w on t.idWaste=w.id left join container c on t.idContainer=c.containerId where t.status like '%PENDING%';`
+    `Select t.id,c.station,t.toBin,t.fromContainer,t.weight,t.type,t.badgeId,t.status,w.handletype,t.idscraplog from transaction t inner join waste w on t.idWaste=w.id left join container c on t.idContainer=c.containerId where t.status like '%PENDING%';`
   );
   if (!transactionPendingRecords || transactionPendingRecords.length < 1)
     return transactionPendingRecords;
@@ -606,7 +606,7 @@ export const syncPendingTransaction = async () => {
     if (statuses.includes("STEP1")) {
       try {
         const resStep1  = await axios.put(
-          `http://${process.env.STEP1}/step1/` + idscraplog,
+          `http://${process.env.STEP1}/step1/` + transactionPending[i].idscraplog,
           { status: "Done", logindate: formatDate(new Date().toISOString()) },
           {
             timeout: 5000,
