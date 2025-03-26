@@ -273,7 +273,9 @@ export const syncTransactionStep1 = async () => {
           fromContainer: _container.name,
           toBin: tr.bin,
           idscraplog: tr.idscraplog,
-          status: "Step-1",
+          status: {
+            [Op.or] :["Step-1","PENDING|STEP1"]
+          }
         },
       });
       _data = data;
