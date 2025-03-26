@@ -216,11 +216,12 @@ export const SaveTransaksi = async (req, res) => {
   if (!check)
     return res.status(500)
     .json({ error: "Berat Melampaui Kapasitas maksimum bin" });
-  if (payload.idscraplog && payload.idscraplog != '' && payload.idscraplog != 'Fail')
+    
+  const _res = await SendPIDSG({...payload,station:station});
+  if (payload.idscraplog  && _res)
   {
     await UpdateStep1(payload.idscraplog,"Done",payload.type,payload.weight,logindate);
   }
-  const _res = await SendPIDSG({...payload,station:station});
   payload.status = _res ? "Done" : "PENDING|PIDSG";
   payload.success = _res;
   payload.recordDate = moment().format("YYYY-MM-DD HH:mm:ss");
@@ -318,21 +319,11 @@ const UpdateStep1 = async (idscraplog,status,type,weight,logindate)=>{
         { status: "Done", logindate: logindate },
         {
           timeout:3000,
-          validateStatus: (status) => {
-            return (status >= 200 && status < 300) || status == 404;
-          },
         }
       );
-      if (_res.status && _res.status != 200) {
-        _transaction.setDataValue("status", "PENDING|STEP1");
-        _transaction.setDataValue("success", false);
-      }
-      else
-      {
         _transaction.setDataValue("status", status);
         _transaction.setDataValue("type", type);
         _transaction.setDataValue("weight", weight);
-      }
       await _transaction.save();
       return true;
     } catch (err) {
@@ -356,24 +347,12 @@ export const UpdateTransaksi = async (req, res) => {
     try {
       const _res = await axios.put(
         `http://${process.env.STEP1}/step1/` + idscraplog,
-        { status: "Done", logindate: logindate },
-        {
-          validateStatus: (status) => {
-            return (status >= 200 && status < 300) || status == 404;
-          },
-        }
+        { status: "Done", logindate: logindate }
       );
-      if (_res.status && _res.status != 200) {
-        console.log(`${idscraplog} - ${_transaction.dataValues.id} NOT FOUND`);
-        _transaction.setDataValue("status", "PENDING|STEP1");
-        _transaction.setDataValue("success", false);
-      }
-      else
-      {
+      
         _transaction.setDataValue("status", status);
         _transaction.setDataValue("type", type);
         _transaction.setDataValue("weight", weight);
-      }
       await _transaction.save();
       return res.json({ msg: "Ok" }, 200);
     } catch (err) {
