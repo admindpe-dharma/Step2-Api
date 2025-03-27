@@ -4,6 +4,8 @@ import Bin from "../models/BinModel.js";
 import os,{networkInterfaces} from 'os';
 import { createClient } from "redis";
 import { execSync } from "child_process";
+import db from "../config/db.js";
+import { QueryTypes } from "sequelize";
 
 export const getWeightBin =  (socket) => {
     try {
@@ -170,4 +172,13 @@ export const VerifyPassword = async (req,res)=>{
 export const RestartSystem = ()=>{
     const res = execSync(`sudo systemctl restart ${process.env.SYSTEM_NAME}`);
     return res.toString();
+}
+export const UpdateBinStatus = async  (req,res)=>{
+    const {binname} = req.params;
+    const {status} = req.body;
+    await db.query("Update Bin set Status=? where name=?",{
+        type: QueryTypes.UPDATE,
+        replacements: [status,binname]
+    });
+    return res.json({msg:"Updated"});
 }

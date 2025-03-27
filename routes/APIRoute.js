@@ -1,6 +1,6 @@
 import express from 'express';
 import { ResetNetworkInterface, SyncAll, syncEmployeePIDSGAPI, syncPendingTransaction, syncPendingTransactionAPI, syncPIDSGBinAPI, syncPIDSGBinContainerAPI, syncTransaction, TransactionStep1 } from '../controllers/Employee.js';
-import { getIp, RestartSystem, SavePasswordTimbangan, VerifyPassword } from '../controllers/Bin.js';
+import { getIp, RestartSystem, SavePasswordTimbangan, UpdateBinStatus, VerifyPassword } from '../controllers/Bin.js';
 import { ResetUsb } from '../controllers/Scales.js';
 import { clientList } from '../index.js';
 
@@ -23,4 +23,5 @@ routes.get('/reset-network',(req,res)=>res.json({netowrk_reset:ResetNetworkInter
 routes.post('/set-password',SavePasswordTimbangan);
 routes.post('/verify-password',VerifyPassword);
 routes.get('/restart',(req,res)=>res.json(RestartSystem()));
+routes.put('/status-bin/{binname}',UpdateBinStatus);
 export default routes;

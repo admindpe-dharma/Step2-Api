@@ -152,6 +152,10 @@ export const CheckBinCapacity = async (req, res) => {
     const bins = await Bin.findAll({
       where: {
         IdWaste: IdWaste,
+        [Op.and] : [
+          {status: {[Op.ne] : "Dispose" }},
+          {status: {[Op.ne] : "Collection" }}
+        ]
       },
     });
 
