@@ -312,13 +312,6 @@ export const syncTransaction = async (req, res) => {
   }
 };
 const UpdateStep1 = async (idscraplog,isDone,type,weight,logindate)=>{
-  const _transaction = await transaction.findOne({
-    where: {
-      idscraplog: idscraplog,
-    },
-    order: [["recordDate", "DESC"]],
-  });
-  if (!_transaction) return false;
     try {
       if (isDone)
       {
@@ -329,21 +322,25 @@ const UpdateStep1 = async (idscraplog,isDone,type,weight,logindate)=>{
             timeout:3000,
           }
         );
-          _transaction.setDataValue("status", "Done");
-          _transaction.setDataValue("type", type);
-          _transaction.setDataValue("weight", weight);
+        await db.query(`Update transaction set status='Done' where idscraplog=? and status='step-1';`,{
+          type: QueryTypes.UPDATE,
+          replacements: [idscraplog]
+        });
       }
       else
       {    
-        _transaction.setDataValue("status", "PENDING|STEP1");
-        _transaction.setDataValue("success", false);
+
+        await db.query(`Update transaction set status='PENDING|STEP1' where idscraplog=? and status='step-1';`,{
+          type: QueryTypes.UPDATE,
+          replacements: [idscraplog]
+        });
       }
-      await _transaction.save();
       return true;
     } catch (err) {
-      _transaction.setDataValue("status", "PENDING|STEP1");
-      _transaction.setDataValue("success", false);
-      await _transaction.save();
+      await db.query(`Update transaction set status='PENDING|STEP1' where idscraplog=? and status='step-1';`,{
+        type: QueryTypes.UPDATE,
+        replacements: [idscraplog]
+      });
       return false;
     }
   
