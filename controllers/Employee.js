@@ -472,7 +472,7 @@ const UpdateBinWeightCollectionInternal = async (binId)=>{
     ],
   });
   const isRack = data.dataValues.waste.handletype == "Rack";
-  let sendWeight = isRack ? (await getRackWeights()) :  data.dataValues.weight;
+  let sendWeight =  data.dataValues.weight;
   console.log({ handleType: isRack });
   // if (isRack)
   // {
@@ -490,9 +490,10 @@ const UpdateBinWeightCollectionInternal = async (binId)=>{
   if (data) {
     if (isRack)
     {
-      await db.query("update bin b inner join waste w on b.idWaste=w.id set b.weight=0 where w.handletype='Rack'",
+      await db.query("update bin b inner join waste w on b.idWaste=w.id set b.weight=0 where w.handletype='Rack' and name=?",
       {
          type: QueryTypes.BULKUPDATE,
+         replacements: [data.dataValues.name]
       })
     }
     else
