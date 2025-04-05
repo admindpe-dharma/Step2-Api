@@ -653,7 +653,7 @@ export const syncPendingTransaction = async () => {
     }
     if (statuses.includes("STEP3")) {
       try {        
-        const _containerName = transactionPending[cmi].handletype=="Rack"
+        const _containerName = transactionPending[i].handletype=="Rack"
         ? process.env.RACK_TARGET_CONTAINER
         : transactionPending[i].fromContainer;
         const res = await axios.put(
