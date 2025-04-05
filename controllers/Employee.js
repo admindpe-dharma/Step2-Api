@@ -15,6 +15,7 @@ import { execSync } from "child_process";
 import { dirname } from "path";
 import { fileURLToPath } from "url";
 import { writeFileSync } from "fs";
+import e from "express";
 axios.interceptors.response.use((c)=>{
   return c;
 },
@@ -63,6 +64,19 @@ export const TransactionStep1 = async (req, res) => {
   if (!_waste) return res.json({ msg: "Waste Not Found" }, 404);
   if (!_container) return res.json({ msg: " Container Not Found" }, 404);
   if (!_badge) return res.json({ msg: "Badge not found" }, 404);
+  
+  const data = await transaction.findOne({
+    where: {
+      fromContainer: _container.name,
+      toBin: toBin,
+      idscraplog: idscraplog,
+      status: {
+        [Op.or] :["Step-1","PENDING|STEP1","Done"]
+      }
+    },
+  });
+  if (data)
+    return res.json({msg:"ok"});
   const transactionData = {
     idscraplog: idscraplog,
     IdWaste: _waste.getDataValue("Id"),
@@ -318,7 +332,7 @@ const UpdateStep1 = async (idscraplog,isDone,type,weight,logindate)=>{
           timeout:3000,
         }
       );
-      await db.query(`Update transaction set status='Done' where idscraplog=? and status='step-1';`,{
+      await db.query(`Update transaction set status='Done' where idscraplog=? and status='Step-1';`,{
         type: QueryTypes.UPDATE,
         replacements: [idscraplog]
       });
@@ -326,14 +340,14 @@ const UpdateStep1 = async (idscraplog,isDone,type,weight,logindate)=>{
     else
     {    
 
-      await db.query(`Update transaction set status='PENDING|STEP1' where idscraplog=? and status='step-1';`,{
+      await db.query(`Update transaction set status='PENDING|STEP1' where idscraplog=? and status='Step-1';`,{
         type: QueryTypes.UPDATE,
         replacements: [idscraplog]
       });
     }
     return true;
   } catch (err) {
-    await db.query(`Update transaction set status='PENDING|STEP1' where idscraplog=? and status='step-1';`,{
+    await db.query(`Update transaction set status='PENDING|STEP1' where idscraplog=? and status='Step-1';`,{
       type: QueryTypes.UPDATE,
       replacements: [idscraplog]
     });
@@ -394,6 +408,7 @@ export const SaveTransaksiCollection = async (req, res) => {
     statusdata.push('PIDSG');
   payload.status = statusdata.length==0 ?  "Done" : `PENDING|${statusdata.join('|')}`;
   payload.success  = statusdata.length==0;
+  payload.weight = res1.weight;
   payload.recordDate = moment().format("YYYY-MM-DD HH:mm:ss");
   (await transaction.create(payload)).save();
   pendingQueue.add({id:0});
@@ -435,6 +450,13 @@ export const UpdateStep3Value = async (containerName, isRack, weight) => {
     return false;
   }
 };
+const getRackWeights = async ()=>{
+  const weight = await db.query(`select sum(weight) as weight from bin b inner join waste w on b.idWaste=w.id where w.handletype='Rack';`,
+  {
+    type:QueryTypes.SELECT
+  });
+  return weight[0].weight;
+}
 const UpdateBinWeightCollectionInternal = async (binId)=>{
   const data = await Bin.findOne({
     where: { id: binId },
@@ -449,9 +471,8 @@ const UpdateBinWeightCollectionInternal = async (binId)=>{
       },
     ],
   });
-
-  let sendWeight = data.dataValues.weight;
   const isRack = data.dataValues.waste.handletype == "Rack";
+  let sendWeight = isRack ? (await getRackWeights()) :  data.dataValues.weight;
   console.log({ handleType: isRack });
   // if (isRack)
   // {
@@ -467,6 +488,15 @@ const UpdateBinWeightCollectionInternal = async (binId)=>{
     sendWeight
   );
   if (data) {
+    if (isRack)
+    {
+      await db.query("update bin b inner join waste w on b.idWaste=w.id set b.weight=0 where w.handletype='Rack'",
+      {
+         type: QueryTypes.BULKUPDATE,
+      })
+    }
+    else
+    {
     const binData = await Bin.findAll({
       where: { name: data.dataValues.name },
     });
@@ -480,15 +510,16 @@ const UpdateBinWeightCollectionInternal = async (binId)=>{
         catch (er){
             return res.status(500).json(er);
         }*/
-    for (let i = 0; i < binData.length; i++) {
-      binData[i].weight = 0;
-      await binData[i].save();
+      for (let i = 0; i < binData.length; i++) {
+        binData[i].weight = 0;
+        await binData[i].save();
+      }
     }
     await updateBinWeightData(data.name_hostname);
-    return { msg: "ok", step3: step3,success:true };
+    return { msg: "ok", step3: step3,success:true,weight: sendWeight };
   } else {
     
-    return { msg: "Bin not found", step3: step3,success:false };
+    return { msg: "Bin not found", step3: step3,success:false,weight:sendWeight };
   }
 }
 export const UpdateBinWeightCollection = async (req, res) => {
@@ -622,7 +653,7 @@ export const syncPendingTransaction = async () => {
     }
     if (statuses.includes("STEP3")) {
       try {        
-        const _containerName = transactionPending[i].handletype=="Rack"
+        const _containerName = transactionPending[cmi].handletype=="Rack"
         ? process.env.RACK_TARGET_CONTAINER
         : transactionPending[i].fromContainer;
         const res = await axios.put(
