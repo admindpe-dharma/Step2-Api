@@ -490,7 +490,7 @@ const UpdateBinWeightCollectionInternal = async (binId)=>{
   if (data) {
     if (isRack)
     {
-      await db.query("update bin b inner join waste w on b.idWaste=w.id set b.weight=0 where w.handletype='Rack' and name=?",
+      await db.query("update bin b inner join waste w on b.idWaste=w.id set b.weight=0 where w.handletype='Rack' and c.name=?",
       {
          type: QueryTypes.BULKUPDATE,
          replacements: [data.dataValues.name]
