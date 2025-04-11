@@ -10,7 +10,7 @@ import { Server } from "socket.io";
 import { getScales4Kg ,getScales50Kg, ResetUsb} from "./controllers/Scales.js";
 import bodyParser from "body-parser";
 import {BroadcastBinWeight, getWeightBin} from "./controllers/Bin.js"
-import { syncEmployeePIDSG, syncPendingTransaction, syncPIDSGBin, syncPIDSGContainer, syncTransaction, syncTransactionStep1 } from "./controllers/Employee.js";
+import { ExecuteDispose, syncEmployeePIDSG, syncPendingTransaction, syncPIDSGBin, syncPIDSGContainer, syncTransaction, syncTransactionStep1 } from "./controllers/Employee.js";
 import Queue from 'bull';
 import { ExpressAdapter } from '@bull-board/express';
 import {createBullBoard} from '@bull-board/api';
@@ -174,6 +174,7 @@ server.listen(port, () => {
   // EthObserverQueue.add({type:'observe'},{
   //   removeOnFail:{count:10},timeout:3000,delay: 3000,removeOnComplete:{count:5}
   // }); 
+  DisposeQueue.add({id:10});
   scale4Queue.add({id:4});
   scale50Queue.add({id:50});
   pendingQueue.add({id:1});
