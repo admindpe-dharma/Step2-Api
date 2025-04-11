@@ -73,13 +73,18 @@ setInterval(()=>{
   BroadcastBinWeight();
 },1000);
 
-const [scale4Queue,scale50Queue,pendingQueue,employeeQueue,weightbinQueue,RackSyncQueue]
- = [Queue('scale4Queue',{limiter:{max:3,duration:1000}}),Queue('scale50Queue',{limiter:{max:3,duration:1000}}),Queue('pending'),Queue('employee'),Queue('weightbin'),Queue('Rack Sync Queue')];
+const [scale4Queue,scale50Queue,pendingQueue,employeeQueue,weightbinQueue,RackSyncQueue,DisposeQueue]
+ = [Queue('scale4Queue',{limiter:{max:3,duration:1000}}),Queue('scale50Queue',{limiter:{max:3,duration:1000}}),Queue('pending'),Queue('employee'),Queue('weightbin'),Queue('Rack Sync Queue'),Queue('Dispose Task Queue')];
  const EthObserverQueue = new Queue("ETH1 (USB - LAN) Observation Task Queue",{
   limiter: { 
     duration: 1000,
     max: 1,
   }
+});
+
+DisposeQueue.process(async(job,done)=>{
+  const res = await ExecuteDispose();
+  done(null,JSON.stringify(res));
 });
 EthObserverQueue.process(async (job,done)=>{
   return done(null,'disable');
@@ -155,7 +160,7 @@ RackSyncQueue.process(async (job,done)=>{
 const serverAdapter = new ExpressAdapter();
 serverAdapter.setBasePath('/queues');
 const bullBoard = createBullBoard({
-  queues: [new BullAdapter(scale4Queue),new BullAdapter(scale50Queue),new BullAdapter(pendingQueue),new BullAdapter(employeeQueue),new BullAdapter(weightbinQueue),new BullAdapter(RackSyncQueue),new BullAdapter(EthObserverQueue)],
+  queues: [new BullAdapter(scale4Queue),new BullAdapter(scale50Queue),new BullAdapter(pendingQueue),new BullAdapter(employeeQueue),new BullAdapter(weightbinQueue),new BullAdapter(RackSyncQueue),new BullAdapter(EthObserverQueue),new BullAdapter(DisposeQueue)],
   serverAdapter: serverAdapter,
   options:{
     uiConfig:{
@@ -176,7 +181,7 @@ server.listen(port, () => {
   employeeQueue.add({id:3});
   console.log(`Server up and running on port ${port}`);
 }); 
-export { clientList,Server, io,scale50Queue,scale4Queue,employeeQueue,weightbinQueue,pendingQueue };
+export { clientList,Server, io,scale50Queue,scale4Queue,employeeQueue,weightbinQueue,pendingQueue,DisposeQueue };
 
 
 

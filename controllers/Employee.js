@@ -10,7 +10,7 @@ import axios from "axios";
 import os from "os";
 import { Op, QueryTypes } from "sequelize";
 import db from "../config/db.js";
-import { employeeQueue, pendingQueue, weightbinQueue } from "../index.js";
+import { DisposeQueue, employeeQueue, pendingQueue, weightbinQueue } from "../index.js";
 import { execSync } from "child_process";
 import { dirname } from "path";
 import { fileURLToPath } from "url";
@@ -225,25 +225,69 @@ const UpdateBinWeightInternal = async (binId,neto)=>{
   return true;
 }
 export const SaveTransaksi = async (req, res) => {
-  const { payload,station,logindate,binId } = req.body;
-  const check = await UpdateBinWeightInternal(binId,payload.weight);
-  if (!check)
-    return res.status(500)
-    .json({ error: "Berat Melampaui Kapasitas maksimum bin" });
-    
-  const _res = await SendPIDSG({...payload,station:station});
-  if (payload.idscraplog )
+  const { payload,logindate,binId } = req.body;
+  const payloads = Array.isArray(payload) ? payload : [payload];
+  for (let i=0;i<payloads.length;i++)
   {
-      await UpdateStep1(payload.idscraplog,_res,payload.type,payload.weight,logindate);
-  }
-  payload.status = _res ? "Done" : "PENDING|PIDSG";
-  payload.success = _res;
-  payload.recordDate = moment().format("YYYY-MM-DD HH:mm:ss");
-  (await transaction.create(payload)).save();
+    try
+    {
+      const check = await UpdateBinWeightInternal(binId,payloads[i].weight);
+      if (!check)
+        return res.status(500)
+        .json({ error: "Berat Melampaui Kapasitas maksimum bin" });
+      payloads[i].status = "READY";
+      payloads[i].success = 0;
+      payloads[i].recordDate = logindate;
+      (await transaction.create(payloads[i])).save();
+    }
+    catch (er)
+    {
+      console.log(er?.message ?? er);
+      const message = `${moment(new Date()).format('HH:mm:ss')}: ${er.message ?? er} - ${JSON.stringify(payloads[i])}`
+      writeFileSync(`fail_transaction_${moment(new Date()).format('YYYY_MM_DD')}.txt`,message);
+    }
   //    const data = await syncPendingTransaction();
+  }
+  DisposeQueue.add({id:10});
   pendingQueue.add({id:0});
-  res.status(200).json({ msg: "ok" });
+  return res.status(200).json({ msg: "ok" });
 };
+export const ExecuteDispose =  async ()=>{
+  const payloads = await db.query(
+    `Select t.id,c.station,t.toBin,t.fromContainer,t.weight,t.type,t.badgeId,t.status,w.handletype,t.idscraplog from transaction t inner join waste w on t.idWaste=w.id left join container c on t.idContainer=c.containerId where t.status='READY';`,{
+      type: QueryTypes.SELECT
+    });
+  const result =[];
+  for (let i=0;i<payloads.length;i++)
+  {
+    try
+    {     
+      const _res = await SendPIDSG({...payloads[i]});
+      if (payloads[i].idscraplog && _res)
+      {
+          await UpdateStep1(payloads[i].idscraplog,_res,payloads[i].type,payloads[i].weight,payloads[i].recordDate);
+      }
+      await db.query(`UPDATE TRANSACTION SET status=?,success=?,recordDate=? where id=?`,{
+        type: QueryTypes.BULKUPDATE,
+        replacements: [_res ? "Done" : "PENDING|PIDSG", _res ? 1: 0,_res ?  moment().format("YYYY-MM-DD HH:mm:ss") : payloads[i].recordDate,payloads[i].id]
+      });
+      result.push(
+        payloads[i]
+      );
+    }
+    catch (er)
+    {
+      console.log(er?.message ?? er);
+      const message = `${moment(new Date()).format('HH:mm:ss')}: ${er.message ?? er} - ${JSON.stringify(payloads[i])}`
+      writeFileSync(`fail_execute_transaction_${moment(new Date()).format('YYYY_MM_DD')}.txt`,message);
+      await db.query(`UPDATE TRANSACTION SET status=?,success=?,recordDate=? where id=?`,{
+        type: QueryTypes.BULKUPDATE,
+        replacements: [ "PENDING|PIDSG",  0, payloads[i].recordDate,payloads[i].id]
+      });
+    }
+  }
+  return result;
+}
 export const getTransaction = async (req, res) => {
   const { containerName } = req.params;
   const tr = await transaction.findOne({
@@ -284,12 +328,7 @@ export const syncTransactionStep1 = async () => {
       });
       const data = await transaction.findOne({
         where: {
-          fromContainer: _container.name,
-          toBin: tr.bin,
-          idscraplog: tr.idscraplog,
-          status: {
-            [Op.or] :["Step-1","PENDING|STEP1"]
-          }
+          idscraplog: tr.idscraplog
         },
       });
       _data = data;
@@ -333,7 +372,7 @@ const UpdateStep1 = async (idscraplog,isDone,type,weight,logindate)=>{
         }
       );
       await db.query(`Update transaction set status='Done' where idscraplog=? and status='Step-1';`,{
-        type: QueryTypes.UPDATE,
+        type: QueryTypes.BULKUPDATE,
         replacements: [idscraplog]
       });
     }
@@ -341,14 +380,14 @@ const UpdateStep1 = async (idscraplog,isDone,type,weight,logindate)=>{
     {    
 
       await db.query(`Update transaction set status='PENDING|STEP1' where idscraplog=? and status='Step-1';`,{
-        type: QueryTypes.UPDATE,
+        type: QueryTypes.BULKUPDATE,
         replacements: [idscraplog]
       });
     }
     return true;
   } catch (err) {
     await db.query(`Update transaction set status='PENDING|STEP1' where idscraplog=? and status='Step-1';`,{
-      type: QueryTypes.UPDATE,
+      type: QueryTypes.BULKUPDATE,
       replacements: [idscraplog]
     });
     return false;
