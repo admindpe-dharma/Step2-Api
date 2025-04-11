@@ -74,7 +74,7 @@ export const getScales4Kg = () => {
         fs.writeFileSync(_name, "Sebelum Connect "+" - " + new Date().toLocaleString()+"\n",{flag:'a+'});
         const Timbangan = new SerialPort({
             path: process.env.USB1,
-            baudRate: 9600,
+            baudRate: process.env.COIL_BAUDRATE2 ?? 9600,
             dataBits: 8,
             lock:false,
             rtscts:true,
@@ -183,7 +183,7 @@ export const getScales50Kg = () => {
             lock:false,
             rtscts:true,
             
-            baudRate: 9600,
+            baudRate: process.env.COIL_BAUDRATE ?? 9600,
             dataBits: 8,
             stopBits: 1,
             parity: 'none',
