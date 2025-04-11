@@ -267,7 +267,7 @@ export const ExecuteDispose =  async ()=>{
       {
           await UpdateStep1(payloads[i].idscraplog,_res,payloads[i].type,payloads[i].weight,payloads[i].recordDate);
       }
-      await db.query(`UPDATE TRANSACTION SET status=?,success=?,recordDate=? where id=?`,{
+      await db.query(`UPDATE transaction SET status=?,success=?,recordDate=? where id=?`,{
         type: QueryTypes.BULKUPDATE,
         replacements: [_res ? "Done" : "PENDING|PIDSG", _res ? 1: 0,_res ?  moment().format("YYYY-MM-DD HH:mm:ss") : payloads[i].recordDate,payloads[i].id]
       });
