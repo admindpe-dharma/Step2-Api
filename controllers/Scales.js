@@ -101,7 +101,7 @@ export const getScales4Kg = () => {
                 const filename = fileNames.usb1 + moment(new Date()).format('YYYY_MM_DD') + ".txt";
                 fs.writeFileSync(filename,temp+" - " + new Date().toLocaleString()+"\n",{flag:'a+'});
             }
-            if (temp.length < 5)
+            if (temp.length < 5 && process.env.CAPACITOR!= 1)
             {
                 if (temp != '\n'  && temp != ' ' && temp != '\t' && temp != '\0')
                 {
@@ -142,6 +142,12 @@ export const getScales4Kg = () => {
     } 
 };
 const processWeight = async (payload) =>{
+    if (process.env.CAPACITOR==1)
+    {
+        const response = { weight: parseFloat(payload) };
+        io.emit('data', response);
+        return true;   
+    }
     const match = payload.toString().match(/[\d]+\.\d{2}(?=Kg)/);
     const match4 = payload.toString().match(/WT:(\d+\.\d+)g/);
     if (match4 && match4.length && match4.length > 0 ) {
@@ -198,7 +204,7 @@ export const getScales50Kg = () => {
                 const filename = fileNames.usb0 + moment(new Date()).format('YYYY_MM_DD') + ".txt";
                 fs.writeFileSync(filename,temp +" - " + new Date().toLocaleString()+"\n",{flag:'a+'});
             }
-            if (temp.length < 5)
+            if (temp.length < 5 && process.env.CAPACITOR != 1)
             {
                 if (temp != '\n'  && temp != ' ' && temp != '\t' && temp != '\0')
                 {
