@@ -225,7 +225,7 @@ const UpdateBinWeightInternal = async (binId,neto)=>{
   return true;
 }
 export const SaveTransaksi = async (req, res) => {
-  const { payload,logindate,binId } = req.body;
+  const { payload,binId } = req.body;
   const payloads = Array.isArray(payload) ? payload : [payload];
   for (let i=0;i<payloads.length;i++)
   {
@@ -237,7 +237,6 @@ export const SaveTransaksi = async (req, res) => {
         .json({ error: "Berat Melampaui Kapasitas maksimum bin" });
       payloads[i].status = "READY";
       payloads[i].success = 0;
-      payloads[i].recordDate = logindate;
       (await transaction.create(payloads[i])).save();
     }
     catch (er)
