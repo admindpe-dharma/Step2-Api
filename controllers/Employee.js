@@ -904,7 +904,7 @@ export const SendPIDSG = async (data)=>{
       `http://${process.env.PIDSG}/api/pid/pidatalog`,
       {
         badgeno: data.badgeId,
-        logindate: "",
+        logindate: data.recordDate,
         stationname: data.station,
         frombinname: data.fromContainer,
         tobinname: data.toBin,
