@@ -253,7 +253,7 @@ export const SaveTransaksi = async (req, res) => {
 };
 export const ExecuteDispose =  async ()=>{
   const payloads = await db.query(
-    `Select t.id,c.station,t.toBin,t.fromContainer,t.weight,t.type,t.badgeId,t.status,w.handletype,t.idscraplog from transaction t inner join waste w on t.idWaste=w.id left join container c on t.idContainer=c.containerId where t.status='READY';`,{
+    `Select t.id,c.station,t.toBin,t.fromContainer,t.weight,t.type,t.badgeId,t.status,w.handletype,t.idscraplog,t.recordDate from transaction t inner join waste w on t.idWaste=w.id left join container c on t.idContainer=c.containerId where t.status='READY';`,{
       type: QueryTypes.SELECT
     });
   const result =[];
@@ -619,7 +619,7 @@ export const UpdateBinWeightCollection = async (req, res) => {
 };
 export const syncPendingTransaction = async () => {
   const transactionPendingRecords = await db.query(
-    `Select t.id,c.station,t.toBin,t.fromContainer,t.weight,t.type,t.badgeId,t.status,w.handletype,t.idscraplog from transaction t inner join waste w on t.idWaste=w.id left join container c on t.idContainer=c.containerId where t.status like '%PENDING%';`
+    `Select t.id,c.station,t.toBin,t.fromContainer,t.recordDate,t.weight,t.type,t.badgeId,t.status,w.handletype,t.idscraplog from transaction t inner join waste w on t.idWaste=w.id left join container c on t.idContainer=c.containerId where t.status like '%PENDING%';`
   );
   if (!transactionPendingRecords || transactionPendingRecords.length < 1)
     return transactionPendingRecords;
@@ -650,7 +650,7 @@ export const syncPendingTransaction = async () => {
           `http://${process.env.PIDSG}/api/pid/pidatalog`,
           {
             badgeno: transactionPending[i].badgeId,
-            logindate: "",
+            logindate: transactionPending[i].recordDate,
             stationname: transactionPending[i].station,
             frombinname: transactionPending[i].fromContainer,
             tobinname: transactionPending[i].toBin,
@@ -889,6 +889,7 @@ const sendWeight = async (name, weight) => {
     );
     return true;
   } catch (error) {
+    
     return false;
   }
 };
