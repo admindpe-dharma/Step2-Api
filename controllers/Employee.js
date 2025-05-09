@@ -865,7 +865,13 @@ export const syncPIDSGBinContainerAPI = async (req,res)=>{
 }
 export const ResetNetworkInterface = ()=>
 {
-    return execSync(`sudo service networking restart`).toString();
+  const res = [];
+  res.push(
+    execSync(`sudo service networking restart`).toString());
+  res.push(
+    execSync(`sudo bash -c "echo '' > /etc/resolv.conf"`).toString()
+  );
+  return res;
 }
 const WriteErrorLog = (url,msg)=>{
   
