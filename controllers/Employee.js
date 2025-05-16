@@ -439,6 +439,7 @@ export const SaveTransaksiCollection = async (req, res) => {
   {
     return res.status(404).json({msg:res1.msg});
   }
+  payload.recordDate = moment().format("YYYY-MM-DD HH:mm:ss");
   if (!res1.step3)
     statusdata.push('STEP3');
   const _res = await SendPIDSG({...payload,station:station});
@@ -447,7 +448,7 @@ export const SaveTransaksiCollection = async (req, res) => {
   payload.status = statusdata.length==0 ?  "Done" : `PENDING|${statusdata.join('|')}`;
   payload.success  = statusdata.length==0;
   payload.weight = res1.weight;
-  payload.recordDate = moment().format("YYYY-MM-DD HH:mm:ss");
+//  payload.recordDate = moment().format("YYYY-MM-DD HH:mm:ss");
   (await transaction.create(payload)).save();
   pendingQueue.add({id:0});
   res.status(200).json({ msg: "ok" });
