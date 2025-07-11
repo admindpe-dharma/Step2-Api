@@ -370,7 +370,7 @@ const UpdateStep1 = async (idscraplog,isDone,type,weight,logindate)=>{
           timeout:3000,
         }
       );
-      await db.query(`Update transaction set status='Done' where idscraplog=? and status='Step-1';`,{
+      await db.query(`Update transaction set status='Done' where idscraplog=? and status != 'Done';`,{
         type: QueryTypes.BULKUPDATE,
         replacements: [idscraplog]
       });
@@ -378,14 +378,14 @@ const UpdateStep1 = async (idscraplog,isDone,type,weight,logindate)=>{
     else
     {    
 
-      await db.query(`Update transaction set status='PENDING|STEP1' where idscraplog=? and status='Step-1';`,{
+      await db.query(`Update transaction set status='PENDING|STEP1' where idscraplog=? and status != 'Done';`,{
         type: QueryTypes.BULKUPDATE,
         replacements: [idscraplog]
       });
     }
     return true;
   } catch (err) {
-    await db.query(`Update transaction set status='PENDING|STEP1' where idscraplog=? and status='Step-1';`,{
+    await db.query(`Update transaction set status='PENDING|STEP1' where idscraplog=? and status='Done';`,{
       type: QueryTypes.BULKUPDATE,
       replacements: [idscraplog]
     });
@@ -666,9 +666,6 @@ export const syncPendingTransaction = async () => {
         if (res.status >= 200 && res.status < 300) {
           const index = statuses.indexOf("PIDSG");
           statuses.splice(index, 1);
-        }
-        else
-        {
           await UpdateStep1(transactionPending[i].idscraplog,true,transactionPending[i].type,transactionPending[i].weight,transactionPending[i].recordDate);
         }
       } catch(e) {
