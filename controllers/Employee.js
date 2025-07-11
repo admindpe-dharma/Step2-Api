@@ -262,7 +262,7 @@ export const ExecuteDispose =  async ()=>{
     try
     {     
       const _res = await SendPIDSG({...payloads[i]});
-      if (payloads[i].idscraplog && _res)
+      if (payloads[i].idscraplog )
       {
           await UpdateStep1(payloads[i].idscraplog,_res,payloads[i].type,payloads[i].weight,payloads[i].recordDate);
       }
@@ -620,7 +620,7 @@ export const UpdateBinWeightCollection = async (req, res) => {
 };
 export const syncPendingTransaction = async () => {
   const transactionPendingRecords = await db.query(
-    `Select t.id,c.station,t.toBin,t.fromContainer,t.recordDate,t.weight,t.type,t.badgeId,t.status,w.handletype,t.idscraplog from transaction t inner join waste w on t.idWaste=w.id left join container c on t.idContainer=c.containerId where t.status like '%PENDING%';`
+    `Select t.id,c.station,t.toBin,t.fromContainer,t.recordDate,t.weight,t.type,t.badgeId,t.status,w.handletype,t.idscraplog from transaction t inner join waste w on t.idWaste=w.id left join container c on t.idContainer=c.containerId where t.status like '%PENDING%' order by t.id;`
   );
   if (!transactionPendingRecords || transactionPendingRecords.length < 1)
     return transactionPendingRecords;
@@ -667,12 +667,25 @@ export const syncPendingTransaction = async () => {
           const index = statuses.indexOf("PIDSG");
           statuses.splice(index, 1);
         }
+        else
+        {
+          await UpdateStep1(transactionPending[i].idscraplog,true,transactionPending[i].type,transactionPending[i].weight,transactionPending[i].recordDate);
+        }
       } catch(e) {
         console.log(e);
       }
     }
     if (statuses.includes("STEP1")) {
       try {
+        const check = await db.query(
+          `Select count(*) as c from transaction t inner join waste w on t.idWaste=w.id left join container c on t.idContainer=c.containerId where t.status like '%PIDSG%' and t.idscraplog=?;`,
+          {
+            type: QueryTypes.SELECT,
+            replacements: [transactionPending[i].idscraplog]
+          }
+        );
+          if (check[0].c > 0)
+            break;
         const resStep1  = await axios.put(
           `http://${process.env.STEP1}/step1/` + transactionPending[i].idscraplog,
           { status: "Done", logindate: formatDate(new Date().toISOString()) },
