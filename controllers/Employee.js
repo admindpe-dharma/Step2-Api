@@ -682,7 +682,7 @@ export const syncPendingTransaction = async () => {
           }
         );
           if (check[0].c > 0)
-            break;
+            continue;
         const resStep1  = await axios.put(
           `http://${process.env.STEP1}/step1/` + transactionPending[i].idscraplog,
           { status: "Done", logindate: formatDate(new Date().toISOString()) },
