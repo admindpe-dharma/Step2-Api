@@ -25,6 +25,9 @@ const bin = db.define('bin', {
     },
     name_hostname: {
         type:DataTypes.STRING,
+    },
+    dispose: {
+        type: DataTypes.BOOLEAN
     }
 
 }, {

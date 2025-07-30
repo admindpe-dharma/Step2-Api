@@ -202,7 +202,8 @@ export const CheckBinCapacity = async (req, res) => {
 
     // Memilih tempat sampah yang paling kosong
     let selectedBin = eligibleBins[0];
-
+    selectedBin.dispose = true;
+    await selectedBin.save();
     res.status(200).json({ success: true, bin: selectedBin });
   } catch (error) {
     console.log("Error checking bin capacity:", error);
@@ -238,6 +239,10 @@ export const SaveTransaksi = async (req, res) => {
       payloads[i].status = "READY";
       payloads[i].success = 0;
       (await transaction.create(payloads[i])).save();
+      await db.query("update bin set dispose=0 where name=?",{
+        replacements: [payloads[i].name],
+        type: QueryTypes.UPDATE
+      });
     }
     catch (er)
     {
