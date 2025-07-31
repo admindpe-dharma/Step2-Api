@@ -31,7 +31,7 @@ const getBinByHostname = async (hostname)=>{
     const bin = await Bin.findOne({ where: { name_hostname: hostname } });
     let payload = {};
     if (bin) {
-        payload = { weight: bin.weight,max_weight: bin.max_weight };
+        payload = { weight: bin.weight,max_weight: bin.max_weight,...bin };
     } else {
         payload = { error: 'Bin not found' };
     }
