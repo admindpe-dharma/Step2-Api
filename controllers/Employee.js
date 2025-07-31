@@ -240,7 +240,7 @@ export const SaveTransaksi = async (req, res) => {
       payloads[i].success = 0;
       (await transaction.create(payloads[i])).save();
       await db.query("update from bin set dispose=0 where b.name=?",{
-        replacements: [payloads[i].tobin],
+        replacements: [payloads[i].toBin],
         type: QueryTypes.UPDATE
       });
     }
