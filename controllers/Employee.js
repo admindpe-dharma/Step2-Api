@@ -207,7 +207,7 @@ export const CheckBinCapacity = async (req, res) => {
       {
         timeout: 5000
       });
-      check =  (res.data.isRunning == true)
+      check =  (res.data.isRunning == false)
     }
     catch{
       check = false;
