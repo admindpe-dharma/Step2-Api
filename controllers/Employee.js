@@ -199,10 +199,21 @@ export const CheckBinCapacity = async (req, res) => {
     eligibleBins = eligibleBins.sort(
       (a, b) => parseFloat(a.weight) - parseFloat(b.weight)
     );
-
+    let check = false;
+    try
+    {
+      const res = await axios.get(`http://${binName}.local:5000/status`,
+      {
+        timeout: 1000
+      });
+      check =  (res.data.isRunning == true)
+    }
+    catch{
+      check = false;
+    }
     // Memilih tempat sampah yang paling kosong
     let selectedBin = eligibleBins[0];
-    selectedBin.dispose = true;
+    selectedBin.dispose = check;
     await selectedBin.save();
     res.status(200).json({ success: true, bin: selectedBin });
   } catch (error) {
