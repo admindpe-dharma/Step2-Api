@@ -239,8 +239,8 @@ export const SaveTransaksi = async (req, res) => {
       payloads[i].status = "READY";
       payloads[i].success = 0;
       (await transaction.create(payloads[i])).save();
-      await db.query("update bin set dispose=0 where name=?",{
-        replacements: [payloads[i].name],
+      await db.query("update from bin set dispose=0 where b.name=?",{
+        replacements: [payloads[i].tobin],
         type: QueryTypes.UPDATE
       });
     }
