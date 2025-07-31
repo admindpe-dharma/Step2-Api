@@ -200,21 +200,6 @@ export const CheckBinCapacity = async (req, res) => {
       (a, b) => parseFloat(a.weight) - parseFloat(b.weight)
     );
     let selectedBin = eligibleBins[0];
-    let check = false;
-    try
-    {
-      const res = await axios.get(`http://${selectedBin.dataValues.name_hostname}.local:5000/status`,
-      {
-        timeout: 5000
-      });
-      check =  (res.data.isRunning == false)
-    }
-    catch{
-      check = false;
-    }
-    // Memilih tempat sampah yang paling kosong
-    selectedBin.dispose = check;
-    await selectedBin.save();
     res.status(200).json({ success: true, bin: selectedBin });
   } catch (error) {
     console.log("Error checking bin capacity:", error);
@@ -267,6 +252,28 @@ export const SaveTransaksi = async (req, res) => {
   pendingQueue.add({id:0});
   return res.status(200).json({ msg: "ok" });
 };
+export const StartDispose = async (req,res)=>{
+  const {bin} = req.body;
+  const selectedBin = await Bin.findOne({where: {name:bin.name}});
+  if (selectedBin == null)
+    return res.status(404).json({msg:"Not found"});
+  let check = false;
+  try
+  {
+    const res = await axios.get(`http://${selectedBin.dataValues.name_hostname}.local:5000/status`,
+    {
+      timeout: 5000
+    });
+    check =  (res.data.isRunning == false)
+  }
+  catch{
+    check = false;
+  }
+  // Memilih tempat sampah yang paling kosong
+  selectedBin.dispose = check;
+  await selectedBin.save();
+  return res.json({msg:"ok"});
+}
 export const ExecuteDispose =  async ()=>{
   const payloads = await db.query(
     `Select t.id,c.station,t.toBin,t.fromContainer,t.weight,t.type,t.badgeId,t.status,w.handletype,t.idscraplog,t.recordDate from transaction t inner join waste w on t.idWaste=w.id left join container c on t.idContainer=c.containerId where t.status='READY';`,{
