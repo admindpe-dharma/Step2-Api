@@ -205,7 +205,7 @@ export const CheckBinCapacity = async (req, res) => {
     {
       const res = await axios.get(`http://${selectedBin.dataValues.name_hostname}.local:5000/status`,
       {
-        timeout: 1000
+        timeout: 5000
       });
       check =  (res.data.isRunning == true)
     }
