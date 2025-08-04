@@ -253,7 +253,7 @@ export const SaveTransaksi = async (req, res) => {
   return res.status(200).json({ msg: "ok" });
 };
 export const ResetDispose = async (req,res)=>{
-  await db.query("Update bin set dispose=0");
+  await db.query("update bin set dispose=0",{type:QueryTypes.BULKUPDATE});
   return res.json({msg:"ok"}); 
 }
 export const StartDispose = async (req,res)=>{
