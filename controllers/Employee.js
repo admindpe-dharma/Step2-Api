@@ -252,6 +252,10 @@ export const SaveTransaksi = async (req, res) => {
   pendingQueue.add({id:0});
   return res.status(200).json({ msg: "ok" });
 };
+export const ResetDispose = async (req,res)=>{
+  db.query("Update bin set dispose=0");
+  return res.json({msg:"ok"}); 
+}
 export const StartDispose = async (req,res)=>{
   const {bin} = req.body;
   const selectedBin = await Bin.findOne({where: {name:bin.name}});
