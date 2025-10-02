@@ -28,6 +28,9 @@ const bin = db.define('bin', {
     },
     dispose: {
         type: DataTypes.BOOLEAN
+    },
+    disabled:{
+        type: DataTypes.BOOLEAN
     }
 
 }, {

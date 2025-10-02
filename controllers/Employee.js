@@ -158,7 +158,15 @@ export const VerificationScan = async (req, res) => {
     res.status(500).json({ msg: "Terjadi kesalahan server" });
   }
 };
-
+export const EnableBin = async (req,res)=>{
+  const {binId} = req.params;
+  const {value} = req.query;
+  await db.query("Update bin set disabled=? where id=?",{
+    replacements: [value,binId],
+    type: QueryTypes.UPDATE
+  });
+  return res.json({msg:"ok"});
+}
 export const CheckBinCapacity = async (req, res) => {
   const { IdWaste, neto } = req.body;
   try {
@@ -166,6 +174,7 @@ export const CheckBinCapacity = async (req, res) => {
     const bins = await Bin.findAll({
       where: {
         IdWaste: IdWaste,
+        disabled: 0
       },
     });
 
@@ -222,7 +231,7 @@ const UpdateBinWeightInternal = async (binId,neto)=>{
   return true;
 }
 export const SaveTransaksi = async (req, res) => {
-  const { payload,binId } = req.body;
+  const { payload,binId,disable } = req.body;
   const payloads = Array.isArray(payload) ? payload : [payload];
   for (let i=0;i<payloads.length;i++)
   {
@@ -235,8 +244,8 @@ export const SaveTransaksi = async (req, res) => {
       payloads[i].status = "READY";
       payloads[i].success = 0;
       (await transaction.create(payloads[i])).save();
-      await db.query("update  bin set dispose=0 where name=?",{
-        replacements: [payloads[i].toBin],
+      await db.query("update  bin set dispose=0,disabled=? where name=?",{
+        replacements: [disable,payloads[i].toBin],
         type: QueryTypes.UPDATE
       });
     }
