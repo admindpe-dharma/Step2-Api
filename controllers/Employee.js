@@ -231,7 +231,7 @@ const UpdateBinWeightInternal = async (binId,neto)=>{
   return true;
 }
 export const SaveTransaksi = async (req, res) => {
-  const { payload,binId,disable } = req.body;
+  const { payload,binId,disabled } = req.body;
   const payloads = Array.isArray(payload) ? payload : [payload];
   for (let i=0;i<payloads.length;i++)
   {
@@ -245,7 +245,7 @@ export const SaveTransaksi = async (req, res) => {
       payloads[i].success = 0;
       (await transaction.create(payloads[i])).save();
       await db.query("update  bin set dispose=0,disabled=? where name=?",{
-        replacements: [disable,payloads[i].toBin],
+        replacements: [disabled,payloads[i].toBin],
         type: QueryTypes.UPDATE
       });
     }
