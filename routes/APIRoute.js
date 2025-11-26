@@ -20,6 +20,7 @@ routes.get('/reset',(req,res)=>{
 });
 routes.post('/start',StartDispose);
 routes.post('/enablebin/:binId',EnableBin);
+routes.get('/enablebin/:binId',EnableBin);
 routes.get('/client-bin',(req,res)=>res.json({connected_bin:clientList}));
 routes.get('/reset-network',(req,res)=>res.json({netowrk_reset:ResetNetworkInterface()}));
 routes.post('/set-password',SavePasswordTimbangan);

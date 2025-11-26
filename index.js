@@ -74,7 +74,32 @@ setInterval(()=>{
 },1000);
 
 const [scale4Queue,scale50Queue,pendingQueue,employeeQueue,weightbinQueue,RackSyncQueue,DisposeQueue]
- = [Queue('scale4Queue',{limiter:{max:3,duration:1000}}),Queue('scale50Queue',{limiter:{max:3,duration:1000}}),Queue('pending'),Queue('employee'),Queue('weightbin'),Queue('Rack Sync Queue'),Queue('Dispose Task Queue')];
+ = [Queue('scale4Queue',{limiter:{max:3,duration:1000},defaultJobOptions:{
+  removeOnFail:{age: 60*10,count:10},timeout:3000,removeOnComplete:{age:60,count:5}
+ } }),Queue('scale50Queue',{limiter:{max:3,duration:1000},
+defaultJobOptions:{
+  removeOnFail:{age: 60*10,count:10},timeout:3000,removeOnComplete:{age:60,count:5}
+}}),Queue('pending',{
+  defaultJobOptions:{
+    removeOnFail:{age: 60*10,count:10},timeout:3000,removeOnComplete:{age:60,count:5}
+  }
+}),Queue('employee',{
+  defaultJobOptions:{
+    removeOnFail:{age: 60*10,count:10},timeout:3000,removeOnComplete:{age:60,count:5}
+  }
+}),Queue('weightbin',{
+  defaultJobOptions:{
+    removeOnFail:{age: 60*10,count:10},timeout:3000,removeOnComplete:{age:60,count:5}
+  }
+}),Queue('Rack Sync Queue',{
+  defaultJobOptions:{
+    removeOnFail:{age: 60*10,count:10},timeout:3000,removeOnComplete:{age:60,count:5}
+  }
+}),Queue('Dispose Task Queue',{
+  defaultJobOptions:{
+    removeOnFail:{age: 60*10,count:10},timeout:3000,removeOnComplete:{age:60,count:5}
+  }
+})];
  const EthObserverQueue = new Queue("ETH1 (USB - LAN) Observation Task Queue",{
   limiter: { 
     duration: 1000,

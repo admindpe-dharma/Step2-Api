@@ -231,7 +231,8 @@ const UpdateBinWeightInternal = async (binId,neto)=>{
   return true;
 }
 export const SaveTransaksi = async (req, res) => {
-  const { payload,binId,disabled } = req.body;
+  const { payload,binId } = req.body;
+  const disabled = 0;
   const payloads = Array.isArray(payload) ? payload : [payload];
   for (let i=0;i<payloads.length;i++)
   {
