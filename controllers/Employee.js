@@ -209,7 +209,7 @@ export const CheckBinCapacity = async (req, res) => {
       (a, b) => parseFloat(a.weight) - parseFloat(b.weight)
     );
     let selectedBin = eligibleBins[0];
-    res.status(200).json({ success: true, bin: selectedBin });
+    res.status(200).json({ success: true, bin: selectedBin,bins: eligibleBins });
   } catch (error) {
     console.log("Error checking bin capacity:", error);
     res.status(500).json({ success: false, message: "Internal Server Error" });
