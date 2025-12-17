@@ -336,6 +336,16 @@ export const getTransaction = async (req, res) => {
     },
     order: [["recordDate", "DESC"]],
   });
+  
+  if (!tr)
+  {
+    setTimeout( async ()=>{
+      await axios.get(
+        `http://${process.env.STEP1}/sync-all`,
+        { timeout: 10000 }
+      );
+    },100);
+  }
   return res.status(!tr ? 404 : 200).json(!tr ? { msg: "not found" } : tr);
 };
 export const syncTransactionStep1 = async () => {
